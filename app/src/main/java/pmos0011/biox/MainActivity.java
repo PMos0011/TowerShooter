@@ -8,14 +8,16 @@ import android.view.View;
 
 public class MainActivity extends AppCompatActivity {
 
+    private GamePlaySurfaceView glView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        glView = new GamePlaySurfaceView(this);
+        setContentView(glView);
+
     }
 
-    public void startGame(View view){
-        Intent intent = new Intent(this, GamePlayActivity.class);
-        startActivity(intent);
-    }
 }
