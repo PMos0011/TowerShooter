@@ -1,6 +1,10 @@
 package pmos0011.biox;
 
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.opengl.GLES31;
+import android.opengl.GLUtils;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -10,24 +14,31 @@ import java.nio.ShortBuffer;
 public class Texture {
 
     private final String vertexShaderCode =
-            "attribute vec4 vPosition;" +
+            "attribute vec4 a_Position;" +
+                    "attribute vec2 a_TexCoordinate;"+
+                    "varying vec2 v_TexCoordinate;"+
                     "void main() {" +
-                    "  gl_Position = vPosition;" +
+                    "v_TexCoordinate = a_TexCoordinate;"+
+                    "  gl_Position = a_Position;" +
                     "}";
 
     private final String fragmentShaderCode =
             "precision mediump float;" +
-                    "uniform vec4 vColor;" +
+                    "uniform sampler2D u_Texture;"+
+                    "varying vec2 v_TexCoordinate;"+
                     "void main() {" +
-                    "  gl_FragColor = vColor;" +
+                    "  gl_FragColor = texture2D(u_Texture, v_TexCoordinate);" +
                     "}";
 
 
+    final int[] textureHandle = new int[1];
     private FloatBuffer vertexBuffer;
+    private FloatBuffer textureBuffer;
     private ShortBuffer drawListBuffer;
     private final int mProgram;
 
     static final int COORDS_PER_VERTEX = 2;
+
     static float squareCoords[] = {
             -1.0f,  1.0f,
             -1.0f, -1.0f,
@@ -35,17 +46,23 @@ public class Texture {
              1.0f,  1.0f
     };
 
+    final float[] textureCords =
+            {
+                    0.0f, 1.0f,
+                    0.0f, 0.0f,
+                    1.0f, 0.0f,
+                    1.0f, 1.0f
+            };
+
     short drawOrder[]={0, 1, 2,
-                       0, 2, 3
+            0, 2, 3
     };
 
-    float color[] = { 0.6f, 0.8f, 0.2f, 1.0f };
-
     private int positionHandle;
-    private int colorHandle;
+    private int mTextureHandle;
+    private int textureCoordinateHandle;
+    private final int vertexStride = COORDS_PER_VERTEX * 4;
 
-
-    private final int vertexStride = COORDS_PER_VERTEX * 4;    private final int vertexCount = squareCoords.length / COORDS_PER_VERTEX;
 
     public Texture(){
 
@@ -60,6 +77,12 @@ public class Texture {
         drawListBuffer = dlb.asShortBuffer();
         drawListBuffer.put(drawOrder);
         drawListBuffer.position(0);
+
+        ByteBuffer tlb = ByteBuffer.allocateDirect(textureCords.length * 4);
+        tlb.order(ByteOrder.nativeOrder());
+        textureBuffer = tlb.asFloatBuffer();
+        textureBuffer.put(textureCords);
+        textureBuffer.position(0);
 
         int vertexShader = GamePlayRenderer.loadShader(GLES31.GL_VERTEX_SHADER,
                 vertexShaderCode);
@@ -77,21 +100,46 @@ public class Texture {
 
         GLES31.glUseProgram(mProgram);
 
-        positionHandle = GLES31.glGetAttribLocation(mProgram, "vPosition");
+        positionHandle = GLES31.glGetAttribLocation(mProgram, "a_Position");
+        mTextureHandle = GLES31.glGetUniformLocation(mProgram, "u_Texture");
+        textureCoordinateHandle = GLES31.glGetAttribLocation(mProgram, "a_TexCoordinate");
 
-        GLES31.glEnableVertexAttribArray(positionHandle);
+        GLES31.glActiveTexture(GLES31.GL_TEXTURE0);
+        GLES31.glBindTexture(GLES31.GL_TEXTURE_2D, textureHandle[0]);
+        GLES31.glUniform1i(mTextureHandle, 0);
 
         GLES31.glVertexAttribPointer(positionHandle, COORDS_PER_VERTEX,
                 GLES31.GL_FLOAT, false,
                 vertexStride, vertexBuffer);
+        GLES31.glEnableVertexAttribArray(positionHandle);
 
-        colorHandle = GLES31.glGetUniformLocation(mProgram, "vColor");
-
-        GLES31.glUniform4fv(colorHandle, 1, color, 0);
+        GLES31.glVertexAttribPointer(textureCoordinateHandle, COORDS_PER_VERTEX,
+                GLES31.GL_FLOAT, false,
+                0, textureBuffer);
+        GLES31.glEnableVertexAttribArray(textureCoordinateHandle);
 
         GLES31.glDrawElements(GLES31.GL_TRIANGLES, drawOrder.length,
                 GLES31.GL_UNSIGNED_SHORT, drawListBuffer);
 
         GLES31.glDisableVertexAttribArray(positionHandle);
+        GLES31.glDisableVertexAttribArray(textureCoordinateHandle);
+    }
+
+    public void loadTexture(Context context, int texture_id){
+        GLES31.glGenTextures(1, textureHandle, 0);
+
+        final BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inScaled = false;
+
+        final Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), texture_id, options);
+
+        GLES31.glBindTexture(GLES31.GL_TEXTURE_2D, textureHandle[0]);
+
+        GLES31.glTexParameteri(GLES31.GL_TEXTURE_2D, GLES31.GL_TEXTURE_MIN_FILTER, GLES31.GL_NEAREST);
+        GLES31.glTexParameteri(GLES31.GL_TEXTURE_2D, GLES31.GL_TEXTURE_MAG_FILTER, GLES31.GL_NEAREST);
+
+        GLUtils.texImage2D(GLES31.GL_TEXTURE_2D, 0, bitmap, 0);
+
+        bitmap.recycle();
     }
 }

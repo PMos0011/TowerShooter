@@ -12,7 +12,7 @@ public class GamePlaySurfaceView extends GLSurfaceView {
 
         setEGLContextClientVersion(3);
 
-        renderer = new GamePlayRenderer();
+        renderer = new GamePlayRenderer(context);
 
         setRenderer(renderer);
         setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
