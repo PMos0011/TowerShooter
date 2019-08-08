@@ -8,7 +8,6 @@ import android.view.MotionEvent;
 public class GamePlaySurfaceView extends GLSurfaceView {
 
     private final GamePlayRenderer renderer;
-    final static String TAG = "Touch point ";
 
     public GamePlaySurfaceView(Context context) {
         super(context);
@@ -26,39 +25,45 @@ public class GamePlaySurfaceView extends GLSurfaceView {
         float x = e.getX();
         float y = e.getY();
 
-        Log.d(TAG,x+", "+y);
         switch (e.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                if (y > 500) {
-                    if (x < 200) {
+                if (y > renderer.leftArrow.position.y-renderer.leftArrow.halfDimension) {
+                    if (x > renderer.leftArrow.position.x-renderer.leftArrow.halfDimension
+                    && x<renderer.leftArrow.position.x+renderer.leftArrow.halfDimension) {
+                        renderer.rotateLeft = false;
+                        renderer.rotateRight = true;
+                    } else if (x > renderer.rightArrow.position.x-renderer.rightArrow.halfDimension
+                            && x<renderer.rightArrow.position.x+renderer.rightArrow.halfDimension) {
                         renderer.rotateLeft = true;
                         renderer.rotateRight = false;
-                    } else if (x > 500) {
-                        renderer.rotateRight = true;
-                        renderer.rotateLeft = false;
                     }
                 }
                 break;
 
             case MotionEvent.ACTION_MOVE:
-                if (y > 500) {
-                    if (x < 200) {
+                if (y > renderer.leftArrow.position.y-renderer.leftArrow.halfDimension) {
+                    if (x > renderer.leftArrow.position.x-renderer.leftArrow.halfDimension
+                            && x<renderer.leftArrow.position.x+renderer.leftArrow.halfDimension) {
+                        renderer.rotateLeft = false;
+                        renderer.rotateRight = true;
+                    } else if (x > renderer.rightArrow.position.x-renderer.rightArrow.halfDimension
+                            && x<renderer.rightArrow.position.x+renderer.rightArrow.halfDimension) {
                         renderer.rotateLeft = true;
                         renderer.rotateRight = false;
-                    } else if (x > 500) {
-                        renderer.rotateRight = true;
+                    }else{
                         renderer.rotateLeft = false;
+                        renderer.rotateRight = false;
                     }
                 }
                 else{
-                    renderer.rotateRight = false;
                     renderer.rotateLeft = false;
+                    renderer.rotateRight = false;
                 }
                 break;
 
             case MotionEvent.ACTION_UP:
-                renderer.rotateRight = false;
                 renderer.rotateLeft = false;
+                renderer.rotateRight = false;
                 break;
         }
 

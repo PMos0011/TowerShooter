@@ -16,12 +16,13 @@ public class Texture {
 
     private final String vertexShaderCode =
             "attribute vec4 a_Position;" +
-                    "uniform mat4 u_mVPMatrix;" +
+                    "uniform mat4 u_mModelMatrix;" +
+                    "uniform mat4 u_mProjectionMatrix;" +
                     "attribute vec2 a_TexCoordinate;" +
                     "varying vec2 v_TexCoordinate;" +
                     "void main() {" +
                     "v_TexCoordinate = a_TexCoordinate;" +
-                    "  gl_Position = u_mVPMatrix*a_Position;" +
+                    "  gl_Position = (u_mProjectionMatrix*u_mModelMatrix)*a_Position;" +
                     "}";
 
     private final String fragmentShaderCode =
@@ -34,6 +35,11 @@ public class Texture {
                     "}";
 
 
+    public void setmProjectionMatrix(float[] mProjectionMatrix) {
+        this.mProjectionMatrix = mProjectionMatrix;
+    }
+
+    float[] mProjectionMatrix = new float[16];
 
     private FloatBuffer vertexBuffer;
     private FloatBuffer textureBuffer;
@@ -44,7 +50,8 @@ public class Texture {
     private int positionHandle;
     private int mTextureHandle;
     private int textureCoordinateHandle;
-    private int mVPMatrixHandle;
+    private int mModelMatrixHandle;
+    private int mProjectionMatrixHandle;
     private int mColorHandle;
     private final int COORDS_PER_VERTEX = 2;
     private final int vertexStride = COORDS_PER_VERTEX * 4;
@@ -54,6 +61,7 @@ public class Texture {
             -1.0f, -1.0f,
             1.0f, -1.0f,
             1.0f, 1.0f
+
     };
 
     float textureCords[] =
@@ -68,7 +76,10 @@ public class Texture {
             0, 2, 3
     };
 
-    public Texture() {
+    public Texture(float size_mod) {
+
+        for (int i=0; i<squareCoords.length; i++)
+            squareCoords[i]*=size_mod;
 
         ByteBuffer bb = ByteBuffer.allocateDirect(squareCoords.length * 4);
         bb.order(ByteOrder.nativeOrder());
@@ -101,7 +112,7 @@ public class Texture {
         GLES31.glLinkProgram(mProgram);
     }
 
-    public void draw(float[] mVPMatrix, int texture_handle, float opacity) {
+    public void draw(float[] mModelMatrix, int texture_handle, float opacity) {
 
         GLES31.glUseProgram(mProgram);
 
@@ -111,12 +122,14 @@ public class Texture {
         float color[] = { 1.0f, 1.0f, 1.0f, opacity };
 
         mColorHandle = GLES31.glGetUniformLocation(mProgram, "v_Color");
-        mVPMatrixHandle = GLES31.glGetUniformLocation(mProgram, "u_mVPMatrix");
+        mModelMatrixHandle = GLES31.glGetUniformLocation(mProgram, "u_mModelMatrix");
+        mProjectionMatrixHandle = GLES31.glGetUniformLocation(mProgram, "u_mProjectionMatrix");
         positionHandle = GLES31.glGetAttribLocation(mProgram, "a_Position");
         mTextureHandle = GLES31.glGetUniformLocation(mProgram, "u_Texture");
         textureCoordinateHandle = GLES31.glGetAttribLocation(mProgram, "a_TexCoordinate");
 
-        GLES31.glUniformMatrix4fv(mVPMatrixHandle, 1, false, mVPMatrix, 0);
+        GLES31.glUniformMatrix4fv(mModelMatrixHandle, 1, false, mModelMatrix, 0);
+        GLES31.glUniformMatrix4fv(mProjectionMatrixHandle, 1, false, mProjectionMatrix, 0);
 
         GLES31.glVertexAttribPointer(positionHandle, COORDS_PER_VERTEX,
                 GLES31.GL_FLOAT, false,
@@ -151,7 +164,7 @@ public class Texture {
         Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), texture_id, options);
 
         Matrix matrix = new Matrix();
-        matrix.preScale(-1.0f, -1.0f);
+        matrix.preScale(1.0f, -1.0f);
         Bitmap flippedBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
 
         GLES31.glBindTexture(GLES31.GL_TEXTURE_2D, texture_handle);
