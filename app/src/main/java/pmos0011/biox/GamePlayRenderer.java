@@ -14,22 +14,19 @@ import android.util.Log;
 public class GamePlayRenderer implements GLSurfaceView.Renderer {
     
     Context mContext;
-    Texture mBackgroundTexture;
-    Texture mMainMenuBacteria;
+    Texture mTexture;
 
     int[] staticBitmapID;
-    int[] eyeBitmapID;
-    int[] mouthBitmapID;
-    int[] barrierBitmapID;
-    int[] antennalBitmapID;
     float[] mProjectionMatrix = new float[16];
     float[] mViewMatrix = new float[16];
     float[] mModelMatrix = new float[16];
     float[] mMVPMatrix = new float[16];
     float[] mBackgroundProjectionMatrix = new float[16];
 
-    int barrierFrame = 0;
-    long last_millis = 0;
+    float turretAngle = 0;
+    public volatile boolean rotateRight=false;
+    public volatile boolean rotateLeft=false;
+
 
 
     public GamePlayRenderer(Context context) {
@@ -43,26 +40,10 @@ public class GamePlayRenderer implements GLSurfaceView.Renderer {
         //GLES31.glGenTextures(TEXTURE_COUNT, textureHandle, 0);
 
         staticBitmapID = BitmapID.getStaticBitmapID();
-        eyeBitmapID = BitmapID.getEyesBitmapID();
-        mouthBitmapID = BitmapID.getMouthBitmapID();
-        antennalBitmapID = BitmapID.getAntennalBitmapID();
-        barrierBitmapID = BitmapID.getBarrierBitmapID();
 
-        mBackgroundTexture = new Texture(1.0f);
-        mBackgroundTexture.loadTexture(mContext, staticBitmapID[0]);
-
-        mMainMenuBacteria = new Texture(1.0f);
-        for (int i = 1; i < staticBitmapID.length; i++)
-            mMainMenuBacteria.loadTexture(mContext, staticBitmapID[i]);
-
-        for (int i : barrierBitmapID)
-            mMainMenuBacteria.loadTexture(mContext, i);
-        for (int i : eyeBitmapID)
-            mMainMenuBacteria.loadTexture(mContext, i);
-        for (int i : mouthBitmapID)
-            mMainMenuBacteria.loadTexture(mContext, i);
-        for (int i : antennalBitmapID)
-            mMainMenuBacteria.loadTexture(mContext, i);
+        mTexture = new Texture();
+        for (int i = 0; i < staticBitmapID.length; i++)
+            mTexture.loadTexture(mContext, staticBitmapID[i]);
 
     }
 
@@ -75,40 +56,40 @@ public class GamePlayRenderer implements GLSurfaceView.Renderer {
         Matrix.setLookAtM(mViewMatrix, 0, 0.0f, -0.0f, -1.0f, 0.0f, 0.0f, -0.0f, 0.0f, 1.0f, 0.0f);
         Matrix.multiplyMM(mMVPMatrix, 0, mViewMatrix, 0, mModelMatrix, 0);
         Matrix.multiplyMM(mMVPMatrix, 0, mBackgroundProjectionMatrix, 0, mMVPMatrix, 0);
-        mBackgroundTexture.draw(mMVPMatrix, staticBitmapID[0], 1);
-
+        mTexture.draw(mMVPMatrix, staticBitmapID[0], 1);
 
         Matrix.setIdentityM(mModelMatrix, 0);
-        Matrix.translateM(mModelMatrix, 0, 1.0f, 0.5f, 0.0000001f);
-        Matrix.setLookAtM(mViewMatrix, 0, 0.0f, -0.0f, -2.3f, -0.0f, 0.0f, -0.0f, 0.0f, 1.0f, 0.0f);
+        Matrix.translateM(mModelMatrix, 0, 0.0f, 0.0f, 0.0000001f);
+        Matrix.setLookAtM(mViewMatrix, 0, 0.0f, -0.0f, -2.0f, -0.0f, 0.0f, -0.0f, 0.0f, 1.0f, 0.0f);
         Matrix.multiplyMM(mMVPMatrix, 0, mViewMatrix, 0, mModelMatrix, 0);
         Matrix.multiplyMM(mMVPMatrix, 0, mProjectionMatrix, 0, mMVPMatrix, 0);
-        mMainMenuBacteria.draw(mMVPMatrix, staticBitmapID[1], 1);
+        mTexture.draw(mMVPMatrix, staticBitmapID[1], 1);
 
-        long time = SystemClock.uptimeMillis() / 50;
-        if (last_millis != time) {
-            last_millis = time;
-            barrierFrame++;
-            if (barrierFrame > 28)
-                barrierFrame = 0;
-        }
+        if(rotateLeft)
+            turretAngle-=0.2f;
+        if(rotateRight)
+            turretAngle+=0.2f;
 
-        mMainMenuBacteria.draw(mMVPMatrix, barrierBitmapID[barrierFrame], 0.55f);
+        Matrix.rotateM(mModelMatrix,0,turretAngle,0.0f,0.0f,1.0f);
+        Matrix.multiplyMM(mMVPMatrix, 0, mViewMatrix, 0, mModelMatrix, 0);
+        Matrix.multiplyMM(mMVPMatrix, 0, mProjectionMatrix, 0, mMVPMatrix, 0);
 
-        for (int i : eyeBitmapID)
-            mMainMenuBacteria.draw(mMVPMatrix, i, 1);
-        for (int i : mouthBitmapID)
-            mMainMenuBacteria.draw(mMVPMatrix, i, 1);
+        for (int i=2; i<staticBitmapID.length-1; i++)
+            mTexture.draw(mMVPMatrix, staticBitmapID[i], 1);
 
-        mMainMenuBacteria.draw(mMVPMatrix, staticBitmapID[2], 1);
+        Matrix.setIdentityM(mModelMatrix, 0);
+        Matrix.translateM(mModelMatrix, 0, 7.5f, -4.0f, 0.0000001f);
+        Matrix.setLookAtM(mViewMatrix, 0, -0.0f, 0.0f, -5.0f, -0.0f, 0.0f, -0.0f, 0.0f, 1.0f, 0.0f);
+        Matrix.multiplyMM(mMVPMatrix, 0, mViewMatrix, 0, mModelMatrix, 0);
+        Matrix.multiplyMM(mMVPMatrix, 0, mProjectionMatrix, 0, mMVPMatrix, 0);
+        mTexture.draw(mMVPMatrix, staticBitmapID[staticBitmapID.length-1], 1);
 
-        for (int i : eyeBitmapID)
-            mMainMenuBacteria.draw(mMVPMatrix, i, 1);
-        for (int i : mouthBitmapID)
-            mMainMenuBacteria.draw(mMVPMatrix, i, 1);
-        for (int i : antennalBitmapID)
-            mMainMenuBacteria.draw(mMVPMatrix, i, 1);
-
+        Matrix.setIdentityM(mModelMatrix, 0);
+        Matrix.translateM(mModelMatrix, 0, 5.0f, -4.0f, 0.0000001f);
+        Matrix.rotateM(mModelMatrix,0,180.0f,0.0f,0.0f,1.0f);
+        Matrix.multiplyMM(mMVPMatrix, 0, mViewMatrix, 0, mModelMatrix, 0);
+        Matrix.multiplyMM(mMVPMatrix, 0, mProjectionMatrix, 0, mMVPMatrix, 0);
+        mTexture.draw(mMVPMatrix, staticBitmapID[staticBitmapID.length-1], 1);
     }
 
     public void onSurfaceChanged(GL10 unused, int width, int height) {

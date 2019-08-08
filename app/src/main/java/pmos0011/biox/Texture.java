@@ -68,11 +68,7 @@ public class Texture {
             0, 2, 3
     };
 
-    public Texture(float modif) {
-
-        for (int i = 0; i < squareCoords.length; i++) {
-            squareCoords[i] *= modif;
-        }
+    public Texture() {
 
         ByteBuffer bb = ByteBuffer.allocateDirect(squareCoords.length * 4);
         bb.order(ByteOrder.nativeOrder());
