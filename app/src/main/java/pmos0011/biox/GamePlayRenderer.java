@@ -15,16 +15,20 @@ import android.util.Log;
 public class GamePlayRenderer implements GLSurfaceView.Renderer {
 
     private final float Z_DIMENSION = -1.0000001f;
-    private final float GAME_CONTROL_OBJECT_SIZE = 0.25f;
+    public static final float GAME_CONTROL_OBJECT_SIZE = 0.2f;
 
     Context mContext;
     Texture backgroundTextures;
     Texture towerTextures;
     Texture buttonsTextures;
     Square laserSight;
+    Square leftCannonReload;
+    Square rightCannonReload;
 
     GameControlObjects rightArrow;
     GameControlObjects leftArrow;
+    GameControlObjects leftCannonButton;
+    GameControlObjects rightCannonButton;
 
     float ratio;
 
@@ -37,6 +41,13 @@ public class GamePlayRenderer implements GLSurfaceView.Renderer {
     float turretAngle = 0;
     public volatile boolean rotateRight = false;
     public volatile boolean rotateLeft = false;
+
+    public volatile boolean isLeftCannonReload = true;
+    public volatile boolean isRightCannonReload = true;
+    public volatile float leftCannonReloadStatus = 100.0f;
+    public volatile float rightCannonReloadStatus = 100.0f;
+    long leftCannonLastSecond = 0;
+    long rightCannonLastSecond = 0;
 
     public GamePlayRenderer(Context context) {
         mContext = context;
@@ -51,20 +62,24 @@ public class GamePlayRenderer implements GLSurfaceView.Renderer {
         staticBitmapID = BitmapID.getStaticBitmapID();
 
         backgroundTextures = new Texture(1.0f);
-        backgroundTextures.loadTexture(mContext, staticBitmapID[0]);
+        backgroundTextures.loadTexture(mContext, staticBitmapID[BitmapID.textureNames.BACKGROUND.getValue()]);
 
-        towerTextures = new Texture(0.6f);
-        for (int i = 1; i < staticBitmapID.length - 1; i++)
+        towerTextures = new Texture(0.5f);
+        for (int i = BitmapID.textureNames.TURRET_BASE.getValue(); i <= BitmapID.textureNames.TURRET_TOWER.getValue(); i++)
             towerTextures.loadTexture(mContext, staticBitmapID[i]);
 
         buttonsTextures = new Texture(GAME_CONTROL_OBJECT_SIZE);
-        buttonsTextures.loadTexture(mContext, staticBitmapID[staticBitmapID.length - 1]);
+        for (int i = BitmapID.textureNames.LEFT_ARROW.getValue(); i <= BitmapID.textureNames.RIGHT_CANNON_BUTTON.getValue(); i++)
+            buttonsTextures.loadTexture(mContext, staticBitmapID[i]);
 
         leftArrow = new GameControlObjects();
         rightArrow = new GameControlObjects();
+        leftCannonButton = new GameControlObjects();
+        rightCannonButton = new GameControlObjects();
 
         laserSight = new Square();
-
+        leftCannonReload = new Square();
+        rightCannonReload = new Square();
     }
 
     public void onDrawFrame(GL10 unused) {
@@ -73,9 +88,9 @@ public class GamePlayRenderer implements GLSurfaceView.Renderer {
 
         Matrix.setIdentityM(mModelMatrix, 0);
         Matrix.translateM(mModelMatrix, 0, 0, 0, Z_DIMENSION);
-        backgroundTextures.draw(mModelMatrix, staticBitmapID[0], 1);
-        towerTextures.draw(mModelMatrix, staticBitmapID[1], 1);
-        laserSight.draw(mModelMatrix,turretAngle);
+        backgroundTextures.draw(mModelMatrix, staticBitmapID[BitmapID.textureNames.BACKGROUND.getValue()], 1);
+        towerTextures.draw(mModelMatrix, staticBitmapID[BitmapID.textureNames.TURRET_BASE.getValue()], 1);
+        laserSight.draw(mModelMatrix, turretAngle,true);
 
         if (rotateLeft) {
             turretAngle += 0.2f;
@@ -91,18 +106,63 @@ public class GamePlayRenderer implements GLSurfaceView.Renderer {
         Matrix.rotateM(mModelMatrix, 0, turretAngle, 0, 0, 1.0f);
         Matrix.multiplyMM(mMVPMatrix, 0, mProjectionMatrix, 0, mModelMatrix, 0);
 
-        for (int i = 2; i < staticBitmapID.length - 1; i++)
+        for (int i = BitmapID.textureNames.TURRET_L_CANNON.getValue(); i <= BitmapID.textureNames.TURRET_TOWER.getValue(); i++)
             towerTextures.draw(mModelMatrix, staticBitmapID[i], 1);
 
         Matrix.setIdentityM(mModelMatrix, 0);
-        Matrix.translateM(mModelMatrix, 0, -ratio + GAME_CONTROL_OBJECT_SIZE, -1 + GAME_CONTROL_OBJECT_SIZE, Z_DIMENSION);
-        Matrix.rotateM(mModelMatrix, 0, 180.0f, 0, 0, 1.0f);
-        buttonsTextures.draw(mModelMatrix, staticBitmapID[staticBitmapID.length - 1], 1);
+        Matrix.translateM(mModelMatrix, 0, leftArrow.xOpenGLPosition, rightArrow.yOpenGLPosition, Z_DIMENSION);
+        Matrix.rotateM(mModelMatrix, 0, turretAngle, 0, 0, 1.0f);
+        buttonsTextures.draw(mModelMatrix, staticBitmapID[BitmapID.textureNames.LEFT_ARROW.getValue()], 1);
 
         Matrix.setIdentityM(mModelMatrix, 0);
-        Matrix.translateM(mModelMatrix, 0, -ratio + 3 * GAME_CONTROL_OBJECT_SIZE, -1 + GAME_CONTROL_OBJECT_SIZE, Z_DIMENSION);
+        Matrix.translateM(mModelMatrix, 0, rightArrow.xOpenGLPosition, rightArrow.yOpenGLPosition, Z_DIMENSION);
+        Matrix.rotateM(mModelMatrix, 0, turretAngle, 0, 0, 1.0f);
         Matrix.multiplyMM(mMVPMatrix, 0, mProjectionMatrix, 0, mModelMatrix, 0);
-        buttonsTextures.draw(mModelMatrix, staticBitmapID[staticBitmapID.length - 1], 1);
+        buttonsTextures.draw(mModelMatrix, staticBitmapID[BitmapID.textureNames.RIGHT_ARROW.getValue()], 1);
+
+        Matrix.setIdentityM(mModelMatrix, 0);
+        Matrix.translateM(mModelMatrix, 0, leftCannonButton.xOpenGLPosition, leftCannonButton.yOpenGLPosition, Z_DIMENSION);
+        buttonsTextures.draw(mModelMatrix, staticBitmapID[BitmapID.textureNames.LEFT_CANNON_BUTTON.getValue()], 1);
+
+        Matrix.setIdentityM(mModelMatrix, 0);
+        Matrix.translateM(mModelMatrix, 0, rightCannonButton.xOpenGLPosition, rightCannonButton.yOpenGLPosition, Z_DIMENSION);
+        buttonsTextures.draw(mModelMatrix, staticBitmapID[BitmapID.textureNames.RIGHT_CANNON_BUTTON.getValue()], 1);
+
+
+        if (isLeftCannonReload) {
+            Matrix.setIdentityM(mModelMatrix, 0);
+            Matrix.translateM(mModelMatrix, 0, leftCannonButton.xOpenGLPosition, leftCannonButton.yOpenGLPosition, Z_DIMENSION);
+            leftCannonReload.draw(mModelMatrix, leftCannonReloadStatus,false);
+
+            long time = SystemClock.uptimeMillis() / 10;
+            if (leftCannonLastSecond != time) {
+                leftCannonReloadStatus-=0.2f;
+                leftCannonLastSecond = time;
+            }
+
+            if (leftCannonReloadStatus <= 0) {
+                isLeftCannonReload = false;
+                leftCannonReloadStatus = 100;
+            }
+        }
+
+        if (isRightCannonReload) {
+            Matrix.setIdentityM(mModelMatrix, 0);
+            Matrix.translateM(mModelMatrix, 0, rightCannonButton.xOpenGLPosition, rightCannonButton.yOpenGLPosition, Z_DIMENSION);
+            Matrix.rotateM(mModelMatrix, 0, 180, 0, 0, 1.0f);
+            rightCannonReload.draw(mModelMatrix, leftCannonReloadStatus,false);
+
+            long time = SystemClock.uptimeMillis() / 10;
+            if (rightCannonLastSecond != time) {
+                rightCannonReloadStatus-=0.2f;
+                rightCannonLastSecond = time;
+            }
+
+            if (rightCannonReloadStatus <= 0) {
+                isRightCannonReload = false;
+                rightCannonReloadStatus = 100;
+            }
+        }
 
 
     }
@@ -117,11 +177,14 @@ public class GamePlayRenderer implements GLSurfaceView.Renderer {
         towerTextures.setmProjectionMatrix(mProjectionMatrix);
         buttonsTextures.setmProjectionMatrix(mProjectionMatrix);
 
-        leftArrow.setObject(width, height, mProjectionMatrix, 0.2f, -ratio + GAME_CONTROL_OBJECT_SIZE, -1 + GAME_CONTROL_OBJECT_SIZE);
-        rightArrow.setObject(width, height, mProjectionMatrix, 0.2f, -ratio + 3 * GAME_CONTROL_OBJECT_SIZE, -1 + GAME_CONTROL_OBJECT_SIZE);
+        leftArrow.setObject(width, height, mProjectionMatrix, GAME_CONTROL_OBJECT_SIZE, -ratio + 1.5f * GAME_CONTROL_OBJECT_SIZE, -1 + GAME_CONTROL_OBJECT_SIZE);
+        rightArrow.setObject(width, height, mProjectionMatrix, GAME_CONTROL_OBJECT_SIZE, -ratio + 4.0f * GAME_CONTROL_OBJECT_SIZE, -1 + GAME_CONTROL_OBJECT_SIZE);
+        leftCannonButton.setObject(width, height, mProjectionMatrix, GAME_CONTROL_OBJECT_SIZE, ratio - 4.0f * GAME_CONTROL_OBJECT_SIZE, -1 + GAME_CONTROL_OBJECT_SIZE);
+        rightCannonButton.setObject(width, height, mProjectionMatrix, GAME_CONTROL_OBJECT_SIZE, ratio - 1.5f * GAME_CONTROL_OBJECT_SIZE, -1 + GAME_CONTROL_OBJECT_SIZE);
 
         laserSight.setSquare(mProjectionMatrix, ratio);
-
+        leftCannonReload.setSquare(mProjectionMatrix, ratio);
+        rightCannonReload.setSquare(mProjectionMatrix, ratio);
     }
 
     public static int loadShader(int type, String shaderCode) {

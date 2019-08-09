@@ -7,8 +7,8 @@ import android.util.Log;
 public class GameControlObjects {
     public Point position;
     public int halfDimension;
-    float xOpenGLPosition;
-    float yOpenGLPosition;
+    public float xOpenGLPosition;
+    public float yOpenGLPosition;
 
     public GameControlObjects() {
     }
