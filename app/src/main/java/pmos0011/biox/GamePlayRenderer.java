@@ -16,11 +16,12 @@ public class GamePlayRenderer implements GLSurfaceView.Renderer {
 
     private final float Z_DIMENSION = -1.0000001f;
     private final float GAME_CONTROL_OBJECT_SIZE = 0.25f;
-    
+
     Context mContext;
     Texture backgroundTextures;
     Texture towerTextures;
     Texture buttonsTextures;
+    Square laserSight;
 
     GameControlObjects rightArrow;
     GameControlObjects leftArrow;
@@ -34,8 +35,8 @@ public class GamePlayRenderer implements GLSurfaceView.Renderer {
     float[] mBackgroundProjectionMatrix = new float[16];
 
     float turretAngle = 0;
-    public volatile boolean rotateRight=false;
-    public volatile boolean rotateLeft=false;
+    public volatile boolean rotateRight = false;
+    public volatile boolean rotateLeft = false;
 
     public GamePlayRenderer(Context context) {
         mContext = context;
@@ -53,14 +54,16 @@ public class GamePlayRenderer implements GLSurfaceView.Renderer {
         backgroundTextures.loadTexture(mContext, staticBitmapID[0]);
 
         towerTextures = new Texture(0.6f);
-        for (int i = 1; i < staticBitmapID.length-1; i++)
+        for (int i = 1; i < staticBitmapID.length - 1; i++)
             towerTextures.loadTexture(mContext, staticBitmapID[i]);
 
         buttonsTextures = new Texture(GAME_CONTROL_OBJECT_SIZE);
-        buttonsTextures.loadTexture(mContext, staticBitmapID[staticBitmapID.length-1]);
+        buttonsTextures.loadTexture(mContext, staticBitmapID[staticBitmapID.length - 1]);
 
         leftArrow = new GameControlObjects();
         rightArrow = new GameControlObjects();
+
+        laserSight = new Square();
 
     }
 
@@ -71,32 +74,38 @@ public class GamePlayRenderer implements GLSurfaceView.Renderer {
         Matrix.setIdentityM(mModelMatrix, 0);
         Matrix.translateM(mModelMatrix, 0, 0, 0, Z_DIMENSION);
         backgroundTextures.draw(mModelMatrix, staticBitmapID[0], 1);
-
-        Matrix.setIdentityM(mModelMatrix, 0);
-        Matrix.translateM(mModelMatrix, 0, 0, 0, Z_DIMENSION);
         towerTextures.draw(mModelMatrix, staticBitmapID[1], 1);
+        laserSight.draw(mModelMatrix,turretAngle);
 
-        if(rotateLeft)
-            turretAngle-=0.2f;
-        if(rotateRight)
-            turretAngle+=0.2f;
+        if (rotateLeft) {
+            turretAngle -= 0.2f;
+            if (turretAngle < 0)
+                turretAngle = 359.8f;
+        }
+        if (rotateRight) {
+            turretAngle += 0.2f;
+            if (turretAngle > 360)
+                turretAngle = 0.2f;
+        }
 
-        Matrix.rotateM(mModelMatrix,0,turretAngle,0,0,1.0f);
+        Matrix.rotateM(mModelMatrix, 0, turretAngle, 0, 0, 1.0f);
         Matrix.multiplyMM(mMVPMatrix, 0, mProjectionMatrix, 0, mModelMatrix, 0);
 
-        for (int i=2; i<staticBitmapID.length-1; i++)
+        for (int i = 2; i < staticBitmapID.length - 1; i++)
             towerTextures.draw(mModelMatrix, staticBitmapID[i], 1);
 
         Matrix.setIdentityM(mModelMatrix, 0);
-        Matrix.translateM(mModelMatrix, 0, -ratio+GAME_CONTROL_OBJECT_SIZE, -1+GAME_CONTROL_OBJECT_SIZE, Z_DIMENSION);
-        Matrix.rotateM(mModelMatrix,0,180.0f,0,0,1.0f);
-        buttonsTextures.draw(mModelMatrix, staticBitmapID[staticBitmapID.length-1], 1);
+        Matrix.translateM(mModelMatrix, 0, -ratio + GAME_CONTROL_OBJECT_SIZE, -1 + GAME_CONTROL_OBJECT_SIZE, Z_DIMENSION);
+        Matrix.rotateM(mModelMatrix, 0, 180.0f, 0, 0, 1.0f);
+        buttonsTextures.draw(mModelMatrix, staticBitmapID[staticBitmapID.length - 1], 1);
 
         Matrix.setIdentityM(mModelMatrix, 0);
-        Matrix.translateM(mModelMatrix, 0, -ratio+3*GAME_CONTROL_OBJECT_SIZE, -1+GAME_CONTROL_OBJECT_SIZE, Z_DIMENSION);
+        Matrix.translateM(mModelMatrix, 0, -ratio + 3 * GAME_CONTROL_OBJECT_SIZE, -1 + GAME_CONTROL_OBJECT_SIZE, Z_DIMENSION);
         Matrix.multiplyMM(mMVPMatrix, 0, mProjectionMatrix, 0, mModelMatrix, 0);
-        buttonsTextures.draw(mModelMatrix, staticBitmapID[staticBitmapID.length-1], 1);
-}
+        buttonsTextures.draw(mModelMatrix, staticBitmapID[staticBitmapID.length - 1], 1);
+
+
+    }
 
     public void onSurfaceChanged(GL10 unused, int width, int height) {
         GLES31.glViewport(0, 0, width, height);
@@ -108,8 +117,10 @@ public class GamePlayRenderer implements GLSurfaceView.Renderer {
         towerTextures.setmProjectionMatrix(mProjectionMatrix);
         buttonsTextures.setmProjectionMatrix(mProjectionMatrix);
 
-        leftArrow.setObject(width,height,mProjectionMatrix,0.2f,-ratio+GAME_CONTROL_OBJECT_SIZE, -1+GAME_CONTROL_OBJECT_SIZE);
-        rightArrow.setObject(width,height,mProjectionMatrix,0.2f,-ratio+3*GAME_CONTROL_OBJECT_SIZE, -1+GAME_CONTROL_OBJECT_SIZE);
+        leftArrow.setObject(width, height, mProjectionMatrix, 0.2f, -ratio + GAME_CONTROL_OBJECT_SIZE, -1 + GAME_CONTROL_OBJECT_SIZE);
+        rightArrow.setObject(width, height, mProjectionMatrix, 0.2f, -ratio + 3 * GAME_CONTROL_OBJECT_SIZE, -1 + GAME_CONTROL_OBJECT_SIZE);
+
+        laserSight.setSquare(mProjectionMatrix, ratio);
 
     }
 

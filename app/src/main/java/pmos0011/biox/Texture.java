@@ -47,7 +47,7 @@ public class Texture {
     private final int mProgram;
 
 
-    private int positionHandle;
+    private int mPositionHandle;
     private int mTextureHandle;
     private int textureCoordinateHandle;
     private int mModelMatrixHandle;
@@ -75,6 +75,7 @@ public class Texture {
     short drawOrder[] = {0, 1, 2,
             0, 2, 3
     };
+
 
     public Texture(float size_mod) {
 
@@ -124,17 +125,17 @@ public class Texture {
         mColorHandle = GLES31.glGetUniformLocation(mProgram, "v_Color");
         mModelMatrixHandle = GLES31.glGetUniformLocation(mProgram, "u_mModelMatrix");
         mProjectionMatrixHandle = GLES31.glGetUniformLocation(mProgram, "u_mProjectionMatrix");
-        positionHandle = GLES31.glGetAttribLocation(mProgram, "a_Position");
+        mPositionHandle = GLES31.glGetAttribLocation(mProgram, "a_Position");
         mTextureHandle = GLES31.glGetUniformLocation(mProgram, "u_Texture");
         textureCoordinateHandle = GLES31.glGetAttribLocation(mProgram, "a_TexCoordinate");
 
         GLES31.glUniformMatrix4fv(mModelMatrixHandle, 1, false, mModelMatrix, 0);
         GLES31.glUniformMatrix4fv(mProjectionMatrixHandle, 1, false, mProjectionMatrix, 0);
 
-        GLES31.glVertexAttribPointer(positionHandle, COORDS_PER_VERTEX,
+        GLES31.glVertexAttribPointer(mPositionHandle, COORDS_PER_VERTEX,
                 GLES31.GL_FLOAT, false,
                 vertexStride, vertexBuffer);
-        GLES31.glEnableVertexAttribArray(positionHandle);
+        GLES31.glEnableVertexAttribArray(mPositionHandle);
 
         GLES31.glVertexAttribPointer(textureCoordinateHandle, COORDS_PER_VERTEX,
                 GLES31.GL_FLOAT, false,
@@ -150,7 +151,7 @@ public class Texture {
         GLES31.glDrawElements(GLES31.GL_TRIANGLES, drawOrder.length,
                 GLES31.GL_UNSIGNED_SHORT, drawListBuffer);
 
-        GLES31.glDisableVertexAttribArray(positionHandle);
+        GLES31.glDisableVertexAttribArray(mPositionHandle);
         GLES31.glDisableVertexAttribArray(textureCoordinateHandle);
 
     }
