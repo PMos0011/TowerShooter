@@ -1,7 +1,6 @@
 package pmos0011.biox;
 
 import android.opengl.GLES31;
-import android.util.Log;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -29,7 +28,6 @@ public class Square {
                     "}";
 
 
-    boolean first = true;
     private final int mProgram;
     private int mPositionHandle;
     private int mColorHandle;
@@ -60,8 +58,8 @@ public class Square {
 
     private final int COORDS_PER_COLOR = 4;
     float squareColors[] = {
-            1.0f, 0.0f, 0.0f, 0.1f,
-            1.0f, 0.0f, 0.0f, 0.1f,
+            1.0f, 0.0f, 0.0f, 0.0f,
+            1.0f, 0.0f, 0.0f, 0.0f,
             1.0f, 0.0f, 0.0f, 0.5f,
             1.0f, 0.0f, 0.0f, 0.5f
     };
@@ -96,7 +94,7 @@ public class Square {
 
     public void draw(float[] mModelMatrix, float angle) {
 
-        setLaserCoords(angle);
+        setCoords(angle);
         ByteBuffer bb = ByteBuffer.allocateDirect(squareCoords.length * 4);
         bb.order(ByteOrder.nativeOrder());
         vertexBuffer = bb.asFloatBuffer();
@@ -129,28 +127,62 @@ public class Square {
         GLES31.glDisableVertexAttribArray(mColorHandle);
     }
 
-    private void setLaserCoords(float angle) {
+    private void setCoords(float angle) {
 
-        while (angle >= 90)
+        int quarter = 0;
+
+        while (angle >= 90) {
             angle -= 90;
-
-        double radians = Math.toRadians(angle);
-
-        float centerXPos = (float) (radius * Math.sin(radians));
-        float centerYPos = (float) (radius * Math.cos(radians));
-
-        squareCoords[0] = centerXPos - 0.02f;
-        squareCoords[2] = squareCoords[0] + 0.04f;
-        squareCoords[1] = centerYPos - 0.02f;
-        squareCoords[3] = squareCoords[1] + 0.04f;
-
-        if (first) {
-            for (float coord : squareCoords) {
-                Log.d("coords: ", String.valueOf(coord));
-            }
-            first = false;
+            quarter++;
         }
+        double radians = Math.toRadians(angle);
+        float delta;
 
+        float centerXPos;
+        float centerYPos;
+
+        if (angle <= 45)
+            delta = (float) (0.015f * Math.cos(radians));
+        else
+            delta = (float) (0.015f * Math.sin(radians));
+
+        switch (quarter) {
+
+            case 0:
+                centerXPos = (float) (radius * Math.sin(radians))*-1.0f;
+                centerYPos = (float) (radius * Math.cos(radians));
+                squareCoords[0] = centerXPos + delta;
+                squareCoords[2] = centerXPos - delta;
+                squareCoords[1] = centerYPos + delta;
+                squareCoords[3] = centerYPos - delta;
+                break;
+
+            case 1:
+                centerXPos = (float) (radius * Math.cos(radians))*-1.0f;
+                centerYPos = (float) (radius * Math.sin(radians))*-1.0f;
+                squareCoords[0] = centerXPos - delta;
+                squareCoords[2] = centerXPos + delta;
+                squareCoords[1] = centerYPos + delta;
+                squareCoords[3] = centerYPos - delta;
+                break;
+
+            case 2:
+                centerXPos = (float) (radius * Math.sin(radians));
+                centerYPos = (float) (radius * Math.cos(radians))*-1.0f;
+                squareCoords[0] = centerXPos + delta;
+                squareCoords[2] = centerXPos - delta;
+                squareCoords[1] = centerYPos + delta;
+                squareCoords[3] = centerYPos - delta;
+                break;
+
+            case 3:
+                centerXPos = (float) (radius * Math.cos(radians));
+                centerYPos = (float) (radius * Math.sin(radians));
+                squareCoords[0] = centerXPos - delta;
+                squareCoords[2] = centerXPos + delta;
+                squareCoords[1] = centerYPos + delta;
+                squareCoords[3] = centerYPos - delta;
+                break;
+        }
     }
-
 }

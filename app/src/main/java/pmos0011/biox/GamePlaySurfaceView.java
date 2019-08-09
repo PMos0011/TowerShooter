@@ -30,12 +30,12 @@ public class GamePlaySurfaceView extends GLSurfaceView {
                 if (y > renderer.leftArrow.position.y-renderer.leftArrow.halfDimension) {
                     if (x > renderer.leftArrow.position.x-renderer.leftArrow.halfDimension
                     && x<renderer.leftArrow.position.x+renderer.leftArrow.halfDimension) {
-                        renderer.rotateLeft = false;
-                        renderer.rotateRight = true;
-                    } else if (x > renderer.rightArrow.position.x-renderer.rightArrow.halfDimension
-                            && x<renderer.rightArrow.position.x+renderer.rightArrow.halfDimension) {
                         renderer.rotateLeft = true;
                         renderer.rotateRight = false;
+                    } else if (x > renderer.rightArrow.position.x-renderer.rightArrow.halfDimension
+                            && x<renderer.rightArrow.position.x+renderer.rightArrow.halfDimension) {
+                        renderer.rotateLeft = false;
+                        renderer.rotateRight = true;
                     }
                 }
                 break;
@@ -44,12 +44,12 @@ public class GamePlaySurfaceView extends GLSurfaceView {
                 if (y > renderer.leftArrow.position.y-renderer.leftArrow.halfDimension) {
                     if (x > renderer.leftArrow.position.x-renderer.leftArrow.halfDimension
                             && x<renderer.leftArrow.position.x+renderer.leftArrow.halfDimension) {
-                        renderer.rotateLeft = false;
-                        renderer.rotateRight = true;
-                    } else if (x > renderer.rightArrow.position.x-renderer.rightArrow.halfDimension
-                            && x<renderer.rightArrow.position.x+renderer.rightArrow.halfDimension) {
                         renderer.rotateLeft = true;
                         renderer.rotateRight = false;
+                    } else if (x > renderer.rightArrow.position.x-renderer.rightArrow.halfDimension
+                            && x<renderer.rightArrow.position.x+renderer.rightArrow.halfDimension) {
+                        renderer.rotateLeft = false;
+                        renderer.rotateRight = true;
                     }else{
                         renderer.rotateLeft = false;
                         renderer.rotateRight = false;

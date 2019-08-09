@@ -78,14 +78,14 @@ public class GamePlayRenderer implements GLSurfaceView.Renderer {
         laserSight.draw(mModelMatrix,turretAngle);
 
         if (rotateLeft) {
-            turretAngle -= 0.2f;
-            if (turretAngle < 0)
-                turretAngle = 359.8f;
-        }
-        if (rotateRight) {
             turretAngle += 0.2f;
             if (turretAngle > 360)
                 turretAngle = 0.2f;
+        }
+        if (rotateRight) {
+            turretAngle -= 0.2f;
+            if (turretAngle < 0)
+                turretAngle = 359.8f;
         }
 
         Matrix.rotateM(mModelMatrix, 0, turretAngle, 0, 0, 1.0f);
