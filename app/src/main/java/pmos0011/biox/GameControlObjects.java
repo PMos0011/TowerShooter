@@ -13,29 +13,29 @@ public class GameControlObjects {
     public GameControlObjects() {
     }
 
-    public void setObject(int width, int height, float[] mProjectionMatrix, float size_mod, float xPosition, float yPosition){
+    public void setObject(int width, int height, float size_mod, float xPosition, float yPosition) {
 
-        halfDimension=(int)(height*size_mod)/2;
-        xOpenGLPosition=xPosition;
-        yOpenGLPosition=yPosition;
+        halfDimension = (int) (height * size_mod) / 2;
+        xOpenGLPosition = xPosition;
+        yOpenGLPosition = yPosition;
 
         float[] mModelMatrix = new float[16];
 
         Matrix.setIdentityM(mModelMatrix, 0);
         Matrix.translateM(mModelMatrix, 0, xOpenGLPosition, yOpenGLPosition, 1.0f);
-        Matrix.multiplyMM(mModelMatrix, 0, mProjectionMatrix, 0, mModelMatrix, 0);
+        Matrix.multiplyMM(mModelMatrix, 0, GamePlayRenderer.mProjectionMatrix, 0, mModelMatrix, 0);
 
-        position=new Point();
-        int halfHeight=height/2;
-        int halfWidth=width/2;
+        position = new Point();
+        int halfHeight = height / 2;
+        int halfWidth = width / 2;
 
-        float tmpPosition = halfHeight*mModelMatrix[13];
-        tmpPosition=halfHeight-tmpPosition;
-        position.y=(int)tmpPosition;
+        float tmpPosition = halfHeight * mModelMatrix[13];
+        tmpPosition = halfHeight - tmpPosition;
+        position.y = (int) tmpPosition;
 
-        tmpPosition = halfWidth*mModelMatrix[12];
-        tmpPosition = halfWidth+tmpPosition;
-        position.x=(int)tmpPosition;
+        tmpPosition = halfWidth * mModelMatrix[12];
+        tmpPosition = halfWidth + tmpPosition;
+        position.x = (int) tmpPosition;
 
     }
 }
