@@ -55,25 +55,25 @@ public class GamePlayRenderer implements GLSurfaceView.Renderer {
 
         staticBitmapID = BitmapID.getStaticBitmapID();
 
-        backgroundTextures = new Texture(2);
-        backgroundTextures.loadTexture(mContext, staticBitmapID[BitmapID.textureNames.BACKGROUND.getValue()]);
+        backgroundTextures = new Texture(mContext, 2);
+        backgroundTextures.loadTexture(staticBitmapID[BitmapID.textureNames.BACKGROUND.getValue()]);
 
-        towerTextures = new Texture(0.5f);
+        towerTextures = new Texture(mContext, 0.5f);
         for (int i = BitmapID.textureNames.TURRET_BASE.getValue(); i <= BitmapID.textureNames.TURRET_TOWER.getValue(); i++)
-            towerTextures.loadTexture(mContext, staticBitmapID[i]);
+            towerTextures.loadTexture(staticBitmapID[i]);
 
-        buttonsTextures = new Texture(GAME_CONTROL_OBJECT_SIZE);
+        buttonsTextures = new Texture(mContext, GAME_CONTROL_OBJECT_SIZE);
         for (int i = BitmapID.textureNames.LEFT_ARROW.getValue(); i <= BitmapID.textureNames.RIGHT_CANNON_BUTTON.getValue(); i++)
-            buttonsTextures.loadTexture(mContext, staticBitmapID[i]);
+            buttonsTextures.loadTexture(staticBitmapID[i]);
 
         leftArrow = new GameControlObjects();
         rightArrow = new GameControlObjects();
         leftCannonButton = new GameControlObjects();
         rightCannonButton = new GameControlObjects();
 
-        laserSight = new Square();
-        leftCannonReload = new Square();
-        rightCannonReload = new Square();
+        laserSight = new Square(mContext);
+        leftCannonReload = new Square(mContext);
+        rightCannonReload = new Square(mContext);
     }
 
     public void onDrawFrame(GL10 unused) {
@@ -182,6 +182,4 @@ public class GamePlayRenderer implements GLSurfaceView.Renderer {
 
         return shader;
     }
-
-
 }

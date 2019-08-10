@@ -14,26 +14,7 @@ import java.nio.ShortBuffer;
 
 public class Texture {
 
-    private final String vertexShaderCode =
-            "attribute vec4 a_Position;" +
-                    "uniform mat4 u_mModelMatrix;" +
-                    "uniform mat4 u_mProjectionMatrix;" +
-                    "attribute vec2 a_TexCoordinate;" +
-                    "varying vec2 v_TexCoordinate;" +
-                    "void main() {" +
-                    "v_TexCoordinate = a_TexCoordinate;" +
-                    "  gl_Position = (u_mProjectionMatrix*u_mModelMatrix)*a_Position;" +
-                    "}";
-
-    private final String fragmentShaderCode =
-            "precision mediump float;" +
-                    "uniform sampler2D u_Texture;" +
-                    "uniform vec4 v_Color;" +
-                    "varying vec2 v_TexCoordinate;" +
-                    "void main() {" +
-                    "  gl_FragColor = texture2D(u_Texture, v_TexCoordinate)* v_Color;" +
-                    "}";
-
+    Context context;
     private FloatBuffer vertexBuffer;
     private FloatBuffer textureBuffer;
     private ShortBuffer drawListBuffer;
@@ -49,25 +30,27 @@ public class Texture {
     private final int VERTEX_STRIDE = COORDS_PER_VERTEX * 4;
 
     float squareCoords[] = {
-            -1.0f,  1.0f,
+            -1.0f, 1.0f,
             -1.0f, -1.0f,
-             1.0f, -1.0f,
-             1.0f,  1.0f
+            1.0f, -1.0f,
+            1.0f, 1.0f
     };
 
-    float textureCords[] =
-            {0.0f, 1.0f,
-             0.0f, 0.0f,
-             1.0f, 0.0f,
-             1.0f, 1.0f
-            };
+    float textureCords[] = {
+            0.0f, 1.0f,
+            0.0f, 0.0f,
+            1.0f, 0.0f,
+            1.0f, 1.0f
+    };
 
     short drawOrder[] = {
             0, 1, 2,
             0, 2, 3
     };
 
-    public Texture(float size_mod) {
+    public Texture(Context context, float size_mod) {
+
+        this.context = context;
 
         for (int i = 0; i < squareCoords.length; i++)
             squareCoords[i] *= size_mod;
@@ -90,8 +73,8 @@ public class Texture {
         textureBuffer.put(textureCords);
         textureBuffer.position(0);
 
-        int vertexShader = GamePlayRenderer.loadShader(GLES31.GL_VERTEX_SHADER, vertexShaderCode);
-        int fragmentShader = GamePlayRenderer.loadShader(GLES31.GL_FRAGMENT_SHADER, fragmentShaderCode);
+        int vertexShader = FileReader.reader(context, GLES31.GL_VERTEX_SHADER, R.raw.texture_vertex_shader);
+        int fragmentShader = FileReader.reader(context, GLES31.GL_FRAGMENT_SHADER, R.raw.texture_fragment_shader);
 
         mProgram = GLES31.glCreateProgram();
 
@@ -139,7 +122,7 @@ public class Texture {
         GLES31.glDisableVertexAttribArray(textureCoordinateHandle);
     }
 
-    public void loadTexture(Context context, int texture_id) {
+    public void loadTexture(int texture_id) {
 
         final BitmapFactory.Options options = new BitmapFactory.Options();
         options.inScaled = false;

@@ -1,5 +1,6 @@
 package pmos0011.biox;
 
+import android.content.Context;
 import android.opengl.GLES31;
 
 import java.nio.ByteBuffer;
@@ -9,24 +10,7 @@ import java.nio.ShortBuffer;
 
 public class Square {
 
-    private final String vertexShaderCode =
-            "attribute vec4 a_Position;" +
-                    "attribute vec4 a_Color;" +
-                    "uniform mat4 u_mModelMatrix;" +
-                    "uniform mat4 u_mProjectionMatrix;" +
-                    "varying vec4 v_Color;" +
-                    "void main() {" +
-                    "v_Color=a_Color;" +
-                    "  gl_Position = (u_mProjectionMatrix*u_mModelMatrix)*a_Position;" +
-                    "}";
-
-    private final String fragmentShaderCode =
-            "precision mediump float;" +
-                    "varying vec4 v_Color;" +
-                    "void main() {" +
-                    "  gl_FragColor = v_Color;" +
-                    "}";
-
+    Context context;
     private final int mProgram;
     private int mPositionHandle;
     private int mColorHandle;
@@ -61,8 +45,9 @@ public class Square {
             1.0f, 0.0f, 0.0f, 0.5f
     };
 
-    public Square() {
+    public Square(Context context) {
 
+        this.context = context;
         ByteBuffer dlb = ByteBuffer.allocateDirect(drawOrder.length * 2);
         dlb.order(ByteOrder.nativeOrder());
         drawListBuffer = dlb.asShortBuffer();
@@ -75,8 +60,8 @@ public class Square {
         colorBuffer.put(squareColors);
         colorBuffer.position(0);
 
-        int vertexShader = GamePlayRenderer.loadShader(GLES31.GL_VERTEX_SHADER, vertexShaderCode);
-        int fragmentShader = GamePlayRenderer.loadShader(GLES31.GL_FRAGMENT_SHADER, fragmentShaderCode);
+        int vertexShader = FileReader.reader(context, GLES31.GL_VERTEX_SHADER, R.raw.square_vertex_shader);
+        int fragmentShader = FileReader.reader(context, GLES31.GL_FRAGMENT_SHADER, R.raw.square_fragment_shader);
 
         mProgram = GLES31.glCreateProgram();
 
@@ -146,8 +131,8 @@ public class Square {
         } else {
             float coords = GamePlayRenderer.GAME_CONTROL_OBJECT_SIZE;
 
-            float ststusModifer = param / 100.0f;
-            float coordMod = coords - 2 * coords * ststusModifer;
+            float statusModifer = param / 100.0f;
+            float coordMod = coords - 2 * coords * statusModifer;
 
             float tmpCoords[] = {
                     coordMod, coords,
