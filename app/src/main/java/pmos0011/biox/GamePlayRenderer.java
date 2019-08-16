@@ -18,6 +18,8 @@ public class GamePlayRenderer implements GLSurfaceView.Renderer {
     Texture backgroundTextures;
     Texture towerTextures;
     Texture buttonsTextures;
+    SmokeEffect smokeEffect;
+    SmokeEffect smokeEffect1;
     Square laserSight;
     Square leftCannonReload;
     Square rightCannonReload;
@@ -55,16 +57,19 @@ public class GamePlayRenderer implements GLSurfaceView.Renderer {
 
         staticBitmapID = BitmapID.getStaticBitmapID();
 
-        backgroundTextures = new Texture(mContext, 2);
+        backgroundTextures = new Texture(mContext, 2, false);
         backgroundTextures.loadTexture(staticBitmapID[BitmapID.textureNames.BACKGROUND.getValue()]);
 
-        towerTextures = new Texture(mContext, 0.5f);
+        towerTextures = new Texture(mContext, 0.5f, false);
         for (int i = BitmapID.textureNames.TURRET_BASE.getValue(); i <= BitmapID.textureNames.TURRET_TOWER.getValue(); i++)
             towerTextures.loadTexture(staticBitmapID[i]);
 
-        buttonsTextures = new Texture(mContext, GAME_CONTROL_OBJECT_SIZE);
+        buttonsTextures = new Texture(mContext, GAME_CONTROL_OBJECT_SIZE, false);
         for (int i = BitmapID.textureNames.LEFT_ARROW.getValue(); i <= BitmapID.textureNames.RIGHT_CANNON_BUTTON.getValue(); i++)
             buttonsTextures.loadTexture(staticBitmapID[i]);
+
+        smokeEffect = new SmokeEffect(mContext, 0.3f, true);
+        smokeEffect1 = new SmokeEffect(mContext, 0.3f, true);
 
         leftArrow = new GameControlObjects();
         rightArrow = new GameControlObjects();
@@ -145,7 +150,7 @@ public class GamePlayRenderer implements GLSurfaceView.Renderer {
             Matrix.rotateM(mModelMatrix, 0, 180, 0, 0, 1.0f);
             rightCannonReload.draw(mModelMatrix, rightCannonReloadStatus, false);
 
-            long time = SystemClock.uptimeMillis() / 10;
+            long time = SystemClock.uptimeMillis() / 30;
             if (rightCannonLastSecond != time) {
                 rightCannonReloadStatus -= 0.2f;
                 rightCannonLastSecond = time;
@@ -156,6 +161,14 @@ public class GamePlayRenderer implements GLSurfaceView.Renderer {
                 rightCannonReloadStatus = 100;
             }
         }
+
+        Matrix.setIdentityM(mModelMatrix, 0);
+        Matrix.translateM(mModelMatrix, 0, -1.0f, 0, Z_DIMENSION);
+        smokeEffect.draw(mModelMatrix, staticBitmapID[BitmapID.textureNames.LEFT_ARROW.getValue()]);
+
+        Matrix.setIdentityM(mModelMatrix, 0);
+        Matrix.translateM(mModelMatrix, 0, -0.5f, 0, Z_DIMENSION);
+        smokeEffect1.draw(mModelMatrix, staticBitmapID[BitmapID.textureNames.LEFT_ARROW.getValue()]);
     }
 
     public void onSurfaceChanged(GL10 unused, int width, int height) {
