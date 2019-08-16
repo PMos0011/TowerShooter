@@ -22,9 +22,7 @@ public class Texture {
     private FloatBuffer vertexBuffer;
     private FloatBuffer textureBuffer;
     private ShortBuffer drawListBuffer;
-    private final int mProgram;
-
-    float someVal;
+    public final int mProgram;
 
     private int mPositionHandle;
     private int mTextureHandle;
@@ -57,10 +55,6 @@ public class Texture {
     public Texture(Context context, float size_mod, boolean isSmoke) {
 
         this.context = context;
-
-        Random r = new Random();
-        someVal=r.nextInt((25 - 20)+1)+20;
-        someVal=-someVal;
 
         for (int i = 0; i < squareCoords.length; i++)
             squareCoords[i] *= size_mod;
@@ -100,53 +94,21 @@ public class Texture {
 
     public void draw(float[] mModelMatrix, int texture_handle, float opacity) {
 
-        GLES31.glUseProgram(mProgram);
-
-        GLES31.glEnable(GLES31.GL_BLEND);
-        GLES31.glBlendFunc(GLES31.GL_SRC_ALPHA, GLES31.GL_ONE_MINUS_SRC_ALPHA);
-
         float color[] = {1.0f, 1.0f, 1.0f, opacity};
 
-        mColorHandle = GLES31.glGetUniformLocation(mProgram, "v_Color");
-        mModelMatrixHandle = GLES31.glGetUniformLocation(mProgram, "u_mModelMatrix");
-        mProjectionMatrixHandle = GLES31.glGetUniformLocation(mProgram, "u_mProjectionMatrix");
-        mPositionHandle = GLES31.glGetAttribLocation(mProgram, "a_Position");
-        mTextureHandle = GLES31.glGetUniformLocation(mProgram, "u_Texture");
-        textureCoordinateHandle = GLES31.glGetAttribLocation(mProgram, "a_TexCoordinate");
-
-        GLES31.glUniformMatrix4fv(mModelMatrixHandle, 1, false, mModelMatrix, 0);
-        GLES31.glUniformMatrix4fv(mProjectionMatrixHandle, 1, false, GamePlayRenderer.mProjectionMatrix, 0);
-
-        GLES31.glVertexAttribPointer(mPositionHandle, COORDS_PER_VERTEX,
-                GLES31.GL_FLOAT, false, VERTEX_STRIDE, vertexBuffer);
-        GLES31.glEnableVertexAttribArray(mPositionHandle);
-
-        GLES31.glVertexAttribPointer(textureCoordinateHandle, COORDS_PER_VERTEX,
-                GLES31.GL_FLOAT, false, VERTEX_STRIDE, textureBuffer);
-        GLES31.glEnableVertexAttribArray(textureCoordinateHandle);
-
-        GLES31.glActiveTexture(GLES31.GL_TEXTURE0);
-        GLES31.glBindTexture(GLES31.GL_TEXTURE_2D, texture_handle);
-        GLES31.glUniform1i(mTextureHandle, 0);
-
-        GLES31.glUniform4fv(mColorHandle, 1, color, 0);
-
-        GLES31.glDrawElements(GLES31.GL_TRIANGLES, drawOrder.length, GLES31.GL_UNSIGNED_SHORT, drawListBuffer);
-
-        GLES31.glDisableVertexAttribArray(mPositionHandle);
-        GLES31.glDisableVertexAttribArray(textureCoordinateHandle);
-    }
-
-    public void draw(float[] mModelMatrix, int texture_handle) {
-
         GLES31.glUseProgram(mProgram);
 
         GLES31.glEnable(GLES31.GL_BLEND);
         GLES31.glBlendFunc(GLES31.GL_SRC_ALPHA, GLES31.GL_ONE_MINUS_SRC_ALPHA);
 
-        someVal+=0.005;
+        mColorHandle = GLES31.glGetUniformLocation(mProgram, "v_Color");
+        GLES31.glUniform4fv(mColorHandle, 1, color, 0);
 
-        mColorHandle = GLES31.glGetUniformLocation(mProgram, "time");
+        loadOpenGLVariables(mModelMatrix,texture_handle);
+
+    }
+
+    public void loadOpenGLVariables(float[] mModelMatrix, int texture_handle){
         mModelMatrixHandle = GLES31.glGetUniformLocation(mProgram, "u_mModelMatrix");
         mProjectionMatrixHandle = GLES31.glGetUniformLocation(mProgram, "u_mProjectionMatrix");
         mPositionHandle = GLES31.glGetAttribLocation(mProgram, "a_Position");
@@ -168,13 +130,12 @@ public class Texture {
         GLES31.glBindTexture(GLES31.GL_TEXTURE_2D, texture_handle);
         GLES31.glUniform1i(mTextureHandle, 0);
 
-        GLES31.glUniform1f(mColorHandle, someVal);
-
         GLES31.glDrawElements(GLES31.GL_TRIANGLES, drawOrder.length, GLES31.GL_UNSIGNED_SHORT, drawListBuffer);
 
         GLES31.glDisableVertexAttribArray(mPositionHandle);
         GLES31.glDisableVertexAttribArray(textureCoordinateHandle);
     }
+
 
     public void loadTexture(int texture_id) {
 
