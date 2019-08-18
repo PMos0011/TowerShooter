@@ -9,16 +9,21 @@ import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
 import android.os.SystemClock;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.function.Predicate;
+
 public class GamePlayRenderer implements GLSurfaceView.Renderer {
 
-    private final float Z_DIMENSION = -1.0000001f;
+    public static final float Z_DIMENSION = -1.0000001f;
     public static final float GAME_CONTROL_OBJECT_SIZE = 0.18f;
 
     private Context mContext;
     private Texture backgroundTextures;
     private Texture towerTextures;
+    private Texture radarTexture;
     private Texture buttonsTextures;
-    private SmokeEffect smokeEffect;
     private Square laserSight;
     private Square leftCannonReload;
     private Square rightCannonReload;
@@ -35,17 +40,20 @@ public class GamePlayRenderer implements GLSurfaceView.Renderer {
     private float[] mModelMatrix = new float[16];
 
     private float turretAngle = 0;
+    private float radarAngle = 0;
     public volatile boolean rotateRight = false;
     public volatile boolean rotateLeft = false;
 
-    public volatile boolean isLeftCannonReloading = true;
-    public volatile boolean isRightCannonReloading = true;
+    public volatile boolean isLeftCannonReloading = false;
+    public volatile boolean isRightCannonReloading = false;
     private volatile float leftCannonReloadStatus = 100.0f;
     private volatile float rightCannonReloadStatus = 100.0f;
     private long leftCannonLastSecond = 0;
     private long rightCannonLastSecond = 0;
     private float leftCannonPosition = 0;
     private float rightCannonPosition = 0;
+
+    public List <SmokeEffect> smokeEffects = new ArrayList<>();
 
     public GamePlayRenderer(Context context) {
         mContext = context;
@@ -57,18 +65,19 @@ public class GamePlayRenderer implements GLSurfaceView.Renderer {
 
         staticBitmapID = BitmapID.getStaticBitmapID();
 
-        backgroundTextures = new Texture(mContext, 2, false);
+        backgroundTextures = new Texture(mContext, 2,false);
         backgroundTextures.loadTexture(staticBitmapID[BitmapID.textureNames.BACKGROUND.getValue()]);
 
-        towerTextures = new Texture(mContext, 0.4f, false);
+        towerTextures = new Texture(mContext, 0.4f,false);
         for (int i = BitmapID.textureNames.TURRET_BASE.getValue(); i <= BitmapID.textureNames.TURRET_TOWER.getValue(); i++)
             towerTextures.loadTexture(staticBitmapID[i]);
 
-        buttonsTextures = new Texture(mContext, GAME_CONTROL_OBJECT_SIZE, false);
+        radarTexture = new Texture(mContext,0.065f,false);
+        radarTexture.loadTexture(staticBitmapID[BitmapID.textureNames.RADAR.getValue()]);
+
+        buttonsTextures = new Texture(mContext, GAME_CONTROL_OBJECT_SIZE,false);
         for (int i = BitmapID.textureNames.LEFT_ARROW.getValue(); i <= BitmapID.textureNames.RIGHT_CANNON_BUTTON.getValue(); i++)
             buttonsTextures.loadTexture(staticBitmapID[i]);
-
-        smokeEffect = new SmokeEffect(mContext, 0.2f, true);
 
         leftArrow = new GameControlObjects();
         rightArrow = new GameControlObjects();
@@ -106,6 +115,12 @@ public class GamePlayRenderer implements GLSurfaceView.Renderer {
         towerTextures.draw(mModelMatrix, staticBitmapID[BitmapID.textureNames.TURRET_TOWER.getValue()], 1);
 
         Matrix.setIdentityM(mModelMatrix, 0);
+        Matrix.rotateM(mModelMatrix, 0, turretAngle, 0, 0, 1.0f);
+        Matrix.translateM(mModelMatrix, 0, 0.065f, -0.1f, Z_DIMENSION);
+        Matrix.rotateM(mModelMatrix, 0, radarAngle, 0, 0, 1.0f);
+        radarTexture.draw(mModelMatrix,staticBitmapID[BitmapID.textureNames.RADAR.getValue()],1);
+
+        Matrix.setIdentityM(mModelMatrix, 0);
         Matrix.translateM(mModelMatrix, 0, leftArrow.xOpenGLPosition, rightArrow.yOpenGLPosition, Z_DIMENSION);
         Matrix.rotateM(mModelMatrix, 0, turretAngle, 0, 0, 1.0f);
         buttonsTextures.draw(mModelMatrix, staticBitmapID[BitmapID.textureNames.LEFT_ARROW.getValue()], 1);
@@ -123,11 +138,13 @@ public class GamePlayRenderer implements GLSurfaceView.Renderer {
         Matrix.translateM(mModelMatrix, 0, rightCannonButton.xOpenGLPosition, rightCannonButton.yOpenGLPosition, Z_DIMENSION);
         buttonsTextures.draw(mModelMatrix, staticBitmapID[BitmapID.textureNames.RIGHT_CANNON_BUTTON.getValue()], 1);
 
-        Matrix.setIdentityM(mModelMatrix, 0);
-        Matrix.translateM(mModelMatrix, 0, -0.5f - smokeEffect.smokeFlow, -smokeEffect.smokeFlow, Z_DIMENSION);
-        Matrix.scaleM(mModelMatrix, 0, smokeEffect.scale, smokeEffect.scale, 1);
-        smokeEffect.draw(mModelMatrix, staticBitmapID[BitmapID.textureNames.LEFT_ARROW.getValue()]);
-
+        Iterator <SmokeEffect> smokeEffectIterator = smokeEffects.iterator();
+        while(smokeEffectIterator.hasNext()){
+            SmokeEffect smoke = smokeEffectIterator.next();
+            smoke.draw(staticBitmapID[BitmapID.textureNames.LEFT_ARROW.getValue()],turretAngle);
+            if(smoke.visibility<=0)
+                smokeEffectIterator.remove();
+        }
         gameActions();
     }
 
@@ -148,6 +165,10 @@ public class GamePlayRenderer implements GLSurfaceView.Renderer {
 
     private void gameActions() {
 
+        radarAngle-=2;
+        if(radarAngle<-358)
+            radarAngle=0;
+
         if (rotateLeft) {
             turretAngle += 0.2f;
             if (turretAngle > 360)
@@ -160,11 +181,13 @@ public class GamePlayRenderer implements GLSurfaceView.Renderer {
         }
 
         if (isLeftCannonReloading) {
-            if(leftCannonReloadStatus==100)
-                leftCannonPosition=-0.03f;
-
+            if(leftCannonReloadStatus==100) {
+                leftCannonPosition = -0.035f;
+                smokeEffects.add(new SmokeEffect(mContext, 0.2f, true, SmokeEffect.effectsNames.LEFT_CANNON_SMOKE));
+                smokeEffects.add(new SmokeEffect(mContext, 0.2f, true, SmokeEffect.effectsNames.LEFT_CANNON_FIRE));
+            }
             if(leftCannonPosition<0.0)
-                leftCannonPosition+=0.005;
+                leftCannonPosition+=0.001;
 
             Matrix.setIdentityM(mModelMatrix, 0);
             Matrix.translateM(mModelMatrix, 0, leftCannonButton.xOpenGLPosition, leftCannonButton.yOpenGLPosition, Z_DIMENSION);
@@ -172,7 +195,7 @@ public class GamePlayRenderer implements GLSurfaceView.Renderer {
 
             long time = SystemClock.uptimeMillis() / 30;
             if (leftCannonLastSecond != time) {
-                leftCannonReloadStatus -= 0.2f;
+                leftCannonReloadStatus -= 0.4f;
                 leftCannonLastSecond = time;
             }
 
@@ -183,11 +206,13 @@ public class GamePlayRenderer implements GLSurfaceView.Renderer {
         }
 
         if (isRightCannonReloading) {
-            if(rightCannonReloadStatus==100)
-                rightCannonPosition=-0.03f;
-
+            if(rightCannonReloadStatus==100) {
+                rightCannonPosition = -0.035f;
+                smokeEffects.add(new SmokeEffect(mContext, 0.2f, true, SmokeEffect.effectsNames.RIGHT_CANNON_SMOKE));
+                smokeEffects.add(new SmokeEffect(mContext, 0.2f, true, SmokeEffect.effectsNames.RIGHT_CANNON_FIRE));
+            }
             if(rightCannonPosition<0.0)
-                rightCannonPosition+=0.005;
+                rightCannonPosition+=0.001;
 
             Matrix.setIdentityM(mModelMatrix, 0);
             Matrix.translateM(mModelMatrix, 0, rightCannonButton.xOpenGLPosition, rightCannonButton.yOpenGLPosition, Z_DIMENSION);
@@ -196,7 +221,7 @@ public class GamePlayRenderer implements GLSurfaceView.Renderer {
 
             long time = SystemClock.uptimeMillis() / 30;
             if (rightCannonLastSecond != time) {
-                rightCannonReloadStatus -= 0.2f;
+                rightCannonReloadStatus -= 0.4f;
                 rightCannonLastSecond = time;
             }
 

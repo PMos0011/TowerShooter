@@ -6,13 +6,14 @@ vec4 transparentColor = vec4(0.0, 0.0, 0.0, 0.0);
 uniform vec4 innerColor;
 uniform vec4 outerColor;
 uniform float visibility;
+uniform bool isFire;
 
 float innerThreshold = 0.35;
 float outerThreshold = 0.15;
 float softEdge = 0.05;
 
 float random(vec2 coord){
-    return fract(sin(dot(coord, vec2(2., 7.)))* 4.);
+    return fract(sin(dot(coord, vec2(12.9898, 78.233)))* 43.7585);
 }
 
 float noise(vec2 coord){
@@ -50,9 +51,22 @@ float overlay(float base, float top) {
 }
 
 float circle(vec2 coord){
-    vec2 dist = coord-vec2(0.5);
+    float dist;
+    if (isFire){
+        vec2 diff = abs(coord - vec2(0.5, 0.8));
 
-    return (0.5 - distance(coord, vec2(0.5))) * visibility;
+        if (coord.y < 0.8){
+            diff.y /= 1.6;
+        } else {
+            diff.y *= 2.0;
+        }
+        dist = sqrt(diff.x * diff.x + diff.y * diff.y) / 0.5;
+        dist=(1.-dist)*visibility;
+    } else {
+        dist = (0.5 - distance(coord, vec2(0.5))) * visibility;
+    }
+    return clamp(dist, 0.0, 1.0);
+
 }
 
 void main() {
@@ -62,7 +76,7 @@ void main() {
     float c = circle(v_TexCoordinate);
 
     float noise1 = noise(coord + vec2(f_Time * 0.25, f_Time * 4.0));
-    float noise2 = noise(coord + vec2(f_Time * 0.5, f_Time * 7.0));
+    float noise2 = noise(coord + vec2(f_Time * 0.5, f_Time *7.0));
     float combinedNoise = (noise1 + noise2) / 2.0;
 
     float fbmNoise = fbm(fbmcoord + vec2(0.0, f_Time));
@@ -81,5 +95,7 @@ void main() {
     } else {
         gl_FragColor = innerColor;
     }
+
+    //gl_FragColor = vec4(vec3(random(v_TexCoordinate)), 1.0);
 
 }

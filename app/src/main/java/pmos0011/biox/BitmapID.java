@@ -4,8 +4,8 @@ public class BitmapID {
 
     public static int[] getStaticBitmapID() {
 
-        int[] tmp_bitmapID = new int[9];
-        tmp_bitmapID[0] = R.drawable.steppe;
+        int[] tmp_bitmapID = new int[10];
+        tmp_bitmapID[0] = R.drawable.background;
         tmp_bitmapID[1] = R.drawable.base;
         tmp_bitmapID[2] = R.drawable.left_cannon;
         tmp_bitmapID[3] = R.drawable.right_cannon;
@@ -14,6 +14,7 @@ public class BitmapID {
         tmp_bitmapID[6] = R.drawable.r_arrow;
         tmp_bitmapID[7] = R.drawable.l_cannon_b;
         tmp_bitmapID[8] = R.drawable.r_cannon_b;
+        tmp_bitmapID[9] = R.drawable.radar;
 
         return tmp_bitmapID;
     }
@@ -28,7 +29,8 @@ public class BitmapID {
         LEFT_ARROW(5),
         RIGHT_ARROW(6),
         LEFT_CANNON_BUTTON(7),
-        RIGHT_CANNON_BUTTON(8);
+        RIGHT_CANNON_BUTTON(8),
+        RADAR(9);
 
         private final int value;
 
