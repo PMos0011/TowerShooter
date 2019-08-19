@@ -1,6 +1,5 @@
 package pmos0011.biox;
 
-import android.content.Context;
 import android.opengl.GLES31;
 import android.opengl.Matrix;
 
@@ -24,16 +23,15 @@ public class SmokeEffect extends Texture {
     private boolean notGrayDestroyEffect = true;
     private boolean initValues = true;
 
-
     private float[] mModelMatrix = new float[16];
 
-    public SmokeEffect(Context context, float size_mod, boolean isSmoke, effectsNames effect) {
-        super(context, size_mod,isSmoke);
+    public SmokeEffect(float size_mod, boolean isSmoke, effectsNames effect) {
+        super(size_mod, isSmoke);
 
         Random r = new Random();
         timeVal = r.nextInt((25 - 20) + 1) + 20;
         timeVal = -timeVal;
-        this.effect=effect;
+        this.effect = effect;
     }
 
     public void draw(int texture_handle, float angle) {
@@ -42,32 +40,32 @@ public class SmokeEffect extends Texture {
         switch (effect) {
             case DESTROY_EFFECT:
                 destroyEffect();
-            break;
+                break;
             case LEFT_CANNON_FIRE:
-                cannonFire(angle,true);
-            break;
+                cannonFire(angle, true);
+                break;
             case LEFT_CANNON_SMOKE:
-                cannonSmoke(angle,true);
+                cannonSmoke(angle, true);
                 break;
             case RIGHT_CANNON_FIRE:
-                cannonFire(angle,false);
-            break;
+                cannonFire(angle, false);
+                break;
             case RIGHT_CANNON_SMOKE:
-                cannonSmoke(angle,false);
+                cannonSmoke(angle, false);
                 break;
         }
 
-        GLES31.glUseProgram(mProgram);
+        GLES31.glUseProgram(ShadersManager.SMOKE_PROGRAM_HANDLE);
 
-        GLES31.glUniform4fv(GLES31.glGetUniformLocation(mProgram, "innerColor"), 1, innerColor, 0);
-        GLES31.glUniform4fv(GLES31.glGetUniformLocation(mProgram, "outerColor"), 1, outerColor, 0);
-        GLES31.glUniform1f(GLES31.glGetUniformLocation(mProgram, "visibility"), visibility);
-        GLES31.glUniform1f(GLES31.glGetUniformLocation(mProgram, "f_Time"), timeVal);
+        GLES31.glUniform4fv(GLES31.glGetUniformLocation(ShadersManager.SMOKE_PROGRAM_HANDLE, "innerColor"), 1, innerColor, 0);
+        GLES31.glUniform4fv(GLES31.glGetUniformLocation(ShadersManager.SMOKE_PROGRAM_HANDLE, "outerColor"), 1, outerColor, 0);
+        GLES31.glUniform1f(GLES31.glGetUniformLocation(ShadersManager.SMOKE_PROGRAM_HANDLE, "visibility"), visibility);
+        GLES31.glUniform1f(GLES31.glGetUniformLocation(ShadersManager.SMOKE_PROGRAM_HANDLE, "f_Time"), timeVal);
 
         if (isFire)
-            GLES31.glUniform1f(GLES31.glGetUniformLocation(mProgram, "isFire"), ROCKET_FIRE);
+            GLES31.glUniform1f(GLES31.glGetUniformLocation(ShadersManager.SMOKE_PROGRAM_HANDLE, "isFire"), ROCKET_FIRE);
         else
-            GLES31.glUniform1f(GLES31.glGetUniformLocation(mProgram, "isFire"), SMOKE_EFFECT);
+            GLES31.glUniform1f(GLES31.glGetUniformLocation(ShadersManager.SMOKE_PROGRAM_HANDLE, "isFire"), SMOKE_EFFECT);
         loadOpenGLVariables(mModelMatrix, texture_handle);
     }
 
@@ -160,14 +158,14 @@ public class SmokeEffect extends Texture {
         }
 
         float xPosition = 0.028f;
-        if(isLeft)
-            xPosition=-xPosition;
+        if (isLeft)
+            xPosition = -xPosition;
 
         Matrix.setIdentityM(mModelMatrix, 0);
         Matrix.rotateM(mModelMatrix, 0, angle, 0, 0, 1.0f);
         Matrix.translateM(mModelMatrix, 0, xPosition, +0.5f, GamePlayRenderer.Z_DIMENSION);
         Matrix.rotateM(mModelMatrix, 0, 180, 0, 0, 1.0f);
-        Matrix.scaleM(mModelMatrix, 0, scale, scale*1.2f, 1);
+        Matrix.scaleM(mModelMatrix, 0, scale, scale * 1.2f, 1);
 
         timeVal += 0.03;
         visibility -= 0.2;
@@ -192,8 +190,8 @@ public class SmokeEffect extends Texture {
         }
 
         float xPosition = 0.028f;
-        if(isLeft)
-            xPosition=-xPosition;
+        if (isLeft)
+            xPosition = -xPosition;
 
         Matrix.setIdentityM(mModelMatrix, 0);
         Matrix.rotateM(mModelMatrix, 0, smokePosition, 0, 0, 1.0f);
