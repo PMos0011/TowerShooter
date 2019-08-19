@@ -50,7 +50,7 @@ float overlay(float base, float top) {
     }
 }
 
-float circle(vec2 coord){
+float circle(vec2 coord, float radius){
     float dist;
     if (isFire){
         vec2 diff = abs(coord - vec2(0.5, 0.8));
@@ -60,10 +60,10 @@ float circle(vec2 coord){
         } else {
             diff.y *= 2.0;
         }
-        dist = sqrt(diff.x * diff.x + diff.y * diff.y) / 0.5;
+        dist = sqrt(diff.x * diff.x + diff.y * diff.y) / radius;
         dist=(1.-dist)*visibility;
     } else {
-        dist = (0.5 - distance(coord, vec2(0.5))) * visibility;
+        dist = (radius - distance(coord, vec2(0.5))) * visibility;
     }
     return clamp(dist, 0.0, 1.0);
 
@@ -73,8 +73,9 @@ void main() {
 
     vec2 coord = v_TexCoordinate * 8.0;
     vec2 fbmcoord = coord / 6.0;
-    float c = circle(v_TexCoordinate);
-
+    float c = circle(v_TexCoordinate, 0.5f);
+    c+= circle(v_TexCoordinate, 0.3f)/2.;
+    
     float noise1 = noise(coord + vec2(f_Time * 0.25, f_Time * 4.0));
     float noise2 = noise(coord + vec2(f_Time * 0.5, f_Time *7.0));
     float combinedNoise = (noise1 + noise2) / 2.0;

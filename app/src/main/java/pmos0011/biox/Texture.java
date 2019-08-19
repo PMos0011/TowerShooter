@@ -13,30 +13,6 @@ import java.nio.FloatBuffer;
 
 public class Texture {
 
-    private FloatBuffer vertexBuffer;
-
-    private final int COORDS_PER_VERTEX = 2;
-    private final int VERTEX_STRIDE = COORDS_PER_VERTEX * 4;
-
-    float squareCoords[] = {
-            -1.0f, 1.0f,
-            -1.0f, -1.0f,
-            1.0f, -1.0f,
-            1.0f, 1.0f
-    };
-
-    public Texture(float size_mod, boolean isSmoke) {
-
-
-        for (int i = 0; i < squareCoords.length; i++)
-            squareCoords[i] *= size_mod;
-
-        ByteBuffer bb = ByteBuffer.allocateDirect(squareCoords.length * 4);
-        bb.order(ByteOrder.nativeOrder());
-        vertexBuffer = bb.asFloatBuffer();
-        vertexBuffer.put(squareCoords);
-        vertexBuffer.position(0);
-    }
 
     public void draw(float[] mModelMatrix, int texture_handle, float opacity) {
 
@@ -56,12 +32,12 @@ public class Texture {
         GLES31.glUniformMatrix4fv(GLES31.glGetUniformLocation(ShadersManager.TEXTURE_PROGRAM_HANDLE, "u_mModelMatrix"), 1, false, mModelMatrix, 0);
         GLES31.glUniformMatrix4fv(GLES31.glGetUniformLocation(ShadersManager.TEXTURE_PROGRAM_HANDLE, "u_mProjectionMatrix"), 1, false, GamePlayRenderer.mProjectionMatrix, 0);
 
-        GLES31.glVertexAttribPointer(mPositionHandle, COORDS_PER_VERTEX,
-                GLES31.GL_FLOAT, false, VERTEX_STRIDE, vertexBuffer);
+        GLES31.glVertexAttribPointer(mPositionHandle, ShadersManager.COORDS_PER_VERTEX,
+                GLES31.GL_FLOAT, false, ShadersManager.VERTEX_STRIDE, ShadersManager.vertexBuffer);
         GLES31.glEnableVertexAttribArray(mPositionHandle);
 
-        GLES31.glVertexAttribPointer(textureCoordinateHandle, COORDS_PER_VERTEX,
-                GLES31.GL_FLOAT, false, VERTEX_STRIDE, ShadersManager.textureBuffer);
+        GLES31.glVertexAttribPointer(textureCoordinateHandle, ShadersManager.COORDS_PER_VERTEX,
+                GLES31.GL_FLOAT, false, ShadersManager.VERTEX_STRIDE, ShadersManager.textureBuffer);
         GLES31.glEnableVertexAttribArray(textureCoordinateHandle);
 
         GLES31.glActiveTexture(GLES31.GL_TEXTURE0);
@@ -73,7 +49,6 @@ public class Texture {
         GLES31.glDisableVertexAttribArray(mPositionHandle);
         GLES31.glDisableVertexAttribArray(textureCoordinateHandle);
     }
-
 
     public void loadTexture(Context context, int texture_id) {
 

@@ -24,6 +24,18 @@ public class ShadersManager {
     public static int squareFragmentShaderHandle;
     public static int smokeFragmentShaderHandle;
 
+    public static final int COORDS_PER_VERTEX = 2;
+    public static final int VERTEX_STRIDE = COORDS_PER_VERTEX * 4;
+    public static final int COORDS_PER_COLOR = 4;
+    public static final int COLOR_STRIDE = COORDS_PER_COLOR * 4;
+
+    public static final float SQUARE_CORDS[] = {
+            -1.0f, 1.0f,
+            -1.0f, -1.0f,
+            1.0f, -1.0f,
+            1.0f, 1.0f
+    };
+
     public static final float TEXTURE_CORDS[] = {
             0.0f, 1.0f,
             0.0f, 0.0f,
@@ -43,6 +55,7 @@ public class ShadersManager {
             1.0f, 0.0f, 0.0f, 0.5f
     };
 
+    public static FloatBuffer vertexBuffer;
     public static FloatBuffer textureBuffer;
     public static ShortBuffer drawListBuffer;
     public static FloatBuffer colorBuffer;
@@ -75,6 +88,12 @@ public class ShadersManager {
     }
 
     public static void loadShaders(Context context) {
+
+        ByteBuffer bb = ByteBuffer.allocateDirect(SQUARE_CORDS.length * 4);
+        bb.order(ByteOrder.nativeOrder());
+        vertexBuffer = bb.asFloatBuffer();
+        vertexBuffer.put(SQUARE_CORDS);
+        vertexBuffer.position(0);
 
         ByteBuffer dlb = ByteBuffer.allocateDirect(DRAW_ORDER.length * 2);
         dlb.order(ByteOrder.nativeOrder());

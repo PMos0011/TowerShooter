@@ -8,23 +8,13 @@ import java.nio.FloatBuffer;
 
 public class Square {
 
-    private int mPositionHandle;
-    private int mColorHandle;
-
     public void setSquare() {
         this.radius = GamePlayRenderer.ratio * 0.85f;
     }
 
-    float radius;
-
+    private float radius;
     private FloatBuffer vertexBuffer;
-
-    private final int COORDS_PER_VERTEX = 2;
-    private final int VERTEX_STRIDE = COORDS_PER_VERTEX * 4;
-    float squareCoords[] = new float[8];
-
-    private final int COORDS_PER_COLOR = 4;
-    private final int COLOR_STRIDE = COORDS_PER_COLOR * 4;
+    private float squareCoords[] = new float[8];
 
     public void draw(float[] mModelMatrix, float param, boolean isLaser) {
 
@@ -110,17 +100,17 @@ public class Square {
         vertexBuffer.position(0);
 
         GLES31.glUseProgram(ShadersManager.SQUARE_PROGRAM_HANDLE);
-        mPositionHandle = GLES31.glGetAttribLocation(ShadersManager.SQUARE_PROGRAM_HANDLE, "a_Position");
-        mColorHandle = GLES31.glGetAttribLocation(ShadersManager.SQUARE_PROGRAM_HANDLE, "a_Color");
+        int mPositionHandle = GLES31.glGetAttribLocation(ShadersManager.SQUARE_PROGRAM_HANDLE, "a_Position");
+        int mColorHandle = GLES31.glGetAttribLocation(ShadersManager.SQUARE_PROGRAM_HANDLE, "a_Color");
 
         GLES31.glUniformMatrix4fv(GLES31.glGetUniformLocation(ShadersManager.SQUARE_PROGRAM_HANDLE, "u_mModelMatrix"), 1, false, mModelMatrix, 0);
         GLES31.glUniformMatrix4fv(GLES31.glGetUniformLocation(ShadersManager.SQUARE_PROGRAM_HANDLE, "u_mProjectionMatrix"), 1, false, GamePlayRenderer.mProjectionMatrix, 0);
 
-        GLES31.glVertexAttribPointer(mPositionHandle, COORDS_PER_VERTEX,
-                GLES31.GL_FLOAT, false, VERTEX_STRIDE, vertexBuffer);
+        GLES31.glVertexAttribPointer(mPositionHandle, ShadersManager.COORDS_PER_VERTEX,
+                GLES31.GL_FLOAT, false, ShadersManager.VERTEX_STRIDE, vertexBuffer);
         GLES31.glEnableVertexAttribArray(mPositionHandle);
 
-        GLES31.glVertexAttribPointer(mColorHandle, COORDS_PER_COLOR, GLES31.GL_FLOAT, false, COLOR_STRIDE, ShadersManager.colorBuffer);
+        GLES31.glVertexAttribPointer(mColorHandle, ShadersManager.COORDS_PER_COLOR, GLES31.GL_FLOAT, false, ShadersManager.COLOR_STRIDE, ShadersManager.colorBuffer);
         GLES31.glEnableVertexAttribArray(mColorHandle);
 
         GLES31.glDrawElements(GLES31.GL_TRIANGLES, ShadersManager.DRAW_ORDER.length, GLES31.GL_UNSIGNED_SHORT, ShadersManager.drawListBuffer);

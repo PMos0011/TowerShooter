@@ -3,7 +3,6 @@ package pmos0011.biox;
 import android.content.Context;
 import android.graphics.PointF;
 import android.opengl.GLSurfaceView;
-import android.util.Log;
 import android.view.MotionEvent;
 
 public class GamePlaySurfaceView extends GLSurfaceView {
