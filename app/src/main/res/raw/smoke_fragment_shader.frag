@@ -1,4 +1,4 @@
-precision mediump float;
+precision highp float;
 uniform float f_Time;
 varying vec2 v_TexCoordinate;
 
@@ -13,7 +13,7 @@ float outerThreshold = 0.15;
 float softEdge = 0.05;
 
 float random(vec2 coord){
-    return fract(sin(dot(coord, vec2(12.9898, 78.233)))* 43.7585);
+    return fract(sin(dot(coord, vec2(12.9898, 78.233)))* 43758.5);
 }
 
 float noise(vec2 coord){
@@ -66,7 +66,6 @@ float circle(vec2 coord, float radius){
         dist = (radius - distance(coord, vec2(0.5))) * visibility;
     }
     return clamp(dist, 0.0, 1.0);
-
 }
 
 void main() {
@@ -75,7 +74,7 @@ void main() {
     vec2 fbmcoord = coord / 6.0;
     float c = circle(v_TexCoordinate, 0.5f);
     c+= circle(v_TexCoordinate, 0.3f)/2.;
-    
+
     float noise1 = noise(coord + vec2(f_Time * 0.25, f_Time * 4.0));
     float noise2 = noise(coord + vec2(f_Time * 0.5, f_Time *7.0));
     float combinedNoise = (noise1 + noise2) / 2.0;
@@ -96,7 +95,4 @@ void main() {
     } else {
         gl_FragColor = innerColor;
     }
-
-    //gl_FragColor = vec4(vec3(random(v_TexCoordinate)), 1.0);
-
 }
