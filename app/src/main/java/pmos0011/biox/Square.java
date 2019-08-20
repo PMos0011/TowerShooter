@@ -11,17 +11,19 @@ public class Square {
     private FloatBuffer vertexBuffer;
     private float[] squareCoords;
 
-    public Square(boolean isLaser){
+    public Square(boolean isLaser) {
 
-        if(isLaser) {
-            squareCoords = new float[8];
+        if (isLaser) {
+            squareCoords = new float[12];
             squareCoords[0] = -GamePlayRenderer.LASER_SIGHT_DISPERSION;
             squareCoords[2] = GamePlayRenderer.LASER_SIGHT_DISPERSION;
-        }else {
+        } else {
             float coords = GamePlayRenderer.GAME_CONTROL_OBJECT_SIZE;
-            squareCoords=new float[]{
+            squareCoords = new float[]{
                     -coords, coords,
                     -coords, -coords,
+                    coords, -coords,
+                    -coords, coords,
                     coords, -coords,
                     coords, coords,
             };
@@ -33,12 +35,14 @@ public class Square {
         if (isLaser) {
             squareCoords[1] = param * 0.85f;
             squareCoords[3] = squareCoords[1];
+            squareCoords[7] = squareCoords[1];
         } else {
             float coords = GamePlayRenderer.GAME_CONTROL_OBJECT_SIZE;
             float coordMod = coords - 2 * coords * param;
 
-            squareCoords[0]=coordMod;
-            squareCoords[2]=coordMod;
+            squareCoords[0] = coordMod;
+            squareCoords[2] = coordMod;
+            squareCoords[6] = coordMod;
         }
 
         GLES31.glEnable(GLES31.GL_BLEND);
@@ -63,16 +67,16 @@ public class Square {
         GLES31.glUniformMatrix4fv(ShadersManager.modelMatrixHandle, 1, false, mModelMatrix, 0);
         GLES31.glUniformMatrix4fv(ShadersManager.projectionMatrixHandle, 1, false, GamePlayRenderer.mProjectionMatrix, 0);
 
-        GLES31.glVertexAttribPointer(ShadersManager.positionHandle, ShadersManager.COORDS_PER_VERTEX,
+        GLES31.glVertexAttribPointer(ShadersManager.squarePositionHandle, ShadersManager.COORDS_PER_VERTEX,
                 GLES31.GL_FLOAT, false, ShadersManager.VERTEX_STRIDE, vertexBuffer);
-        GLES31.glEnableVertexAttribArray(ShadersManager.positionHandle);
+        GLES31.glEnableVertexAttribArray(ShadersManager.squarePositionHandle);
 
         GLES31.glVertexAttribPointer(ShadersManager.squareColorHandle, ShadersManager.COORDS_PER_COLOR, GLES31.GL_FLOAT, false, ShadersManager.COLOR_STRIDE, ShadersManager.colorBuffer);
         GLES31.glEnableVertexAttribArray(ShadersManager.squareColorHandle);
 
-        GLES31.glDrawElements(GLES31.GL_TRIANGLES, ShadersManager.DRAW_ORDER.length, GLES31.GL_UNSIGNED_SHORT, ShadersManager.drawListBuffer);
+        GLES31.glDrawArrays(GLES31.GL_TRIANGLES, 0, 6);
 
-        GLES31.glDisableVertexAttribArray(ShadersManager.positionHandle);
+        GLES31.glDisableVertexAttribArray(ShadersManager.squarePositionHandle);
         GLES31.glDisableVertexAttribArray(ShadersManager.squareColorHandle);
     }
 }

@@ -13,8 +13,8 @@ public class SmokeEffect extends Texture {
     private effectsNames effect;
 
     private float timeVal;
-    private float[] innerColor = {0.85f, 0.60f, 0.10f, 0.95f};
-    private float[] outerColor = {0.85f, 0.20f, 0.10f, 0.95f};
+    private float[] innerColor = {0.85f, 0.60f, 0.10f, 1.0f};
+    private float[] outerColor = {0.85f, 0.20f, 0.10f, 1.0f};
 
     private float scale = 1.0f;
     private PointF smokeFlow= new PointF();
@@ -36,18 +36,20 @@ public class SmokeEffect extends Texture {
 
         switch (effect) {
             case DESTROY_EFFECT:
+                GLES31.glEnable(GLES31.GL_BLEND);
+                GLES31.glBlendFunc(GLES31.GL_SRC_ALPHA, GLES31.GL_ONE_MINUS_SRC_ALPHA);
                 destroyEffect(angle);
                 break;
-            case LEFT_CANNON_FIRE:
-                cannonFire(angle, true);
+            case CANNON_FIRE:
+                GLES31.glEnable(GLES31.GL_BLEND);
+                GLES31.glBlendFunc(GLES31.GL_SRC_ALPHA, GLES31.GL_ONE);
+                cannonFire(angle);
                 break;
             case CANNON_SMOKE:
+                GLES31.glEnable(GLES31.GL_BLEND);
+                GLES31.glBlendFunc(GLES31.GL_SRC_ALPHA, GLES31.GL_ONE_MINUS_SRC_ALPHA);
                 cannonSmoke(angle);
                 break;
-            case RIGHT_CANNON_FIRE:
-                cannonFire(angle, false);
-                break;
-
         }
 
         GLES31.glUseProgram(ShadersManager.SMOKE_PROGRAM_HANDLE);
@@ -70,8 +72,6 @@ public class SmokeEffect extends Texture {
     }
 
     private void destroyEffect(float angle) {
-        GLES31.glEnable(GLES31.GL_BLEND);
-        GLES31.glBlendFuncSeparate(GLES31.GL_SRC_ALPHA, GLES31.GL_ONE,GLES31.GL_ONE_MINUS_SRC_ALPHA,GLES31.GL_ONE_MINUS_SRC_ALPHA);
         if (initValues) {
 
             innerColor[0] = 1.f;
@@ -142,9 +142,7 @@ public class SmokeEffect extends Texture {
         smokeFlow.y+=GamePlayRenderer.WIND_FLOW_Y;
     }
 
-    private void cannonFire(float angle, boolean isLeft) {
-        GLES31.glEnable(GLES31.GL_BLEND);
-        GLES31.glBlendFunc(GLES31.GL_SRC_ALPHA, GLES31.GL_ONE);
+    private void cannonFire(float angle) {
 
         if (initValues) {
 
@@ -162,13 +160,9 @@ public class SmokeEffect extends Texture {
             initValues = false;
         }
 
-        float xPosition = GamePlayRenderer.CANNON_X_POSITION;
-        if (isLeft)
-            xPosition = -xPosition;
-
         Matrix.setIdentityM(mModelMatrix, 0);
         Matrix.rotateM(mModelMatrix, 0, angle, 0, 0, 1.0f);
-        Matrix.translateM(mModelMatrix, 0, xPosition, +0.5f, GamePlayRenderer.Z_DIMENSION);
+        Matrix.translateM(mModelMatrix, 0, 0, +0.5f, GamePlayRenderer.Z_DIMENSION);
         Matrix.rotateM(mModelMatrix, 0, 180, 0, 0, 1.0f);
         Matrix.scaleM(mModelMatrix, 0, scale, scale * 1.2f, 1);
 
@@ -177,8 +171,7 @@ public class SmokeEffect extends Texture {
     }
 
     private void cannonSmoke(float angle) {
-        GLES31.glEnable(GLES31.GL_BLEND);
-        GLES31.glBlendFunc(GLES31.GL_SRC_ALPHA, GLES31.GL_ONE_MINUS_SRC_ALPHA);
+
         if (initValues) {
 
             innerColor[0] = 0.85f;
@@ -189,7 +182,7 @@ public class SmokeEffect extends Texture {
             outerColor[1] = 0.85f;
             outerColor[2] = 0.85f;
 
-            scale = GamePlayRenderer.SMOKE_EFFECT_SIZE * 1.6f;
+            scale = GamePlayRenderer.SMOKE_EFFECT_SIZE * 1.4f;
             visibility = 4.0f;
 
             smokeFlow=Calculations.calculatePoint(angle,GamePlayRenderer.SMOKE_CANNON_INITIAL);
@@ -213,8 +206,7 @@ public class SmokeEffect extends Texture {
     public enum effectsNames {
 
         DESTROY_EFFECT,
-        LEFT_CANNON_FIRE,
-        RIGHT_CANNON_FIRE,
+CANNON_FIRE,
         CANNON_SMOKE
 
     }

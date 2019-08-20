@@ -27,10 +27,11 @@ public class ShadersManager {
     public static int projectionMatrixHandle;
     public static int modelMatrixHandle;
     public static int textureHandle;
-    public static int positionHandle;
+    public static int texturePositionHandle;
     public static int textureColorHandle;
     public static int textureCoordinateHandle;
     public static int squareColorHandle;
+    public static int squarePositionHandle;
     public static int smokeInnerColorHandle;
     public static int smokeOuterColorHandle;
     public static int smokeVisibilityHandle;
@@ -46,6 +47,8 @@ public class ShadersManager {
             -1.0f, 1.0f,
             -1.0f, -1.0f,
             1.0f, -1.0f,
+            -1.0f, 1.0f,
+            1.0f, -1.0f,
             1.0f, 1.0f
     };
 
@@ -53,16 +56,16 @@ public class ShadersManager {
             0.0f, 1.0f,
             0.0f, 0.0f,
             1.0f, 0.0f,
+            0.0f, 1.0f,
+            1.0f, 0.0f,
             1.0f, 1.0f
     };
 
-    public static final short DRAW_ORDER[] = {
-            0, 1, 2,
-            0, 2, 3
-    };
 
     public static final float SQUARE_COLORS[] = {
             1.0f, 0.0f, 0.0f, 0.0f,
+            1.0f, 0.0f, 0.0f, 0.0f,
+            1.0f, 0.0f, 0.0f, 0.5f,
             1.0f, 0.0f, 0.0f, 0.0f,
             1.0f, 0.0f, 0.0f, 0.5f,
             1.0f, 0.0f, 0.0f, 0.5f
@@ -70,7 +73,6 @@ public class ShadersManager {
 
     public static FloatBuffer vertexBuffer;
     public static FloatBuffer textureBuffer;
-    public static ShortBuffer drawListBuffer;
     public static FloatBuffer colorBuffer;
 
     public static int reader(Context context, int type, int resID) {
@@ -108,12 +110,6 @@ public class ShadersManager {
         vertexBuffer.put(SQUARE_CORDS);
         vertexBuffer.position(0);
 
-        ByteBuffer dlb = ByteBuffer.allocateDirect(DRAW_ORDER.length * 2);
-        dlb.order(ByteOrder.nativeOrder());
-        drawListBuffer = dlb.asShortBuffer();
-        drawListBuffer.put(DRAW_ORDER);
-        drawListBuffer.position(0);
-
         ByteBuffer tlb = ByteBuffer.allocateDirect(TEXTURE_CORDS.length * 4);
         tlb.order(ByteOrder.nativeOrder());
         textureBuffer = tlb.asFloatBuffer();
@@ -146,11 +142,12 @@ public class ShadersManager {
         projectionMatrixHandle = GLES31.glGetUniformLocation(ShadersManager.TEXTURE_PROGRAM_HANDLE, "u_mProjectionMatrix");
         modelMatrixHandle = GLES31.glGetUniformLocation(ShadersManager.TEXTURE_PROGRAM_HANDLE, "u_mModelMatrix");
         textureHandle = GLES31.glGetUniformLocation(ShadersManager.TEXTURE_PROGRAM_HANDLE, "u_Texture");
-        positionHandle = GLES31.glGetAttribLocation(ShadersManager.TEXTURE_PROGRAM_HANDLE, "a_Position");
         textureColorHandle = GLES31.glGetUniformLocation(ShadersManager.TEXTURE_PROGRAM_HANDLE, "v_Color");
+        texturePositionHandle = GLES31.glGetAttribLocation(ShadersManager.TEXTURE_PROGRAM_HANDLE, "a_Position");
         textureCoordinateHandle = GLES31.glGetAttribLocation(ShadersManager.TEXTURE_PROGRAM_HANDLE, "a_TexCoordinate");
 
         squareColorHandle = GLES31.glGetAttribLocation(ShadersManager.SQUARE_PROGRAM_HANDLE, "a_Color");
+        squarePositionHandle = GLES31.glGetAttribLocation(ShadersManager.SQUARE_PROGRAM_HANDLE, "square_Position");
 
         smokeInnerColorHandle = GLES31.glGetUniformLocation(ShadersManager.SMOKE_PROGRAM_HANDLE, "innerColor");
         smokeOuterColorHandle = GLES31.glGetUniformLocation(ShadersManager.SMOKE_PROGRAM_HANDLE, "outerColor");

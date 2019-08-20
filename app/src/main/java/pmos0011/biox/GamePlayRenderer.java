@@ -208,7 +208,7 @@ public class GamePlayRenderer implements GLSurfaceView.Renderer {
             if (leftCannonReloadStatus == 1) {
                 leftCannonPosition = -0.035f;
                 smokeEffects.add(new SmokeEffect(SmokeEffect.effectsNames.CANNON_SMOKE));
-                smokeEffects.add(new SmokeEffect(SmokeEffect.effectsNames.LEFT_CANNON_FIRE));
+                smokeEffects.add(new SmokeEffect(SmokeEffect.effectsNames.CANNON_FIRE));
                 shells.add(new Shells(turretAngle, true));
             }
             if (leftCannonPosition < 0.0)
@@ -230,7 +230,7 @@ public class GamePlayRenderer implements GLSurfaceView.Renderer {
             if (rightCannonReloadStatus == 1) {
                 rightCannonPosition = -0.035f;
                 smokeEffects.add(new SmokeEffect(SmokeEffect.effectsNames.CANNON_SMOKE));
-                smokeEffects.add(new SmokeEffect(SmokeEffect.effectsNames.RIGHT_CANNON_FIRE));
+                smokeEffects.add(new SmokeEffect(SmokeEffect.effectsNames.CANNON_FIRE));
                 shells.add(new Shells(turretAngle, false));
             }
             if (rightCannonPosition < 0.0)

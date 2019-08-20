@@ -31,9 +31,9 @@ public class Texture {
         GLES31.glUniformMatrix4fv(ShadersManager.modelMatrixHandle, 1, false, mModelMatrix, 0);
         GLES31.glUniformMatrix4fv(ShadersManager.projectionMatrixHandle, 1, false, GamePlayRenderer.mProjectionMatrix, 0);
 
-        GLES31.glVertexAttribPointer(ShadersManager.positionHandle, ShadersManager.COORDS_PER_VERTEX,
+        GLES31.glVertexAttribPointer(ShadersManager.texturePositionHandle, ShadersManager.COORDS_PER_VERTEX,
                 GLES31.GL_FLOAT, false, ShadersManager.VERTEX_STRIDE, ShadersManager.vertexBuffer);
-        GLES31.glEnableVertexAttribArray(ShadersManager.positionHandle);
+        GLES31.glEnableVertexAttribArray(ShadersManager.texturePositionHandle);
 
         GLES31.glVertexAttribPointer(ShadersManager.textureCoordinateHandle, ShadersManager.COORDS_PER_VERTEX,
                 GLES31.GL_FLOAT, false, ShadersManager.VERTEX_STRIDE, ShadersManager.textureBuffer);
@@ -43,9 +43,8 @@ public class Texture {
         GLES31.glBindTexture(GLES31.GL_TEXTURE_2D, texture_handle);
         GLES31.glUniform1i(ShadersManager.textureHandle, 0);
 
-        GLES31.glDrawElements(GLES31.GL_TRIANGLES, ShadersManager.DRAW_ORDER.length, GLES31.GL_UNSIGNED_SHORT, ShadersManager.drawListBuffer);
-
-        GLES31.glDisableVertexAttribArray(ShadersManager.positionHandle);
+        GLES31.glDrawArrays(GLES31.GL_TRIANGLES,0,6);
+        GLES31.glDisableVertexAttribArray(ShadersManager.texturePositionHandle);
         GLES31.glDisableVertexAttribArray(ShadersManager.textureCoordinateHandle);
     }
 
