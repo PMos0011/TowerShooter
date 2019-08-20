@@ -8,75 +8,20 @@ import java.nio.FloatBuffer;
 
 public class Square {
 
-    public void setSquare() {
-        this.radius = GamePlayRenderer.ratio * 0.85f;
-    }
-
-    private float radius;
     private FloatBuffer vertexBuffer;
     private float squareCoords[] = new float[8];
 
     public void draw(float[] mModelMatrix, float param, boolean isLaser) {
 
         if (isLaser) {
-            int quarter = 0;
 
-            while (param >= 90) {
-                param -= 90;
-                quarter++;
-            }
-            double radians = Math.toRadians(param);
-            float delta;
+            squareCoords[0] = -GamePlayRenderer.LASER_SIGHT_DISPERSION;
+            squareCoords[2] = GamePlayRenderer.LASER_SIGHT_DISPERSION;
+            squareCoords[1] = param * 0.85f;
+            squareCoords[3] = squareCoords[1];
 
-            float centerXPos;
-            float centerYPos;
-
-            if (param <= 45)
-                delta = (float) (0.015f * Math.cos(radians));
-            else
-                delta = (float) (0.015f * Math.sin(radians));
-
-            switch (quarter) {
-
-                case 0:
-                    centerXPos = (float) (radius * Math.sin(radians)) * -1.0f;
-                    centerYPos = (float) (radius * Math.cos(radians));
-                    squareCoords[0] = centerXPos + delta;
-                    squareCoords[2] = centerXPos - delta;
-                    squareCoords[1] = centerYPos + delta;
-                    squareCoords[3] = centerYPos - delta;
-                    break;
-
-                case 1:
-                    centerXPos = (float) (radius * Math.cos(radians)) * -1.0f;
-                    centerYPos = (float) (radius * Math.sin(radians)) * -1.0f;
-                    squareCoords[0] = centerXPos - delta;
-                    squareCoords[2] = centerXPos + delta;
-                    squareCoords[1] = centerYPos + delta;
-                    squareCoords[3] = centerYPos - delta;
-                    break;
-
-                case 2:
-                    centerXPos = (float) (radius * Math.sin(radians));
-                    centerYPos = (float) (radius * Math.cos(radians)) * -1.0f;
-                    squareCoords[0] = centerXPos + delta;
-                    squareCoords[2] = centerXPos - delta;
-                    squareCoords[1] = centerYPos + delta;
-                    squareCoords[3] = centerYPos - delta;
-                    break;
-
-                case 3:
-                    centerXPos = (float) (radius * Math.cos(radians));
-                    centerYPos = (float) (radius * Math.sin(radians));
-                    squareCoords[0] = centerXPos - delta;
-                    squareCoords[2] = centerXPos + delta;
-                    squareCoords[1] = centerYPos + delta;
-                    squareCoords[3] = centerYPos - delta;
-                    break;
-            }
         } else {
             float coords = GamePlayRenderer.GAME_CONTROL_OBJECT_SIZE;
-
             float statusModifer = param / 100.0f;
             float coordMod = coords - 2 * coords * statusModifer;
 

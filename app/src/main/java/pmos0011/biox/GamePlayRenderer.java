@@ -28,6 +28,7 @@ public class GamePlayRenderer implements GLSurfaceView.Renderer {
     public static final float SMOKE_CANNON_INITIAL =0.45f;
     public final static float SHELL_SPEED = 0.1f;
     public final static float SHELL_START_POSITION = 0.3f;
+    public final static float LASER_SIGHT_DISPERSION = 0.015f;
 
     private Context mContext;
     private Texture gameObjectTextures;
@@ -41,7 +42,7 @@ public class GamePlayRenderer implements GLSurfaceView.Renderer {
     GameControlObjects leftCannonButton;
     GameControlObjects rightCannonButton;
 
-    public static float ratio;
+    private static float ratio;
 
     private int[] staticBitmapID;
     public static float[] mProjectionMatrix = new float[16];
@@ -104,8 +105,9 @@ public class GamePlayRenderer implements GLSurfaceView.Renderer {
         gameObjectTextures.draw(mModelMatrix, staticBitmapID[BitmapID.textureNames.TURRET_BASE.getValue()], 1);
 
         Matrix.setIdentityM(mModelMatrix, 0);
+        Matrix.rotateM(mModelMatrix, 0, turretAngle, 0, 0, 1.0f);
         Matrix.translateM(mModelMatrix, 0, 0, 0, Z_DIMENSION);
-        laserSight.draw(mModelMatrix, turretAngle, true);
+        laserSight.draw(mModelMatrix, ratio, true);
 
         Iterator<Shells> shellsIterator = shells.iterator();
         while (shellsIterator.hasNext()) {
@@ -188,10 +190,6 @@ public class GamePlayRenderer implements GLSurfaceView.Renderer {
         rightArrow.setObject(width, height, GAME_CONTROL_OBJECT_SIZE, -ratio + 3.4f * GAME_CONTROL_OBJECT_SIZE, -1 + GAME_CONTROL_OBJECT_SIZE);
         leftCannonButton.setObject(width, height, GAME_CONTROL_OBJECT_SIZE, ratio - 3.2f * GAME_CONTROL_OBJECT_SIZE, -1 + GAME_CONTROL_OBJECT_SIZE);
         rightCannonButton.setObject(width, height, GAME_CONTROL_OBJECT_SIZE, ratio - 1.1f * GAME_CONTROL_OBJECT_SIZE, -1 + GAME_CONTROL_OBJECT_SIZE);
-
-        laserSight.setSquare();
-        leftCannonReload.setSquare();
-        rightCannonReload.setSquare();
     }
 
     private void gameActions() {
