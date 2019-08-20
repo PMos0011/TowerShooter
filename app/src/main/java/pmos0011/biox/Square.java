@@ -9,29 +9,36 @@ import java.nio.FloatBuffer;
 public class Square {
 
     private FloatBuffer vertexBuffer;
-    private float squareCoords[] = new float[8];
+    private float[] squareCoords;
+
+    public Square(boolean isLaser){
+
+        if(isLaser) {
+            squareCoords = new float[8];
+            squareCoords[0] = -GamePlayRenderer.LASER_SIGHT_DISPERSION;
+            squareCoords[2] = GamePlayRenderer.LASER_SIGHT_DISPERSION;
+        }else {
+            float coords = GamePlayRenderer.GAME_CONTROL_OBJECT_SIZE;
+            squareCoords=new float[]{
+                    -coords, coords,
+                    -coords, -coords,
+                    coords, -coords,
+                    coords, coords,
+            };
+        }
+    }
 
     public void draw(float[] mModelMatrix, float param, boolean isLaser) {
 
         if (isLaser) {
-
-            squareCoords[0] = -GamePlayRenderer.LASER_SIGHT_DISPERSION;
-            squareCoords[2] = GamePlayRenderer.LASER_SIGHT_DISPERSION;
             squareCoords[1] = param * 0.85f;
             squareCoords[3] = squareCoords[1];
-
         } else {
             float coords = GamePlayRenderer.GAME_CONTROL_OBJECT_SIZE;
-            float statusModifer = param / 100.0f;
-            float coordMod = coords - 2 * coords * statusModifer;
+            float coordMod = coords - 2 * coords * param;
 
-            float tmpCoords[] = {
-                    coordMod, coords,
-                    coordMod, -coords,
-                    coords, -coords,
-                    coords, coords,
-            };
-            squareCoords = tmpCoords;
+            squareCoords[0]=coordMod;
+            squareCoords[2]=coordMod;
         }
         openGLProgram(mModelMatrix);
     }

@@ -24,8 +24,8 @@ public class GamePlaySurfaceView extends GLSurfaceView {
     @Override
     public boolean onTouchEvent(MotionEvent e) {
 
-        int test = e.getPointerCount();
-        for (int i = 0; i < test; i++) {
+        int pointerCount = e.getPointerCount();
+        for (int i = 0; i < pointerCount; i++) {
 
             PointF point = new PointF();
             point.x = e.getX(i);

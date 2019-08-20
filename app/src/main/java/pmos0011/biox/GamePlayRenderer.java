@@ -26,16 +26,15 @@ public class GamePlayRenderer implements GLSurfaceView.Renderer {
     public static final float WIND_FLOW_X = new Random().nextFloat()/1000f;
     public static final float WIND_FLOW_Y = new Random().nextFloat()/1000f;
     public static final float SMOKE_CANNON_INITIAL =0.45f;
-    public final static float SHELL_SPEED = 0.1f;
-    public final static float SHELL_START_POSITION = 0.3f;
-    public final static float LASER_SIGHT_DISPERSION = 0.015f;
+    public static final float SHELL_SPEED = 0.1f;
+    public static final float SHELL_START_POSITION = 0.3f;
+    public static final float LASER_SIGHT_DISPERSION = 0.015f;
 
     private Context mContext;
     private Texture gameObjectTextures;
 
     private Square laserSight;
-    private Square leftCannonReload;
-    private Square rightCannonReload;
+    private Square reloadStatus;
 
     GameControlObjects rightArrow;
     GameControlObjects leftArrow;
@@ -55,13 +54,13 @@ public class GamePlayRenderer implements GLSurfaceView.Renderer {
 
     public boolean isLeftCannonReloading = false;
     public boolean isRightCannonReloading = false;
-    private float leftCannonReloadStatus = 100.0f;
-    private float rightCannonReloadStatus = 100.0f;
+    private float leftCannonReloadStatus = 1.0f;
+    private float rightCannonReloadStatus = 1.0f;
     private float leftCannonPosition = 0;
     private float rightCannonPosition = 0;
 
-    public List<SmokeEffect> smokeEffects = new ArrayList<>();
-    public List<Shells> shells = new ArrayList<>();
+    private List<SmokeEffect> smokeEffects = new ArrayList<>();
+    private List<Shells> shells = new ArrayList<>();
 
     public GamePlayRenderer(Context context) {
         mContext = context;
@@ -85,9 +84,8 @@ public class GamePlayRenderer implements GLSurfaceView.Renderer {
         leftCannonButton = new GameControlObjects();
         rightCannonButton = new GameControlObjects();
 
-        laserSight = new Square();
-        leftCannonReload = new Square();
-        rightCannonReload = new Square();
+        laserSight = new Square(true);
+        reloadStatus = new Square(false);
     }
 
     public void onDrawFrame(GL10 unused) {
@@ -210,30 +208,29 @@ public class GamePlayRenderer implements GLSurfaceView.Renderer {
         }
 
         if (isLeftCannonReloading) {
-            if (leftCannonReloadStatus == 100) {
+            if (leftCannonReloadStatus == 1) {
                 leftCannonPosition = -0.035f;
                 smokeEffects.add(new SmokeEffect(SmokeEffect.effectsNames.CANNON_SMOKE));
                 smokeEffects.add(new SmokeEffect(SmokeEffect.effectsNames.LEFT_CANNON_FIRE));
                 shells.add(new Shells(turretAngle, true));
-
             }
             if (leftCannonPosition < 0.0)
                 leftCannonPosition += 0.001;
 
             Matrix.setIdentityM(mModelMatrix, 0);
             Matrix.translateM(mModelMatrix, 0, leftCannonButton.xOpenGLPosition, leftCannonButton.yOpenGLPosition, Z_DIMENSION);
-            leftCannonReload.draw(mModelMatrix, leftCannonReloadStatus, false);
+            reloadStatus.draw(mModelMatrix, leftCannonReloadStatus, false);
 
-            leftCannonReloadStatus -= 0.2f;
+            leftCannonReloadStatus -= 0.002f;
 
             if (leftCannonReloadStatus <= 0) {
                 isLeftCannonReloading = false;
-                leftCannonReloadStatus = 100;
+                leftCannonReloadStatus = 1;
             }
         }
 
         if (isRightCannonReloading) {
-            if (rightCannonReloadStatus == 100) {
+            if (rightCannonReloadStatus == 1) {
                 rightCannonPosition = -0.035f;
                 smokeEffects.add(new SmokeEffect(SmokeEffect.effectsNames.CANNON_SMOKE));
                 smokeEffects.add(new SmokeEffect(SmokeEffect.effectsNames.RIGHT_CANNON_FIRE));
@@ -245,13 +242,13 @@ public class GamePlayRenderer implements GLSurfaceView.Renderer {
             Matrix.setIdentityM(mModelMatrix, 0);
             Matrix.translateM(mModelMatrix, 0, rightCannonButton.xOpenGLPosition, rightCannonButton.yOpenGLPosition, Z_DIMENSION);
             Matrix.rotateM(mModelMatrix, 0, 180, 0, 0, 1.0f);
-            rightCannonReload.draw(mModelMatrix, rightCannonReloadStatus, false);
+            reloadStatus.draw(mModelMatrix, rightCannonReloadStatus, false);
 
-            rightCannonReloadStatus -= 0.2f;
+            rightCannonReloadStatus -= 0.002f;
 
             if (rightCannonReloadStatus <= 0) {
                 isRightCannonReloading = false;
-                rightCannonReloadStatus = 100;
+                rightCannonReloadStatus = 1;
             }
         }
     }
