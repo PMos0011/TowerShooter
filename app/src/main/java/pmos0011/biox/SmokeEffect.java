@@ -54,16 +54,22 @@ public class SmokeEffect extends Texture {
 
         GLES31.glUseProgram(ShadersManager.SMOKE_PROGRAM_HANDLE);
 
-        GLES31.glUniform4fv(GLES31.glGetUniformLocation(ShadersManager.SMOKE_PROGRAM_HANDLE, "innerColor"), 1, innerColor, 0);
-        GLES31.glUniform4fv(GLES31.glGetUniformLocation(ShadersManager.SMOKE_PROGRAM_HANDLE, "outerColor"), 1, outerColor, 0);
-        GLES31.glUniform1f(GLES31.glGetUniformLocation(ShadersManager.SMOKE_PROGRAM_HANDLE, "visibility"), visibility);
-        GLES31.glUniform1f(GLES31.glGetUniformLocation(ShadersManager.SMOKE_PROGRAM_HANDLE, "f_Time"), timeVal);
+        GLES31.glUniform4fv(ShadersManager.smokeInnerColorHandle, 1, innerColor, 0);
+        GLES31.glUniform4fv(ShadersManager.smokeOuterColorHandle, 1, outerColor, 0);
+        GLES31.glUniform1f(ShadersManager.smokeVisibilityHandle, visibility);
+        GLES31.glUniform1f(ShadersManager.smokeTimeHandle, timeVal);
 
         if (isFire)
-            GLES31.glUniform1f(GLES31.glGetUniformLocation(ShadersManager.SMOKE_PROGRAM_HANDLE, "isFire"), ROCKET_FIRE);
+            GLES31.glUniform1f(ShadersManager.smokeFireBoolHandle, ROCKET_FIRE);
         else
-            GLES31.glUniform1f(GLES31.glGetUniformLocation(ShadersManager.SMOKE_PROGRAM_HANDLE, "isFire"), SMOKE_EFFECT);
+            GLES31.glUniform1f(ShadersManager.smokeFireBoolHandle, SMOKE_EFFECT);
+
+        GLES31.glEnable(GLES31.GL_BLEND);
+        GLES31.glBlendFunc(GLES31.GL_SRC_ALPHA, GLES31.GL_ONE);
+
         loadOpenGLVariables(mModelMatrix, texture_handle);
+
+        GLES31.glDisable(GLES31.GL_BLEND);
     }
 
     private void destroyEffect(float angle) {
@@ -141,13 +147,13 @@ public class SmokeEffect extends Texture {
     private void cannonFire(float angle, boolean isLeft) {
         if (initValues) {
 
-            innerColor[0] = 0.85f;
-            innerColor[1] = 0.60f;
-            innerColor[2] = 0.10f;
+            innerColor[0] = 1.00f;
+            innerColor[1] = 0.70f;
+            innerColor[2] = 0.20f;
 
-            outerColor[0] = 0.85f;
-            outerColor[1] = 0.20f;
-            outerColor[2] = 0.10f;
+            outerColor[0] = 1.00f;
+            outerColor[1] = 0.30f;
+            outerColor[2] = 0.20f;
 
             scale = GamePlayRenderer.SMOKE_EFFECT_SIZE;
             visibility = 4.0f;
@@ -172,15 +178,15 @@ public class SmokeEffect extends Texture {
     private void cannonSmoke(float angle) {
         if (initValues) {
 
-            innerColor[0] = 0.8f;
-            innerColor[1] = 0.8f;
-            innerColor[2] = 0.8f;
+            innerColor[0] = 0.5f;
+            innerColor[1] = 0.5f;
+            innerColor[2] = 0.6f;
 
-            outerColor[0] = 0.8f;
-            outerColor[1] = 0.8f;
-            outerColor[2] = 0.8f;
+            outerColor[0] = 0.5f;
+            outerColor[1] = 0.5f;
+            outerColor[2] = 0.6f;
 
-            scale = GamePlayRenderer.SMOKE_EFFECT_SIZE * 1.3f;
+            scale = GamePlayRenderer.SMOKE_EFFECT_SIZE * 1.6f;
             visibility = 4.0f;
 
             smokeFlow=Calculations.calculatePoint(angle,GamePlayRenderer.SMOKE_CANNON_INITIAL);

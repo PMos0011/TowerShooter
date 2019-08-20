@@ -70,9 +70,6 @@ public class GamePlayRenderer implements GLSurfaceView.Renderer {
 
         GLES31.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
-        GLES31.glEnable(GLES31.GL_BLEND);
-        GLES31.glBlendFunc(GLES31.GL_SRC_ALPHA, GLES31.GL_ONE_MINUS_SRC_ALPHA);
-
         staticBitmapID = BitmapID.getStaticBitmapID();
         ShadersManager.loadShaders(mContext);
 

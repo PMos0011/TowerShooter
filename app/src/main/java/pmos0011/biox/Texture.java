@@ -7,10 +7,6 @@ import android.graphics.Matrix;
 import android.opengl.GLES31;
 import android.opengl.GLUtils;
 
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.FloatBuffer;
-
 public class Texture {
 
 
@@ -19,35 +15,38 @@ public class Texture {
         float color[] = {1.0f, 1.0f, 1.0f, opacity};
 
         GLES31.glUseProgram(ShadersManager.TEXTURE_PROGRAM_HANDLE);
-        GLES31.glUniform4fv(GLES31.glGetUniformLocation(ShadersManager.TEXTURE_PROGRAM_HANDLE, "v_Color"), 1, color, 0);
+        GLES31.glUniform4fv(ShadersManager.textureColorHandle, 1, color, 0);
+
+        GLES31.glEnable(GLES31.GL_BLEND);
+        GLES31.glBlendFunc(GLES31.GL_SRC_ALPHA, GLES31.GL_ONE_MINUS_SRC_ALPHA);
 
         loadOpenGLVariables(mModelMatrix, texture_handle);
+
+        GLES31.glDisable(GLES31.GL_BLEND);
+
     }
 
     public void loadOpenGLVariables(float[] mModelMatrix, int texture_handle) {
 
-        int mPositionHandle = GLES31.glGetAttribLocation(ShadersManager.TEXTURE_PROGRAM_HANDLE, "a_Position");
-        int textureCoordinateHandle = GLES31.glGetAttribLocation(ShadersManager.TEXTURE_PROGRAM_HANDLE, "a_TexCoordinate");
+        GLES31.glUniformMatrix4fv(ShadersManager.modelMatrixHandle, 1, false, mModelMatrix, 0);
+        GLES31.glUniformMatrix4fv(ShadersManager.projectionMatrixHandle, 1, false, GamePlayRenderer.mProjectionMatrix, 0);
 
-        GLES31.glUniformMatrix4fv(GLES31.glGetUniformLocation(ShadersManager.TEXTURE_PROGRAM_HANDLE, "u_mModelMatrix"), 1, false, mModelMatrix, 0);
-        GLES31.glUniformMatrix4fv(GLES31.glGetUniformLocation(ShadersManager.TEXTURE_PROGRAM_HANDLE, "u_mProjectionMatrix"), 1, false, GamePlayRenderer.mProjectionMatrix, 0);
-
-        GLES31.glVertexAttribPointer(mPositionHandle, ShadersManager.COORDS_PER_VERTEX,
+        GLES31.glVertexAttribPointer(ShadersManager.positionHandle, ShadersManager.COORDS_PER_VERTEX,
                 GLES31.GL_FLOAT, false, ShadersManager.VERTEX_STRIDE, ShadersManager.vertexBuffer);
-        GLES31.glEnableVertexAttribArray(mPositionHandle);
+        GLES31.glEnableVertexAttribArray(ShadersManager.positionHandle);
 
-        GLES31.glVertexAttribPointer(textureCoordinateHandle, ShadersManager.COORDS_PER_VERTEX,
+        GLES31.glVertexAttribPointer(ShadersManager.textureCoordinateHandle, ShadersManager.COORDS_PER_VERTEX,
                 GLES31.GL_FLOAT, false, ShadersManager.VERTEX_STRIDE, ShadersManager.textureBuffer);
-        GLES31.glEnableVertexAttribArray(textureCoordinateHandle);
+        GLES31.glEnableVertexAttribArray(ShadersManager.textureCoordinateHandle);
 
         GLES31.glActiveTexture(GLES31.GL_TEXTURE0);
         GLES31.glBindTexture(GLES31.GL_TEXTURE_2D, texture_handle);
-        GLES31.glUniform1i(GLES31.glGetUniformLocation(ShadersManager.TEXTURE_PROGRAM_HANDLE, "u_Texture"), 0);
+        GLES31.glUniform1i(ShadersManager.textureHandle, 0);
 
         GLES31.glDrawElements(GLES31.GL_TRIANGLES, ShadersManager.DRAW_ORDER.length, GLES31.GL_UNSIGNED_SHORT, ShadersManager.drawListBuffer);
 
-        GLES31.glDisableVertexAttribArray(mPositionHandle);
-        GLES31.glDisableVertexAttribArray(textureCoordinateHandle);
+        GLES31.glDisableVertexAttribArray(ShadersManager.positionHandle);
+        GLES31.glDisableVertexAttribArray(ShadersManager.textureCoordinateHandle);
     }
 
     public void loadTexture(Context context, int texture_id) {

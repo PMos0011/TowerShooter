@@ -24,6 +24,19 @@ public class ShadersManager {
     public static int squareFragmentShaderHandle;
     public static int smokeFragmentShaderHandle;
 
+    public static int projectionMatrixHandle;
+    public static int modelMatrixHandle;
+    public static int textureHandle;
+    public static int positionHandle;
+    public static int textureColorHandle;
+    public static int textureCoordinateHandle;
+    public static int squareColorHandle;
+    public static int smokeInnerColorHandle;
+    public static int smokeOuterColorHandle;
+    public static int smokeVisibilityHandle;
+    public static int smokeTimeHandle;
+    public static int smokeFireBoolHandle;
+
     public static final int COORDS_PER_VERTEX = 2;
     public static final int VERTEX_STRIDE = COORDS_PER_VERTEX * 4;
     public static final int COORDS_PER_COLOR = 4;
@@ -130,7 +143,20 @@ public class ShadersManager {
         GLES31.glLinkProgram(SMOKE_PROGRAM_HANDLE);
         GLES31.glLinkProgram(SQUARE_PROGRAM_HANDLE);
 
+        projectionMatrixHandle = GLES31.glGetUniformLocation(ShadersManager.TEXTURE_PROGRAM_HANDLE, "u_mProjectionMatrix");
+        modelMatrixHandle = GLES31.glGetUniformLocation(ShadersManager.TEXTURE_PROGRAM_HANDLE, "u_mModelMatrix");
+        textureHandle = GLES31.glGetUniformLocation(ShadersManager.TEXTURE_PROGRAM_HANDLE, "u_Texture");
+        positionHandle = GLES31.glGetAttribLocation(ShadersManager.TEXTURE_PROGRAM_HANDLE, "a_Position");
+        textureColorHandle = GLES31.glGetUniformLocation(ShadersManager.TEXTURE_PROGRAM_HANDLE, "v_Color");
+        textureCoordinateHandle = GLES31.glGetAttribLocation(ShadersManager.TEXTURE_PROGRAM_HANDLE, "a_TexCoordinate");
 
+        squareColorHandle = GLES31.glGetAttribLocation(ShadersManager.SQUARE_PROGRAM_HANDLE, "a_Color");
+
+        smokeInnerColorHandle = GLES31.glGetUniformLocation(ShadersManager.SMOKE_PROGRAM_HANDLE, "innerColor");
+        smokeOuterColorHandle = GLES31.glGetUniformLocation(ShadersManager.SMOKE_PROGRAM_HANDLE, "outerColor");
+        smokeVisibilityHandle = GLES31.glGetUniformLocation(ShadersManager.SMOKE_PROGRAM_HANDLE, "visibility");
+        smokeTimeHandle = GLES31.glGetUniformLocation(ShadersManager.SMOKE_PROGRAM_HANDLE, "f_Time");
+        smokeFireBoolHandle = GLES31.glGetUniformLocation(ShadersManager.SMOKE_PROGRAM_HANDLE, "isFire");
     }
 
 }
