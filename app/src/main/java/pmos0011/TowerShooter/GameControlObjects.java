@@ -1,8 +1,7 @@
-package pmos0011.biox;
+package pmos0011.TowerShooter;
 
 import android.graphics.Point;
 import android.opengl.Matrix;
-import android.util.Log;
 
 public class GameControlObjects {
     public Point position;

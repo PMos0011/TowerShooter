@@ -1,4 +1,4 @@
-package pmos0011.biox;
+package pmos0011.TowerShooter;
 
 import android.graphics.PointF;
 import android.opengl.GLES31;
@@ -17,7 +17,7 @@ public class SmokeEffect extends Texture {
     private float[] outerColor = {0.85f, 0.20f, 0.10f, 1.0f};
 
     private float scale = 1.0f;
-    private PointF smokeFlow= new PointF();
+    private PointF smokeFlow = new PointF();
     public float visibility = 4.0f;
 
     private boolean notGrayDestroyEffect = true;
@@ -65,7 +65,6 @@ public class SmokeEffect extends Texture {
             GLES31.glUniform1f(ShadersManager.smokeFireBoolHandle, SMOKE_EFFECT);
 
 
-
         loadOpenGLVariables(mModelMatrix, texture_handle);
 
         GLES31.glDisable(GLES31.GL_BLEND);
@@ -85,12 +84,12 @@ public class SmokeEffect extends Texture {
             scale = GamePlayRenderer.SMOKE_EFFECT_SIZE * 0.1f;
             visibility = 4.0f;
 
-            smokeFlow=Calculations.calculatePoint(angle,GamePlayRenderer.SMOKE_CANNON_INITIAL);
+            smokeFlow = Calculations.calculatePoint(angle, GamePlayRenderer.SMOKE_CANNON_INITIAL);
             initValues = false;
         }
 
         Matrix.setIdentityM(mModelMatrix, 0);
-        Matrix.translateM(mModelMatrix, 0, smokeFlow.x,smokeFlow.y, GamePlayRenderer.Z_DIMENSION);
+        Matrix.translateM(mModelMatrix, 0, smokeFlow.x, smokeFlow.y, GamePlayRenderer.Z_DIMENSION);
         Matrix.scaleM(mModelMatrix, 0, scale, scale, 1);
 
 
@@ -138,8 +137,8 @@ public class SmokeEffect extends Texture {
                 }
             }
         }
-        smokeFlow.x+=GamePlayRenderer.WIND_FLOW_X;
-        smokeFlow.y+=GamePlayRenderer.WIND_FLOW_Y;
+        smokeFlow.x += GamePlayRenderer.WIND_FLOW_X;
+        smokeFlow.y += GamePlayRenderer.WIND_FLOW_Y;
     }
 
     private void cannonFire(float angle) {
@@ -177,36 +176,43 @@ public class SmokeEffect extends Texture {
             innerColor[0] = 0.85f;
             innerColor[1] = 0.85f;
             innerColor[2] = 0.85f;
+            innerColor[3] = 0.0f;
 
             outerColor[0] = 0.85f;
             outerColor[1] = 0.85f;
             outerColor[2] = 0.85f;
+            outerColor[3] = 0.0f;
 
             scale = GamePlayRenderer.SMOKE_EFFECT_SIZE * 1.4f;
             visibility = 4.0f;
 
-            smokeFlow=Calculations.calculatePoint(angle,GamePlayRenderer.SMOKE_CANNON_INITIAL);
+            smokeFlow = Calculations.calculatePoint(angle, GamePlayRenderer.SMOKE_CANNON_INITIAL);
             initValues = false;
         }
 
         Matrix.setIdentityM(mModelMatrix, 0);
-        Matrix.translateM(mModelMatrix, 0, smokeFlow.x, smokeFlow.y , GamePlayRenderer.Z_DIMENSION);
+        Matrix.translateM(mModelMatrix, 0, smokeFlow.x, smokeFlow.y, GamePlayRenderer.Z_DIMENSION);
         Matrix.scaleM(mModelMatrix, 0, scale, scale, 1);
 
+        if (innerColor[3] < 0.9 && visibility == 4.0) {
+            innerColor[3] += 0.07;
+            outerColor[3] += 0.07;
+        } else {
+            scale += 0.0005;
+            visibility -= 0.015;
+            innerColor[3] -= 0.0015;
+            outerColor[3] -= 0.0045;
+            smokeFlow.x += GamePlayRenderer.WIND_FLOW_X;
+            smokeFlow.y += GamePlayRenderer.WIND_FLOW_Y;
+        }
         timeVal += 0.003;
-        scale += 0.0005;
-        visibility -= 0.015;
-        innerColor[3] -= 0.0015;
-        outerColor[3] -= 0.0045;
-        smokeFlow.x+=GamePlayRenderer.WIND_FLOW_X;
-        smokeFlow.y+=GamePlayRenderer.WIND_FLOW_Y;
     }
 
 
     public enum effectsNames {
 
         DESTROY_EFFECT,
-CANNON_FIRE,
+        CANNON_FIRE,
         CANNON_SMOKE
 
     }

@@ -1,4 +1,4 @@
-package pmos0011.biox;
+package pmos0011.TowerShooter;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -34,6 +34,8 @@ public class Texture {
         GLES31.glVertexAttribPointer(ShadersManager.texturePositionHandle, ShadersManager.COORDS_PER_VERTEX,
                 GLES31.GL_FLOAT, false, ShadersManager.VERTEX_STRIDE, ShadersManager.vertexBuffer);
         GLES31.glEnableVertexAttribArray(ShadersManager.texturePositionHandle);
+
+
 
         GLES31.glVertexAttribPointer(ShadersManager.textureCoordinateHandle, ShadersManager.COORDS_PER_VERTEX,
                 GLES31.GL_FLOAT, false, ShadersManager.VERTEX_STRIDE, ShadersManager.textureBuffer);

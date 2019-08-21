@@ -1,4 +1,4 @@
-package pmos0011.biox;
+package pmos0011.TowerShooter;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -7,11 +7,16 @@ import android.content.Context;
 import android.opengl.GLES31;
 import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
+
+import TextCreator.Characters;
+import TextCreator.FontRenderer;
+import TextCreator.FontSettingsReader;
 
 public class GamePlayRenderer implements GLSurfaceView.Renderer {
 
@@ -23,15 +28,18 @@ public class GamePlayRenderer implements GLSurfaceView.Renderer {
     public static final float SHELL_PROPORTION = 300.0f / 76.0f;
     public static final float SMOKE_EFFECT_SIZE = 0.2f;
     public static final float CANNON_X_POSITION = 0.0265f;
-    public static final float WIND_FLOW_X = new Random().nextFloat()/1000f;
-    public static final float WIND_FLOW_Y = new Random().nextFloat()/1000f;
-    public static final float SMOKE_CANNON_INITIAL =0.45f;
+    public static final float WIND_FLOW_X = new Random().nextFloat() / 1000f;
+    public static final float WIND_FLOW_Y = new Random().nextFloat() / 1000f;
+    public static final float SMOKE_CANNON_INITIAL = 0.45f;
     public static final float SHELL_SPEED = 0.1f;
     public static final float SHELL_START_POSITION = 0.3f;
     public static final float LASER_SIGHT_DISPERSION = 0.015f;
 
     private Context mContext;
     private Texture gameObjectTextures;
+    private Texture fontTexture;
+
+    private FontRenderer fontRenderer = new FontRenderer();
 
     private Square laserSight;
     private Square reloadStatus;
@@ -43,7 +51,7 @@ public class GamePlayRenderer implements GLSurfaceView.Renderer {
 
     private static float ratio;
 
-    private int[] staticBitmapID;
+    public static int[] staticBitmapID;
     public static float[] mProjectionMatrix = new float[16];
     private float[] mModelMatrix = new float[16];
 
@@ -68,6 +76,11 @@ public class GamePlayRenderer implements GLSurfaceView.Renderer {
 
     public void onSurfaceCreated(GL10 unused, EGLConfig config) {
 
+        FontSettingsReader.reader(mContext, fontRenderer);
+        Characters c= fontRenderer.getCharacter(60);
+
+        Log.d("x",String.valueOf(c.xOffset));
+
         GLES31.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
         staticBitmapID = BitmapID.getStaticBitmapID();
@@ -83,6 +96,8 @@ public class GamePlayRenderer implements GLSurfaceView.Renderer {
 
         laserSight = new Square(true);
         reloadStatus = new Square(false);
+
+        fontTexture = new Texture();
     }
 
     public void onDrawFrame(GL10 unused) {
@@ -99,6 +114,11 @@ public class GamePlayRenderer implements GLSurfaceView.Renderer {
         Matrix.scaleM(mModelMatrix, 0, TOWER_SIZE, TOWER_SIZE, 1);
         gameObjectTextures.draw(mModelMatrix, staticBitmapID[BitmapID.textureNames.TURRET_BASE.getValue()], 1);
 
+        /*Matrix.setIdentityM(mModelMatrix, 0);
+        Matrix.translateM(mModelMatrix, 0, -1.0f, 0, Z_DIMENSION);
+        Matrix.scaleM(mModelMatrix, 0, TOWER_SIZE*0.7049f, TOWER_SIZE, 1);
+        fontTexture.draw(mModelMatrix, staticBitmapID[BitmapID.textureNames.FONT_MAP.getValue()], 1);*/
+
         Matrix.setIdentityM(mModelMatrix, 0);
         Matrix.rotateM(mModelMatrix, 0, turretAngle, 0, 0, 1.0f);
         Matrix.translateM(mModelMatrix, 0, 0, 0, Z_DIMENSION);
@@ -113,8 +133,8 @@ public class GamePlayRenderer implements GLSurfaceView.Renderer {
             Matrix.scaleM(mModelMatrix, 0, SHELL_SIZE, SHELL_SIZE * SHELL_PROPORTION, 1);
             gameObjectTextures.draw(mModelMatrix, staticBitmapID[BitmapID.textureNames.SHELL.getValue()], 1);
 
-            shell.shellPosition.x+=shell.deltaSpeed.x;
-            shell.shellPosition.y+=shell.deltaSpeed.y;
+            shell.shellPosition.x += shell.deltaSpeed.x;
+            shell.shellPosition.y += shell.deltaSpeed.y;
             if (shell.shellPosition.x > 2 * ratio || shell.shellPosition.y > 2)
                 shellsIterator.remove();
         }
@@ -173,6 +193,8 @@ public class GamePlayRenderer implements GLSurfaceView.Renderer {
             if (smoke.visibility <= 0)
                 smokeEffectIterator.remove();
         }
+
+        // font.draw();
         gameActions();
     }
 

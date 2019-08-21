@@ -1,10 +1,10 @@
-package pmos0011.biox;
+package pmos0011.TowerShooter;
 
 public class BitmapID {
 
     public static int[] getStaticBitmapID() {
 
-        int[] tmp_bitmapID = new int[11];
+        int[] tmp_bitmapID = new int[12];
         tmp_bitmapID[0] = R.drawable.background;
         tmp_bitmapID[1] = R.drawable.base;
         tmp_bitmapID[2] = R.drawable.left_cannon;
@@ -16,6 +16,7 @@ public class BitmapID {
         tmp_bitmapID[8] = R.drawable.r_cannon_b;
         tmp_bitmapID[9] = R.drawable.radar;
         tmp_bitmapID[10] = R.drawable.shell;
+        tmp_bitmapID[11] = R.drawable.calibri;
 
         return tmp_bitmapID;
     }
@@ -32,7 +33,8 @@ public class BitmapID {
         LEFT_CANNON_BUTTON(7),
         RIGHT_CANNON_BUTTON(8),
         RADAR(9),
-        SHELL(10);
+        SHELL(10),
+        FONT_MAP(11);
 
         private final int value;
 

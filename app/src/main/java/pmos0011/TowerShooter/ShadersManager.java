@@ -1,4 +1,4 @@
-package pmos0011.biox;
+package pmos0011.TowerShooter;
 
 import android.content.Context;
 import android.opengl.GLES31;
@@ -10,7 +10,6 @@ import java.io.InputStreamReader;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
-import java.nio.ShortBuffer;
 
 
 public class ShadersManager {
