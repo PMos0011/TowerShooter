@@ -32,8 +32,10 @@ public class GamePlayRenderer implements GLSurfaceView.Renderer {
     public static final float WIND_FLOW_Y = new Random().nextFloat() / 1000f;
     public static final float SMOKE_CANNON_INITIAL = 0.45f;
     public static final float SHELL_SPEED = 0.1f;
-    public static final float SHELL_START_POSITION = 0.3f;
+    public static final float SHELL_START_POSITION = 0.2f;
     public static final float LASER_SIGHT_DISPERSION = 0.015f;
+    public static final float TANK_Y_DIMENSION = 0.26f;
+    public static final float TANK_X_DIMENSION = TANK_Y_DIMENSION * 800.0f/1900.f;
 
     private Context mContext;
     private Texture gameObjectTextures;
@@ -109,6 +111,17 @@ public class GamePlayRenderer implements GLSurfaceView.Renderer {
         Matrix.translateM(mModelMatrix, 0, 0, 0, Z_DIMENSION);
         Matrix.scaleM(mModelMatrix, 0, TOWER_SIZE, TOWER_SIZE, 1);
         gameObjectTextures.draw(mModelMatrix, staticBitmapID[BitmapID.textureNames.TURRET_BASE.getValue()], 1);
+
+        Matrix.setIdentityM(mModelMatrix, 0);
+        Matrix.translateM(mModelMatrix, 0, -1, 0, Z_DIMENSION);
+        Matrix.scaleM(mModelMatrix, 0, TANK_X_DIMENSION, TANK_Y_DIMENSION, 1);
+        gameObjectTextures.draw(mModelMatrix, staticBitmapID[BitmapID.textureNames.TANK_CHASSIS.getValue()], 1);
+
+        Matrix.setIdentityM(mModelMatrix, 0);
+        Matrix.translateM(mModelMatrix, 0, -1, 0, Z_DIMENSION);
+        Matrix.rotateM(mModelMatrix, 0, -turretAngle, 0, 0, 1.0f);
+        Matrix.scaleM(mModelMatrix, 0, TANK_X_DIMENSION, TANK_Y_DIMENSION, 1);
+        gameObjectTextures.draw(mModelMatrix, staticBitmapID[BitmapID.textureNames.TANK_TURRET.getValue()], 1);
 
         Matrix.setIdentityM(mModelMatrix, 0);
         Matrix.rotateM(mModelMatrix, 0, turretAngle, 0, 0, 1.0f);

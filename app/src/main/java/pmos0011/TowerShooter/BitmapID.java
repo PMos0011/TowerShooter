@@ -4,7 +4,7 @@ public class BitmapID {
 
     public static int[] getStaticBitmapID() {
 
-        int[] tmp_bitmapID = new int[12];
+        int[] tmp_bitmapID = new int[14];
         tmp_bitmapID[0] = R.drawable.background;
         tmp_bitmapID[1] = R.drawable.base;
         tmp_bitmapID[2] = R.drawable.left_cannon;
@@ -17,6 +17,8 @@ public class BitmapID {
         tmp_bitmapID[9] = R.drawable.radar;
         tmp_bitmapID[10] = R.drawable.shell;
         tmp_bitmapID[11] = R.drawable.calibri;
+        tmp_bitmapID[12] = R.drawable.tank_chassis;
+        tmp_bitmapID[13] = R.drawable.tank_turret;
 
         return tmp_bitmapID;
     }
@@ -34,7 +36,9 @@ public class BitmapID {
         RIGHT_CANNON_BUTTON(8),
         RADAR(9),
         SHELL(10),
-        FONT_MAP(11);
+        FONT_MAP(11),
+        TANK_CHASSIS(12),
+        TANK_TURRET(13);
 
         private final int value;
 
