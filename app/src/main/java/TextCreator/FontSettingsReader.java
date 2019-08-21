@@ -31,19 +31,19 @@ public class FontSettingsReader {
                 values.clear();
                 for (String part : nextLine.split(" ")) {
                     String[] valuePairs = part.split("=");
-                    if(valuePairs.length==2)
-                        values.put(valuePairs[0],valuePairs[1]);
+                    if (valuePairs.length == 2)
+                        values.put(valuePairs[0], valuePairs[1]);
                 }
-
                 int id = Integer.parseInt(values.get("id"));
                 float x = Float.parseFloat(values.get("x"));
                 float y = Float.parseFloat(values.get("y"));
-                float w= Float.parseFloat(values.get("width"));
+                float w = Float.parseFloat(values.get("width"));
                 float h = Float.parseFloat(values.get("height"));
                 float xoffset = Float.parseFloat(values.get("xoffset"));
                 float yoffset = Float.parseFloat(values.get("yoffset"));
+                float advance = Float.parseFloat(values.get("xadvance"));
 
-                renderer.addCharacterData(new Characters(id,x,y,w,h,xoffset,yoffset));
+                renderer.addCharacterData(new Characters(id, x, y, w, h, xoffset, yoffset, advance));
 
             } catch (IOException e) {
                 e.printStackTrace();

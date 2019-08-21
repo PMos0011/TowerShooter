@@ -16,6 +16,7 @@ public class Texture {
 
         GLES31.glUseProgram(ShadersManager.TEXTURE_PROGRAM_HANDLE);
         GLES31.glUniform4fv(ShadersManager.textureColorHandle, 1, color, 0);
+        GLES31.glUniform1f(GLES31.glGetUniformLocation(ShadersManager.TEXTURE_PROGRAM_HANDLE, "isFont"), 0);
 
         GLES31.glEnable(GLES31.GL_BLEND);
         GLES31.glBlendFunc(GLES31.GL_SRC_ALPHA, GLES31.GL_ONE_MINUS_SRC_ALPHA);
@@ -27,6 +28,8 @@ public class Texture {
     }
 
     public void loadOpenGLVariables(float[] mModelMatrix, int texture_handle) {
+
+
 
         GLES31.glUniformMatrix4fv(ShadersManager.modelMatrixHandle, 1, false, mModelMatrix, 0);
         GLES31.glUniformMatrix4fv(ShadersManager.projectionMatrixHandle, 1, false, GamePlayRenderer.mProjectionMatrix, 0);

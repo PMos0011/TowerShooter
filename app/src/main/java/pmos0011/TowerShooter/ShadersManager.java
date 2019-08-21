@@ -89,7 +89,6 @@ public class ShadersManager {
                 shaderString.append(nextLine);
                 shaderString.append('\n');
             } catch (IOException e) {
-                e.printStackTrace();
             }
         }
 

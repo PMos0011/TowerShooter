@@ -63,7 +63,7 @@ public class SmokeEffect extends Texture {
             GLES31.glUniform1f(ShadersManager.smokeFireBoolHandle, ROCKET_FIRE);
         else
             GLES31.glUniform1f(ShadersManager.smokeFireBoolHandle, SMOKE_EFFECT);
-
+        GLES31.glUniform1f(GLES31.glGetUniformLocation(ShadersManager.TEXTURE_PROGRAM_HANDLE, "isFont"), 0);
 
         loadOpenGLVariables(mModelMatrix, texture_handle);
 

@@ -37,8 +37,6 @@ public class GamePlayRenderer implements GLSurfaceView.Renderer {
 
     private Context mContext;
     private Texture gameObjectTextures;
-    private Texture fontTexture;
-
     private FontRenderer fontRenderer = new FontRenderer();
 
     private Square laserSight;
@@ -59,6 +57,7 @@ public class GamePlayRenderer implements GLSurfaceView.Renderer {
     private float radarAngle = 0;
     public boolean rotateRight = false;
     public boolean rotateLeft = false;
+    public boolean gamePlay = false;
 
     public boolean isLeftCannonReloading = false;
     public boolean isRightCannonReloading = false;
@@ -70,6 +69,8 @@ public class GamePlayRenderer implements GLSurfaceView.Renderer {
     private List<SmokeEffect> smokeEffects = new ArrayList<>();
     private List<Shells> shells = new ArrayList<>();
 
+    int score = 0;
+
     public GamePlayRenderer(Context context) {
         mContext = context;
     }
@@ -77,9 +78,6 @@ public class GamePlayRenderer implements GLSurfaceView.Renderer {
     public void onSurfaceCreated(GL10 unused, EGLConfig config) {
 
         FontSettingsReader.reader(mContext, fontRenderer);
-        Characters c= fontRenderer.getCharacter(60);
-
-        Log.d("x",String.valueOf(c.xOffset));
 
         GLES31.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
@@ -96,8 +94,6 @@ public class GamePlayRenderer implements GLSurfaceView.Renderer {
 
         laserSight = new Square(true);
         reloadStatus = new Square(false);
-
-        fontTexture = new Texture();
     }
 
     public void onDrawFrame(GL10 unused) {
@@ -113,11 +109,6 @@ public class GamePlayRenderer implements GLSurfaceView.Renderer {
         Matrix.translateM(mModelMatrix, 0, 0, 0, Z_DIMENSION);
         Matrix.scaleM(mModelMatrix, 0, TOWER_SIZE, TOWER_SIZE, 1);
         gameObjectTextures.draw(mModelMatrix, staticBitmapID[BitmapID.textureNames.TURRET_BASE.getValue()], 1);
-
-        /*Matrix.setIdentityM(mModelMatrix, 0);
-        Matrix.translateM(mModelMatrix, 0, -1.0f, 0, Z_DIMENSION);
-        Matrix.scaleM(mModelMatrix, 0, TOWER_SIZE*0.7049f, TOWER_SIZE, 1);
-        fontTexture.draw(mModelMatrix, staticBitmapID[BitmapID.textureNames.FONT_MAP.getValue()], 1);*/
 
         Matrix.setIdentityM(mModelMatrix, 0);
         Matrix.rotateM(mModelMatrix, 0, turretAngle, 0, 0, 1.0f);
@@ -194,8 +185,12 @@ public class GamePlayRenderer implements GLSurfaceView.Renderer {
                 smokeEffectIterator.remove();
         }
 
-        // font.draw();
-        gameActions();
+        if (!gamePlay)
+            fontRenderer.writeText(mModelMatrix, -1.2f, 0.3f, "PRESS TO PLAY", 0.13f, staticBitmapID[BitmapID.textureNames.FONT_MAP.getValue()]);
+        fontRenderer.writeText(mModelMatrix, -ratio + 0.06f, 0.88f, "KILLS " + score, 0.06f, staticBitmapID[BitmapID.textureNames.FONT_MAP.getValue()]);
+
+        if (gamePlay)
+            gameActions();
     }
 
     public void onSurfaceChanged(GL10 unused, int width, int height) {

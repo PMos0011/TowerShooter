@@ -34,6 +34,10 @@ public class GamePlaySurfaceView extends GLSurfaceView {
 
                 case MotionEvent.ACTION_DOWN:
                 case MotionEvent.ACTION_POINTER_DOWN:
+
+                    if(!renderer.gamePlay)
+                        renderer.gamePlay=true;
+
                     if (isMoveButtonPressed(point.x, point.y))
                         pointerID = e.getPointerId(i);
                     if (pointerID == e.getPointerId(i))
