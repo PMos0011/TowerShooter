@@ -7,14 +7,12 @@ import android.content.Context;
 import android.opengl.GLES31;
 import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
-import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
-import TextCreator.Characters;
 import TextCreator.FontRenderer;
 import TextCreator.FontSettingsReader;
 
@@ -25,17 +23,18 @@ public class GamePlayRenderer implements GLSurfaceView.Renderer {
     public static final float TOWER_SIZE = 0.4f;
     public static final float RADAR_SIZE = 0.065f;
     public static final float SHELL_SIZE = 0.009f;
-    public static final float SHELL_PROPORTION = 300.0f / 76.0f;
+    public static final float SHELL_ASPECT = 300.0f / 76.0f;
     public static final float SMOKE_EFFECT_SIZE = 0.2f;
     public static final float CANNON_X_POSITION = 0.0265f;
     public static final float WIND_FLOW_X = new Random().nextFloat() / 1000f;
     public static final float WIND_FLOW_Y = new Random().nextFloat() / 1000f;
-    public static final float SMOKE_CANNON_INITIAL = 0.45f;
+    public static final float TOWER_CANNON_Y_POSITION = 0.55f;
+    public static final float TANK_CANNON_Y_POSITION = 0.35f;
     public static final float SHELL_SPEED = 0.1f;
-    public static final float SHELL_START_POSITION = 0.2f;
     public static final float LASER_SIGHT_DISPERSION = 0.015f;
-    public static final float TANK_Y_DIMENSION = 0.26f;
-    public static final float TANK_X_DIMENSION = TANK_Y_DIMENSION * 800.0f/1900.f;
+    public static final float TANK_SIZE = 0.13f;
+    public static final float TANK_ASPECT = 1900.0f/800.f;
+    public static final float TANK_MAX_SPEED = 0.001f;
 
     private Context mContext;
     private Texture gameObjectTextures;
@@ -70,6 +69,7 @@ public class GamePlayRenderer implements GLSurfaceView.Renderer {
 
     private List<SmokeEffect> smokeEffects = new ArrayList<>();
     private List<Shells> shells = new ArrayList<>();
+    private List<Enemy> enemies = new ArrayList<>();
 
     int score = 0;
 
@@ -80,6 +80,8 @@ public class GamePlayRenderer implements GLSurfaceView.Renderer {
     public void onSurfaceCreated(GL10 unused, EGLConfig config) {
 
         FontSettingsReader.reader(mContext, fontRenderer);
+
+        enemies.add(new Enemy(0,-1,0,TANK_MAX_SPEED));
 
         GLES31.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
@@ -96,6 +98,11 @@ public class GamePlayRenderer implements GLSurfaceView.Renderer {
 
         laserSight = new Square(true);
         reloadStatus = new Square(false);
+
+
+        //enemies.add(new Enemy(turretAngle, -1,0,SHELL_SIZE));
+        //smokeEffects.add(new SmokeEffect(SmokeEffect.effectsNames.EXHAUST,0,-0.23f,-1.02f,0,SMOKE_EFFECT_SIZE/2.5f));
+        //smokeEffects.add(new SmokeEffect(SmokeEffect.effectsNames.EXHAUST,0,-0.23f,-0.98f,0,SMOKE_EFFECT_SIZE/2.5f));
     }
 
     public void onDrawFrame(GL10 unused) {
@@ -113,33 +120,50 @@ public class GamePlayRenderer implements GLSurfaceView.Renderer {
         gameObjectTextures.draw(mModelMatrix, staticBitmapID[BitmapID.textureNames.TURRET_BASE.getValue()], 1);
 
         Matrix.setIdentityM(mModelMatrix, 0);
-        Matrix.translateM(mModelMatrix, 0, -1, 0, Z_DIMENSION);
-        Matrix.scaleM(mModelMatrix, 0, TANK_X_DIMENSION, TANK_Y_DIMENSION, 1);
-        gameObjectTextures.draw(mModelMatrix, staticBitmapID[BitmapID.textureNames.TANK_CHASSIS.getValue()], 1);
-
-        Matrix.setIdentityM(mModelMatrix, 0);
-        Matrix.translateM(mModelMatrix, 0, -1, 0, Z_DIMENSION);
-        Matrix.rotateM(mModelMatrix, 0, -turretAngle, 0, 0, 1.0f);
-        Matrix.scaleM(mModelMatrix, 0, TANK_X_DIMENSION, TANK_Y_DIMENSION, 1);
-        gameObjectTextures.draw(mModelMatrix, staticBitmapID[BitmapID.textureNames.TANK_TURRET.getValue()], 1);
-
-        Matrix.setIdentityM(mModelMatrix, 0);
         Matrix.rotateM(mModelMatrix, 0, turretAngle, 0, 0, 1.0f);
         Matrix.translateM(mModelMatrix, 0, 0, 0, Z_DIMENSION);
         laserSight.draw(mModelMatrix, ratio, true);
+
+        Iterator<Enemy> enemyIterator = enemies.iterator();
+        while(enemyIterator.hasNext()){
+            Enemy enemy = enemyIterator.next();
+            Matrix.setIdentityM(mModelMatrix, 0);
+            Matrix.translateM(mModelMatrix, 0, enemy.position.x, enemy.position.y, Z_DIMENSION);
+            Matrix.rotateM(mModelMatrix, 0, enemy.angle, 0, 0, 1.0f);
+            Matrix.scaleM(mModelMatrix, 0, enemy.scale.x, enemy.scale.y, 1);
+            gameObjectTextures.draw(mModelMatrix, staticBitmapID[BitmapID.textureNames.TANK_CHASSIS.getValue()], 1);
+
+            Matrix.setIdentityM(mModelMatrix, 0);
+            Matrix.translateM(mModelMatrix, 0, enemy.position.x, enemy.position.y, Z_DIMENSION);
+            Matrix.rotateM(mModelMatrix, 0, enemy.turretAngle, 0, 0, 1.0f);
+            Matrix.scaleM(mModelMatrix, 0, enemy.scale.x, enemy.scale.y, 1);
+            gameObjectTextures.draw(mModelMatrix, staticBitmapID[BitmapID.textureNames.TANK_TURRET.getValue()], 1);
+
+            enemy.turretAngle += 0.2f;
+            if (enemy.turretAngle > 360)
+                enemy.turretAngle = 0.2f;
+
+            enemy.position.x+=enemy.deltaSpeed.x;
+            enemy.position.y+=enemy.deltaSpeed.y;
+
+            if(enemy.position.y>1.0f){
+                enemy.position.y=-1.0f;
+            }
+
+        }
 
         Iterator<Shells> shellsIterator = shells.iterator();
         while (shellsIterator.hasNext()) {
             Shells shell = shellsIterator.next();
             Matrix.setIdentityM(mModelMatrix, 0);
-            Matrix.translateM(mModelMatrix, 0, shell.shellPosition.x, shell.shellPosition.y, Z_DIMENSION);
-            Matrix.rotateM(mModelMatrix, 0, shell.shellAngle, 0, 0, 1.0f);
-            Matrix.scaleM(mModelMatrix, 0, SHELL_SIZE, SHELL_SIZE * SHELL_PROPORTION, 1);
+            Matrix.translateM(mModelMatrix, 0, shell.position.x, shell.position.y, Z_DIMENSION);
+            Matrix.rotateM(mModelMatrix, 0, shell.angle, 0, 0, 1.0f);
+            Matrix.scaleM(mModelMatrix, 0, shell.scale.x, shell.scale.y, 1);
             gameObjectTextures.draw(mModelMatrix, staticBitmapID[BitmapID.textureNames.SHELL.getValue()], 1);
 
-            shell.shellPosition.x += shell.deltaSpeed.x;
-            shell.shellPosition.y += shell.deltaSpeed.y;
-            if (shell.shellPosition.x > 2 * ratio || shell.shellPosition.y > 2)
+            shell.position.x += shell.deltaSpeed.x;
+            shell.position.y += shell.deltaSpeed.y;
+            if (shell.position.x > 2 * ratio || shell.position.y > 2)
                 shellsIterator.remove();
         }
 
@@ -193,7 +217,7 @@ public class GamePlayRenderer implements GLSurfaceView.Renderer {
         Iterator<SmokeEffect> smokeEffectIterator = smokeEffects.iterator();
         while (smokeEffectIterator.hasNext()) {
             SmokeEffect smoke = smokeEffectIterator.next();
-            smoke.draw(staticBitmapID[BitmapID.textureNames.LEFT_ARROW.getValue()], turretAngle);
+            smoke.draw(staticBitmapID[BitmapID.textureNames.LEFT_ARROW.getValue()]);
             if (smoke.visibility <= 0)
                 smokeEffectIterator.remove();
         }
@@ -202,7 +226,6 @@ public class GamePlayRenderer implements GLSurfaceView.Renderer {
             fontRenderer.writeText(mModelMatrix, -1.2f, 0.3f, "PRESS TO PLAY", 0.13f, staticBitmapID[BitmapID.textureNames.FONT_MAP.getValue()]);
         fontRenderer.writeText(mModelMatrix, -ratio + 0.06f, 0.88f, "KILLS " + score, 0.06f, staticBitmapID[BitmapID.textureNames.FONT_MAP.getValue()]);
 
-        if (gamePlay)
             gameActions();
     }
 
@@ -237,9 +260,11 @@ public class GamePlayRenderer implements GLSurfaceView.Renderer {
         if (isLeftCannonReloading) {
             if (leftCannonReloadStatus == 1) {
                 leftCannonPosition = -0.035f;
-                smokeEffects.add(new SmokeEffect(SmokeEffect.effectsNames.CANNON_SMOKE));
-                smokeEffects.add(new SmokeEffect(SmokeEffect.effectsNames.CANNON_FIRE));
-                shells.add(new Shells(turretAngle, true));
+                smokeEffects.add(new SmokeEffect(SmokeEffect.effectsNames.CANNON_SMOKE,turretAngle,0.55f,0,0,SMOKE_EFFECT_SIZE));
+                smokeEffects.add(new SmokeEffect(SmokeEffect.effectsNames.CANNON_FIRE,turretAngle,0.55f,0,0,SMOKE_EFFECT_SIZE));
+               // smokeEffects.add(new SmokeEffect(SmokeEffect.effectsNames.CANNON_SMOKE,turretAngle,0.35f,-1,0,SMOKE_EFFECT_SIZE/3));
+               // smokeEffects.add(new SmokeEffect(SmokeEffect.effectsNames.CANNON_FIRE,turretAngle,0.35f,-1,0,SMOKE_EFFECT_SIZE/3));
+                shells.add(new Shells(turretAngle, true,SHELL_SPEED));
             }
             if (leftCannonPosition < 0.0)
                 leftCannonPosition += 0.001;
@@ -259,9 +284,12 @@ public class GamePlayRenderer implements GLSurfaceView.Renderer {
         if (isRightCannonReloading) {
             if (rightCannonReloadStatus == 1) {
                 rightCannonPosition = -0.035f;
-                smokeEffects.add(new SmokeEffect(SmokeEffect.effectsNames.CANNON_SMOKE));
-                smokeEffects.add(new SmokeEffect(SmokeEffect.effectsNames.CANNON_FIRE));
-                shells.add(new Shells(turretAngle, false));
+                smokeEffects.add(new SmokeEffect(SmokeEffect.effectsNames.CANNON_SMOKE,turretAngle,0.45f,0,0,SMOKE_EFFECT_SIZE));
+                smokeEffects.add(new SmokeEffect(SmokeEffect.effectsNames.CANNON_FIRE,turretAngle,0.45f,0,0,SMOKE_EFFECT_SIZE));
+                //smokeEffects.add(new SmokeEffect(SmokeEffect.effectsNames.CANNON_SMOKE,turretAngle,0.35f,-1,0,SMOKE_EFFECT_SIZE/2));
+                //smokeEffects.add(new SmokeEffect(SmokeEffect.effectsNames.CANNON_FIRE,turretAngle,0.35f,-1,0,SMOKE_EFFECT_SIZE/2));
+                shells.add(new Shells(turretAngle, false, SHELL_SPEED));
+                //shells.add(new Shells(turretAngle, -1,0));
             }
             if (rightCannonPosition < 0.0)
                 rightCannonPosition += 0.001;

@@ -1,28 +1,18 @@
 package pmos0011.TowerShooter;
 
-import android.graphics.PointF;
+public class Shells extends ObjectPosition {
 
-public class Shells {
+    public Shells(float angle, boolean isLeft, float speed) {
+        super(angle, isLeft, speed);
 
-    public PointF shellPosition;
-    public PointF deltaSpeed;
-    public float shellAngle;
+        setScale(GamePlayRenderer.SHELL_SIZE,GamePlayRenderer.SHELL_ASPECT);
 
-    public Shells(float angle, boolean isLeft) {
-        shellPosition = new PointF();
-        deltaSpeed = new PointF();
-
-        shellPosition = Calculations.calculatePoint(angle, GamePlayRenderer.SHELL_START_POSITION);
-        deltaSpeed = Calculations.calculatePoint(angle, GamePlayRenderer.SHELL_SPEED);
-        PointF tempPoint = Calculations.calculatePoint(angle, GamePlayRenderer.CANNON_X_POSITION);
-
-        if (isLeft) {
-            shellPosition.x -= tempPoint.y;
-            shellPosition.y -= -tempPoint.x;
-        }else {
-            shellPosition.x += tempPoint.y;
-            shellPosition.y += -tempPoint.x;
-        }
-        shellAngle = angle;
     }
+
+    public Shells(float angle, float xPos, float yPos, float speed) {
+        super(angle, xPos, yPos, speed);
+
+        setScale(GamePlayRenderer.SHELL_SIZE/2,GamePlayRenderer.SHELL_ASPECT);
+    }
+
 }

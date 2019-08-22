@@ -16,7 +16,7 @@ public class Texture {
 
         GLES31.glUseProgram(ShadersManager.TEXTURE_PROGRAM_HANDLE);
         GLES31.glUniform4fv(ShadersManager.textureColorHandle, 1, color, 0);
-        GLES31.glUniform1f(GLES31.glGetUniformLocation(ShadersManager.TEXTURE_PROGRAM_HANDLE, "isFont"), 0);
+        GLES31.glUniform1f(ShadersManager.isFontHandle, 0);
 
         GLES31.glEnable(GLES31.GL_BLEND);
         GLES31.glBlendFunc(GLES31.GL_SRC_ALPHA, GLES31.GL_ONE_MINUS_SRC_ALPHA);

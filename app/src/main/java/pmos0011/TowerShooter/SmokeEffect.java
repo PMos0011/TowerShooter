@@ -8,47 +8,65 @@ import java.util.Random;
 
 public class SmokeEffect extends Texture {
 
-    private final int SMOKE_EFFECT = 0;
-    private final int ROCKET_FIRE = 1;
+    private final int DISABLE = 0;
+    private final int ENABLE = 1;
     private effectsNames effect;
 
     private float timeVal;
     private float[] innerColor = {0.85f, 0.60f, 0.10f, 1.0f};
     private float[] outerColor = {0.85f, 0.20f, 0.10f, 1.0f};
 
-    private float scale = 1.0f;
-    private PointF smokeFlow = new PointF();
+    private float scale;
+    private PointF initialPosition;
     public float visibility = 4.0f;
+    private float turretAngle;
 
     private boolean notGrayDestroyEffect = true;
     private boolean initValues = true;
 
     private float[] mModelMatrix = new float[16];
 
-    public SmokeEffect(effectsNames effect) {
+    float shapeMode;
+
+    public SmokeEffect(effectsNames effect, float turretAngle, float lengthDifference, float posX, float posY, float size) {
 
         timeVal = new Random().nextInt(100);
         this.effect = effect;
+        this.turretAngle =turretAngle;
+        this.scale=size;
+
+        initialPosition = Calculations.calculatePoint(turretAngle, lengthDifference);
+        initialPosition.x+=posX;
+        initialPosition.y+=posY;
     }
 
-    public void draw(int texture_handle, float angle) {
-        boolean isFire = false;
+    public void draw(int texture_handle) {
+        boolean shapeModifEnable = false;
 
         switch (effect) {
             case DESTROY_EFFECT:
                 GLES31.glEnable(GLES31.GL_BLEND);
                 GLES31.glBlendFunc(GLES31.GL_SRC_ALPHA, GLES31.GL_ONE_MINUS_SRC_ALPHA);
-                destroyEffect(angle);
+                destroyEffect();
                 break;
             case CANNON_FIRE:
                 GLES31.glEnable(GLES31.GL_BLEND);
                 GLES31.glBlendFunc(GLES31.GL_SRC_ALPHA, GLES31.GL_ONE);
-                cannonFire(angle);
+                shapeModifEnable=true;
+                shapeMode=1.5f;
+                cannonFire();
                 break;
             case CANNON_SMOKE:
                 GLES31.glEnable(GLES31.GL_BLEND);
                 GLES31.glBlendFunc(GLES31.GL_SRC_ALPHA, GLES31.GL_ONE_MINUS_SRC_ALPHA);
-                cannonSmoke(angle);
+                cannonSmoke();
+                break;
+            case EXHAUST:
+                GLES31.glEnable(GLES31.GL_BLEND);
+                GLES31.glBlendFunc(GLES31.GL_SRC_ALPHA, GLES31.GL_ONE_MINUS_SRC_ALPHA);
+                shapeModifEnable=true;
+                shapeMode=4.0f;
+                exhaust();
                 break;
         }
 
@@ -59,18 +77,21 @@ public class SmokeEffect extends Texture {
         GLES31.glUniform1f(ShadersManager.smokeVisibilityHandle, visibility);
         GLES31.glUniform1f(ShadersManager.smokeTimeHandle, timeVal);
 
-        if (isFire)
-            GLES31.glUniform1f(ShadersManager.smokeFireBoolHandle, ROCKET_FIRE);
+        if (shapeModifEnable){
+            GLES31.glUniform1f(ShadersManager.smokeShapeModEnableHandle, ENABLE);
+            GLES31.glUniform1f(ShadersManager.smokeShapeModHandle, shapeMode);
+            }
         else
-            GLES31.glUniform1f(ShadersManager.smokeFireBoolHandle, SMOKE_EFFECT);
-        GLES31.glUniform1f(GLES31.glGetUniformLocation(ShadersManager.TEXTURE_PROGRAM_HANDLE, "isFont"), 0);
+            GLES31.glUniform1f(ShadersManager.smokeShapeModEnableHandle, DISABLE);
+
+        GLES31.glUniform1f(GLES31.glGetUniformLocation(ShadersManager.TEXTURE_PROGRAM_HANDLE, "isFont"), DISABLE);
 
         loadOpenGLVariables(mModelMatrix, texture_handle);
 
         GLES31.glDisable(GLES31.GL_BLEND);
     }
 
-    private void destroyEffect(float angle) {
+    private void destroyEffect() {
         if (initValues) {
 
             innerColor[0] = 1.f;
@@ -81,15 +102,14 @@ public class SmokeEffect extends Texture {
             outerColor[1] = 0.20f;
             outerColor[2] = 0.10f;
 
-            scale = GamePlayRenderer.SMOKE_EFFECT_SIZE * 0.1f;
+            scale *= 0.1f;
             visibility = 4.0f;
 
-            smokeFlow = Calculations.calculatePoint(angle, GamePlayRenderer.SMOKE_CANNON_INITIAL);
             initValues = false;
         }
 
         Matrix.setIdentityM(mModelMatrix, 0);
-        Matrix.translateM(mModelMatrix, 0, smokeFlow.x, smokeFlow.y, GamePlayRenderer.Z_DIMENSION);
+        Matrix.translateM(mModelMatrix, 0, initialPosition.x, initialPosition.y, GamePlayRenderer.Z_DIMENSION);
         Matrix.scaleM(mModelMatrix, 0, scale, scale, 1);
 
 
@@ -137,11 +157,11 @@ public class SmokeEffect extends Texture {
                 }
             }
         }
-        smokeFlow.x += GamePlayRenderer.WIND_FLOW_X;
-        smokeFlow.y += GamePlayRenderer.WIND_FLOW_Y;
+        initialPosition.x += GamePlayRenderer.WIND_FLOW_X;
+        initialPosition.y += GamePlayRenderer.WIND_FLOW_Y;
     }
 
-    private void cannonFire(float angle) {
+    private void cannonFire() {
 
         if (initValues) {
 
@@ -153,23 +173,21 @@ public class SmokeEffect extends Texture {
             outerColor[1] = 0.30f;
             outerColor[2] = 0.20f;
 
-            scale = GamePlayRenderer.SMOKE_EFFECT_SIZE;
             visibility = 4.0f;
 
             initValues = false;
         }
 
         Matrix.setIdentityM(mModelMatrix, 0);
-        Matrix.rotateM(mModelMatrix, 0, angle, 0, 0, 1.0f);
-        Matrix.translateM(mModelMatrix, 0, 0, +0.5f, GamePlayRenderer.Z_DIMENSION);
-        Matrix.rotateM(mModelMatrix, 0, 180, 0, 0, 1.0f);
-        Matrix.scaleM(mModelMatrix, 0, scale, scale * 1.2f, 1);
+        Matrix.translateM(mModelMatrix, 0, initialPosition.x, initialPosition.y, GamePlayRenderer.Z_DIMENSION);
+        Matrix.rotateM(mModelMatrix, 0, turretAngle, 0, 0, 1.0f);
+        Matrix.scaleM(mModelMatrix, 0, scale,-scale, 1);
 
         timeVal += 0.03;
         visibility -= 0.2;
     }
 
-    private void cannonSmoke(float angle) {
+    private void cannonSmoke() {
 
         if (initValues) {
 
@@ -183,15 +201,14 @@ public class SmokeEffect extends Texture {
             outerColor[2] = 0.85f;
             outerColor[3] = 0.0f;
 
-            scale = GamePlayRenderer.SMOKE_EFFECT_SIZE * 1.4f;
+            scale *= 1.4f;
             visibility = 4.0f;
 
-            smokeFlow = Calculations.calculatePoint(angle, GamePlayRenderer.SMOKE_CANNON_INITIAL);
             initValues = false;
         }
 
         Matrix.setIdentityM(mModelMatrix, 0);
-        Matrix.translateM(mModelMatrix, 0, smokeFlow.x, smokeFlow.y, GamePlayRenderer.Z_DIMENSION);
+        Matrix.translateM(mModelMatrix, 0, initialPosition.x, initialPosition.y, GamePlayRenderer.Z_DIMENSION);
         Matrix.scaleM(mModelMatrix, 0, scale, scale, 1);
 
         if (innerColor[3] < 0.9 && visibility == 4.0) {
@@ -202,10 +219,35 @@ public class SmokeEffect extends Texture {
             visibility -= 0.015;
             innerColor[3] -= 0.0015;
             outerColor[3] -= 0.0045;
-            smokeFlow.x += GamePlayRenderer.WIND_FLOW_X;
-            smokeFlow.y += GamePlayRenderer.WIND_FLOW_Y;
+            initialPosition.x += GamePlayRenderer.WIND_FLOW_X;
+            initialPosition.y += GamePlayRenderer.WIND_FLOW_Y;
         }
         timeVal += 0.003;
+    }
+    private void exhaust(){
+        if (initValues) {
+
+            innerColor[0] = 0.25f;
+            innerColor[1] = 0.25f;
+            innerColor[2] = 0.25f;
+            innerColor[3] = 0.3f;
+
+            outerColor[0] = 0.35f;
+            outerColor[1] = 0.35f;
+            outerColor[2] = 0.35f;
+            outerColor[3] = 0.2f;
+
+            visibility = 1.5f;
+
+            initValues = false;
+        }
+
+        Matrix.setIdentityM(mModelMatrix, 0);
+        Matrix.translateM(mModelMatrix, 0, initialPosition.x, initialPosition.y, GamePlayRenderer.Z_DIMENSION);
+        Matrix.rotateM(mModelMatrix, 0, turretAngle, 0, 0, 1.0f);
+        Matrix.scaleM(mModelMatrix, 0, scale, scale, 1);
+
+        timeVal += 0.01;
     }
 
 
@@ -213,7 +255,8 @@ public class SmokeEffect extends Texture {
 
         DESTROY_EFFECT,
         CANNON_FIRE,
-        CANNON_SMOKE
+        CANNON_SMOKE,
+        EXHAUST
 
     }
 }

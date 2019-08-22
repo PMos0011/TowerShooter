@@ -35,7 +35,9 @@ public class ShadersManager {
     public static int smokeOuterColorHandle;
     public static int smokeVisibilityHandle;
     public static int smokeTimeHandle;
-    public static int smokeFireBoolHandle;
+    public static int smokeShapeModEnableHandle;
+    public static int isFontHandle;
+    public static int smokeShapeModHandle;
 
     public static final int COORDS_PER_VERTEX = 2;
     public static final int VERTEX_STRIDE = COORDS_PER_VERTEX * 4;
@@ -151,7 +153,10 @@ public class ShadersManager {
         smokeOuterColorHandle = GLES31.glGetUniformLocation(ShadersManager.SMOKE_PROGRAM_HANDLE, "outerColor");
         smokeVisibilityHandle = GLES31.glGetUniformLocation(ShadersManager.SMOKE_PROGRAM_HANDLE, "visibility");
         smokeTimeHandle = GLES31.glGetUniformLocation(ShadersManager.SMOKE_PROGRAM_HANDLE, "f_Time");
-        smokeFireBoolHandle = GLES31.glGetUniformLocation(ShadersManager.SMOKE_PROGRAM_HANDLE, "isFire");
+        smokeShapeModEnableHandle = GLES31.glGetUniformLocation(ShadersManager.SMOKE_PROGRAM_HANDLE, "shapeModifEnable");
+        smokeShapeModHandle =GLES31.glGetUniformLocation(ShadersManager.SMOKE_PROGRAM_HANDLE,"shapeMode");
+
+        isFontHandle=GLES31.glGetUniformLocation(ShadersManager.TEXTURE_PROGRAM_HANDLE, "isFont");
     }
 
 }

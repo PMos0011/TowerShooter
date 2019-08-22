@@ -6,7 +6,8 @@ vec4 transparentColor = vec4(0.0, 0.0, 0.0, 0.0);
 uniform vec4 innerColor;
 uniform vec4 outerColor;
 uniform float visibility;
-uniform bool isFire;
+uniform bool shapeModifEnable;
+uniform float shapeMode;
 
 float innerThreshold = 0.35;
 float outerThreshold = 0.15;
@@ -52,8 +53,10 @@ float overlay(float base, float top) {
 
 float circle(vec2 coord, float radius){
     float dist;
-    if (isFire){
+    if (shapeModifEnable){
         vec2 diff = abs(coord - vec2(0.5, 0.8));
+
+        diff.x*=shapeMode;
 
         if (coord.y < 0.8){
             diff.y /= 1.6;
@@ -95,4 +98,6 @@ void main() {
     } else {
         gl_FragColor = innerColor;
     }
+
+    //gl_FragColor = vec4(vec3(everythingCombined), 1.0);
 }
