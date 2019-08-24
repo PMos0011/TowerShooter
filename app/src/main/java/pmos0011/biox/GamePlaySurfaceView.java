@@ -5,14 +5,14 @@ import android.opengl.GLSurfaceView;
 
 public class GamePlaySurfaceView extends GLSurfaceView {
 
-    private final LoopRenderer renderer;
+    private final GameLoop renderer;
 
     public GamePlaySurfaceView(Context context) {
         super(context);
 
         setEGLContextClientVersion(3);
 
-        renderer = new LoopRenderer(context);
+        renderer = new GameLoop(context);
 
         setRenderer(renderer);
         //setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);

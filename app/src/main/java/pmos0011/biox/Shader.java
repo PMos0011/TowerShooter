@@ -14,7 +14,7 @@ public class Shader {
     private int vertexShaderHandle;
     private int fragmentShaderHandle;
 
-    public Shader(Context context, int vertexFileID, int fragmentFileID, int attribute, String variableName) {
+    public Shader(Context context, int vertexFileID, int fragmentFileID) {
 
         vertexShaderHandle = loadShader(context, GLES31.GL_VERTEX_SHADER, vertexFileID);
         fragmentShaderHandle = loadShader(context, GLES31.GL_FRAGMENT_SHADER, fragmentFileID);
@@ -23,10 +23,10 @@ public class Shader {
 
         GLES31.glAttachShader(programHandle, vertexShaderHandle);
         GLES31.glAttachShader(programHandle, fragmentShaderHandle);
-        bindAttributes(attribute, variableName);
+        bindAttributes(0, "vPosition");
+        bindAttributes(1, "vTextureCoords");
         GLES31.glLinkProgram(programHandle);
         GLES31.glValidateProgram(programHandle);
-
     }
 
     private void bindAttributes(int attribute, String variableName) {
@@ -60,13 +60,9 @@ public class Shader {
         }
 
         int shader = GLES31.glCreateShader(type);
-
-
         GLES31.glShaderSource(shader, shaderString.toString());
         GLES31.glCompileShader(shader);
 
         return shader;
     }
-
-
 }

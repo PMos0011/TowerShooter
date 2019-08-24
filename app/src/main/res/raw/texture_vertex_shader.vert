@@ -1,11 +1,12 @@
 #version 310 es
 
 in vec4 vPosition;
+in vec2 vTextureCoords;
 
-out vec3 color;
+out vec2 fTextureCoords;
 
 void main() {
-
-    color = vec3(1.0,1.0,1.0);
     gl_Position = vPosition;
+
+    fTextureCoords=vTextureCoords;
 }
