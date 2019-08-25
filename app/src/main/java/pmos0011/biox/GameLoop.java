@@ -14,8 +14,9 @@ public class GameLoop implements GLSurfaceView.Renderer {
 
     private Renderer renderer;
     private GameObjectsLoader loader;
-    private Shader textureShader;
+    private TextureShader textureShader;
     private TextureModel textureModel;
+    private Transformations transformations;
 
     public GameLoop(Context context) {
         this.context = context;
@@ -26,7 +27,7 @@ public class GameLoop implements GLSurfaceView.Renderer {
 
         renderer = new Renderer();
         loader = new GameObjectsLoader(context, BitmapID.getStaticBitmapID());
-        textureShader = new Shader(context, R.raw.texture_vertex_shader, R.raw.texture_fragment_shader);
+        textureShader = new TextureShader(context, R.raw.texture_vertex_shader, R.raw.texture_fragment_shader);
         textureModel = loader.loadToVAO(TextureModel.SQUERE_CORDS, TextureModel.TEXTURE_COORDS, TextureModel.DRAW_ORDER);
     }
 
@@ -34,12 +35,13 @@ public class GameLoop implements GLSurfaceView.Renderer {
         GLES31.glClear(GLES31.GL_COLOR_BUFFER_BIT);
 
         textureShader.start();
-        renderer.draw(textureModel, loader);
+        renderer.draw(transformations, loader);
         textureShader.stop();
     }
 
     public void onSurfaceChanged(GL10 unused, int width, int height) {
         GLES31.glViewport(0, 0, width, height);
+        transformations = new Transformations(textureModel,(float)width/height);
     }
 
 }

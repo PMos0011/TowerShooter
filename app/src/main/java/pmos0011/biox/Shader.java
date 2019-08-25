@@ -2,13 +2,14 @@ package pmos0011.biox;
 
 import android.content.Context;
 import android.opengl.GLES31;
+import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-public class Shader {
+public abstract class Shader {
 
     private int programHandle;
     private int vertexShaderHandle;
@@ -23,14 +24,22 @@ public class Shader {
 
         GLES31.glAttachShader(programHandle, vertexShaderHandle);
         GLES31.glAttachShader(programHandle, fragmentShaderHandle);
-        bindAttributes(0, "vPosition");
-        bindAttributes(1, "vTextureCoords");
+        bindAttributes();
         GLES31.glLinkProgram(programHandle);
         GLES31.glValidateProgram(programHandle);
+        getAllUniformsHandle();
     }
 
-    private void bindAttributes(int attribute, String variableName) {
+    protected abstract void bindAttributes();
+
+    protected void bindAttributes(int attribute, String variableName) {
         GLES31.glBindAttribLocation(programHandle, attribute, variableName);
+    }
+
+    protected abstract void getAllUniformsHandle();
+
+    protected int getUniformHandle(String uniformName) {
+        return GLES31.glGetUniformLocation(programHandle, uniformName);
     }
 
     public void start() {
@@ -65,4 +74,5 @@ public class Shader {
 
         return shader;
     }
+
 }

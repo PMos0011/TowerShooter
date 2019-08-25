@@ -104,5 +104,7 @@ public class GameObjectsLoader {
         return textureIds[id];
     }
 
-
+    public void loadMatrixUniform(int handle, float[] matrix) {
+        GLES31.glUniformMatrix4fv(handle, 1, false, matrix, 0);
+    }
 }
