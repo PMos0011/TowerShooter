@@ -26,10 +26,10 @@ public class BitmapID {
     public enum textureNames {
 
         BACKGROUND(0),
-        TURRET_BASE(1),
-        TURRET_L_CANNON(2),
-        TURRET_R_CANNON(3),
-        TURRET_TOWER(4),
+        TOWER_BASE(1),
+        TOWER_LEFT_CANNON(2),
+        TOWER_RIGHT_CANNON(3),
+        TURRET(4),
         LEFT_ARROW(5),
         RIGHT_ARROW(6),
         LEFT_CANNON_BUTTON(7),

@@ -4,35 +4,16 @@ import android.opengl.Matrix;
 
 public class Transformations {
 
-    private TextureModel textureModel;
-    public static float[] projectionMatrix = new float[16];
-    public static float[] model1 = new float[16];
-    public static float[] model2 = new float[16];
-    public static float[] modelMatrix = new float[32];
-    public static float[] testMatrix = new float[16];
+    public static final float Z_DIMENSION = -1.0000001f;
 
-    public Transformations(TextureModel textureModel, float ratio) {
-        this.textureModel = textureModel;
+    private float ratio;
+    private float[] projectionMatrix = new float[16];
+    private float[] modelMatrix = new float[16];
+
+    public Transformations(float ratio) {
+        this.ratio = ratio;
         Matrix.frustumM(projectionMatrix, 0, -ratio, ratio, -1.0f, 1.0f, 1.0f, 2.0f);
 
-        Matrix.setIdentityM(model1, 0);
-        Matrix.translateM(model1, 0, 0.5f, 0, -1.01f);
-        Matrix.scaleM(model1,0,0.5f,0.5f,1.0f);
-
-        Matrix.setIdentityM(model2, 0);
-        Matrix.translateM(model2, 0, -0.5f, 0, -1.01f);
-        Matrix.scaleM(model2,0,0.5f,0.5f,1.0f);
-
-        for (int i=0;i<16;i++){
-            modelMatrix[i]=model1[i];
-            modelMatrix[i+16]=model2[i];
-        }
-
-        //Matrix.multiplyMM(projectionMatrix,0,testMatrix,0,modelMatrix,0);
-    }
-
-    public TextureModel getTextureModel() {
-        return textureModel;
     }
 
     public float[] getProjectionMatrix() {
@@ -42,4 +23,17 @@ public class Transformations {
     public float[] getModelMatrix() {
         return modelMatrix;
     }
+
+    public float getRatio() {
+        return ratio;
+    }
+
+    public void setModelTranslation(float wordAngle, float objectAngle, float xPos, float yPos, float xScale, float yScale) {
+        Matrix.setIdentityM(modelMatrix, 0);
+        Matrix.rotateM(modelMatrix, 0, wordAngle, 0, 0, 1.0f);
+        Matrix.translateM(modelMatrix, 0, xPos, yPos, Z_DIMENSION);
+        Matrix.rotateM(modelMatrix, 0, objectAngle, 0, 0, 1.0f);
+        Matrix.scaleM(modelMatrix, 0, xScale, yScale, 1);
+    }
+
 }

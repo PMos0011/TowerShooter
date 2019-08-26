@@ -2,7 +2,7 @@
 
 in vec4 vPosition;
 in vec2 vTextureCoords;
-in mat4 vModelMatrix;
+uniform mat4 vModelMatrix;
 
 layout (std140) uniform projectionMatrix{
     mat4 vProjectionMatrix;
