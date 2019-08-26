@@ -6,6 +6,7 @@ import javax.microedition.khronos.opengles.GL10;
 import android.content.Context;
 import android.opengl.GLES31;
 import android.opengl.GLSurfaceView;
+import android.util.Log;
 
 
 public class GameLoop implements GLSurfaceView.Renderer {
@@ -42,6 +43,10 @@ public class GameLoop implements GLSurfaceView.Renderer {
     public void onSurfaceChanged(GL10 unused, int width, int height) {
         GLES31.glViewport(0, 0, width, height);
         transformations = new Transformations(textureModel,(float)width/height);
+
+        loader.addProjectionMatrixAttribute(textureModel.getVao(),transformations.getModelMatrix());
+        loader.addUniformBlockBuffer(0, transformations.getProjectionMatrix());
+
     }
 
 }

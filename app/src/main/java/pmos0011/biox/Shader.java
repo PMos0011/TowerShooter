@@ -28,18 +28,28 @@ public abstract class Shader {
         GLES31.glLinkProgram(programHandle);
         GLES31.glValidateProgram(programHandle);
         getAllUniformsHandle();
+        getAllUniformBlocksIndex();
     }
 
     protected abstract void bindAttributes();
+    protected abstract void getAllUniformsHandle();
+    protected abstract void getAllUniformBlocksIndex();
 
     protected void bindAttributes(int attribute, String variableName) {
         GLES31.glBindAttribLocation(programHandle, attribute, variableName);
     }
 
-    protected abstract void getAllUniformsHandle();
-
     protected int getUniformHandle(String uniformName) {
         return GLES31.glGetUniformLocation(programHandle, uniformName);
+    }
+
+    protected int getUniformBlockIndex(String uniformName){
+        return GLES31.glGetUniformBlockIndex(programHandle,uniformName);
+    }
+
+    protected void uniformBlockBinding(int uniformBlockIndex, int bindingPoint){
+        GLES31.glUniformBlockBinding(programHandle,uniformBlockIndex,bindingPoint);
+
     }
 
     public void start() {
@@ -75,4 +85,7 @@ public abstract class Shader {
         return shader;
     }
 
+    public int getProgramHandle() {
+        return programHandle;
+    }
 }
