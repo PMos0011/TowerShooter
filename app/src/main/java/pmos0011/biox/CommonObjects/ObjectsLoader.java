@@ -1,4 +1,4 @@
-package pmos0011.biox;
+package pmos0011.biox.CommonObjects;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -13,6 +13,9 @@ import java.nio.FloatBuffer;
 import java.nio.ShortBuffer;
 import java.util.ArrayList;
 import java.util.List;
+
+import pmos0011.biox.ParticleEffect.ParticleModel;
+import pmos0011.biox.StaticTextures.StaticTextures;
 
 public class ObjectsLoader {
 
@@ -41,7 +44,7 @@ public class ObjectsLoader {
         return new StaticTextures(vaoID);
     }
 
-    public  ParticleModel loadTOVAO(float[] coords, int size, float[] textureCoords, short[] drawOrder, int particlesMaxCount){
+    public ParticleModel loadTOVAO(float[] coords, int size, float[] textureCoords, short[] drawOrder, int particlesMaxCount){
         int vaoID = createVAO();
         bindVertexArray(vaoID);
         bindDrawOrdersBuffer(drawOrder);
@@ -50,15 +53,15 @@ public class ObjectsLoader {
 
         unbindVertexArray();
 
-        int vboId = createEmptyVBO(particlesMaxCount*ParticleModel.PARTICLE_DATA_LENGHT);
+        int vboId = createEmptyVBO(particlesMaxCount*ParticleModel.PARTICLE_DATA_LENGTH);
 
-        addAttribPointer(vaoID,vboId,2,4,ParticleModel.PARTICLE_DATA_LENGHT,0,1);
-        addAttribPointer(vaoID,vboId,3,4,ParticleModel.PARTICLE_DATA_LENGHT,4,1);
-        addAttribPointer(vaoID,vboId,4,4,ParticleModel.PARTICLE_DATA_LENGHT,8,1);
-        addAttribPointer(vaoID,vboId,5,4,ParticleModel.PARTICLE_DATA_LENGHT,12,1);
-        addAttribPointer(vaoID,vboId,6,4,ParticleModel.PARTICLE_DATA_LENGHT,16,1);
-        addAttribPointer(vaoID,vboId,7,4,ParticleModel.PARTICLE_DATA_LENGHT,20,1);
-        addAttribPointer(vaoID,vboId,8,4,ParticleModel.PARTICLE_DATA_LENGHT,24,1);
+        addAttribPointer(vaoID,vboId,2,4,ParticleModel.PARTICLE_DATA_LENGTH,0,1);
+        addAttribPointer(vaoID,vboId,3,4,ParticleModel.PARTICLE_DATA_LENGTH,4,1);
+        addAttribPointer(vaoID,vboId,4,4,ParticleModel.PARTICLE_DATA_LENGTH,8,1);
+        addAttribPointer(vaoID,vboId,5,4,ParticleModel.PARTICLE_DATA_LENGTH,12,1);
+        addAttribPointer(vaoID,vboId,6,4,ParticleModel.PARTICLE_DATA_LENGTH,16,1);
+        addAttribPointer(vaoID,vboId,7,4,ParticleModel.PARTICLE_DATA_LENGTH,20,1);
+        addAttribPointer(vaoID,vboId,8,4,ParticleModel.PARTICLE_DATA_LENGTH,24,1);
 
 
         return new ParticleModel(vaoID,particlesMaxCount,vboId);

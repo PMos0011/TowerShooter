@@ -1,7 +1,8 @@
-package pmos0011.biox;
+package pmos0011.biox.ParticleEffect;
 
 import android.content.Context;
-import android.util.Log;
+
+import pmos0011.biox.AbstractClasses.Shader;
 
 public class ParticleShader extends Shader {
 
@@ -16,9 +17,9 @@ public class ParticleShader extends Shader {
         super.bindAttributes(0, "vPosition");
         super.bindAttributes(1, "vTextureCoords");
         super.bindAttributes(2, "vModelMatrix");
-        super.bindAttributes(6, "innerColor");
-        super.bindAttributes(7, "outerColor");
-        super.bindAttributes(8, "options");
+        super.bindAttributes(6, "vInnerColor");
+        super.bindAttributes(7, "vOuterColor");
+        super.bindAttributes(8, "vOptions");
     }
 
     @Override

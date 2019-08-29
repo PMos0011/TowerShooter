@@ -1,7 +1,8 @@
-package pmos0011.biox;
+package pmos0011.biox.StaticTextures;
 
 import android.content.Context;
-import android.util.Log;
+
+import pmos0011.biox.AbstractClasses.Shader;
 
 public class StaticShader extends Shader {
 

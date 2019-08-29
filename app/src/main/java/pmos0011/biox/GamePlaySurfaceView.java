@@ -6,6 +6,8 @@ import android.graphics.PointF;
 import android.opengl.GLSurfaceView;
 import android.view.MotionEvent;
 
+import pmos0011.biox.StaticTextures.StaticTextures;
+
 public class GamePlaySurfaceView extends GLSurfaceView {
 
     private final GameLoopRenderer renderer;

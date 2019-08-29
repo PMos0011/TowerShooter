@@ -7,6 +7,15 @@ import android.content.Context;
 import android.opengl.GLES31;
 import android.opengl.GLSurfaceView;
 
+import pmos0011.biox.AbstractClasses.StaticModel;
+import pmos0011.biox.CommonObjects.BitmapID;
+import pmos0011.biox.CommonObjects.ObjectsLoader;
+import pmos0011.biox.CommonObjects.Transformations;
+import pmos0011.biox.ParticleEffect.ParticleModel;
+import pmos0011.biox.ParticleEffect.ParticleShader;
+import pmos0011.biox.StaticTextures.StaticShader;
+import pmos0011.biox.StaticTextures.StaticTextures;
+
 
 public class GameLoopRenderer implements GLSurfaceView.Renderer {
 

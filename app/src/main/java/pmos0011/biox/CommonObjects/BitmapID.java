@@ -1,4 +1,6 @@
-package pmos0011.biox;
+package pmos0011.biox.CommonObjects;
+
+import pmos0011.biox.R;
 
 public class BitmapID {
 

@@ -1,4 +1,4 @@
-package pmos0011.biox;
+package pmos0011.biox.AbstractClasses;
 
 import android.content.Context;
 import android.opengl.GLES31;

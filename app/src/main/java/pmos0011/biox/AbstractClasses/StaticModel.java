@@ -1,6 +1,10 @@
-package pmos0011.biox;
+package pmos0011.biox.AbstractClasses;
 
 import android.opengl.GLES31;
+
+import pmos0011.biox.CommonObjects.ObjectsLoader;
+import pmos0011.biox.ParticleEffect.ParticleShader;
+import pmos0011.biox.StaticTextures.StaticShader;
 
 public abstract class StaticModel {
 

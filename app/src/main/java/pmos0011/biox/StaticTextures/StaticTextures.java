@@ -1,6 +1,16 @@
-package pmos0011.biox;
+package pmos0011.biox.StaticTextures;
 
 import android.opengl.GLES31;
+import android.util.Log;
+
+import pmos0011.biox.AbstractClasses.ParticleEffects;
+import pmos0011.biox.CommonObjects.BitmapID;
+import pmos0011.biox.GameControlObjects;
+import pmos0011.biox.CommonObjects.ObjectsLoader;
+import pmos0011.biox.ParticleEffect.FireParticleEffect;
+import pmos0011.biox.ParticleEffect.ParticleModel;
+import pmos0011.biox.AbstractClasses.StaticModel;
+import pmos0011.biox.CommonObjects.Transformations;
 
 public class StaticTextures extends StaticModel {
 
@@ -200,16 +210,11 @@ public class StaticTextures extends StaticModel {
     }
 
     public void fireFromLeft() {
-        ParticleEffect effect = new ParticleEffect(ParticleEffect.WHITE, ParticleEffect.WHITE, ParticleEffect.RELOAD);
-        Transformations.setModelTranslation(effect.getModelMatrix(),0, 0, -0.5f, 0, 0.4f, 0.4f);
-        particleModel.addPArticleEffect(effect);
-
+        particleModel.addPArticleEffect( new FireParticleEffect(ParticleEffects.effectKind.FIRE,0, 0, -0.5f, 0));
     }
 
     public void fireFromRight() {
-        ParticleEffect effect = new ParticleEffect(ParticleEffect.WHITE, ParticleEffect.WHITE, ParticleEffect.RELOAD);
-        Transformations.setModelTranslation(effect.getModelMatrix(),0, 0, 0.5f, 0, 0.4f, 0.4f);
-        particleModel.addPArticleEffect(effect);
+        particleModel.addPArticleEffect(new FireParticleEffect(ParticleEffects.effectKind.FIRE,0, 0, 0.5f, 0));
     }
 
     public void turretStateUpdate() {
