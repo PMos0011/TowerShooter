@@ -3,12 +3,11 @@ package pmos0011.biox;
 public class ParticleEffect {
 
     private float[] modelMatrix = new float[16];
-    private float[] innerColor = new float[4];
-    private float[] outerColor = new float[4];
-    private float[] options = new float[4];
+    private float[] innerColor;
+    private float[] outerColor;
+    private float[] options;
 
-    public ParticleEffect(float[] modelMatrix, float[] innerColor, float[] outerColor, float[] options) {
-        this.modelMatrix = modelMatrix;
+    public ParticleEffect(float[] innerColor, float[] outerColor, float[] options) {
         this.innerColor = innerColor;
         this.outerColor = outerColor;
         this.options = options;

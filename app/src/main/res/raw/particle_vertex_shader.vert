@@ -2,10 +2,10 @@
 
 in vec4 vPosition;
 in vec2 vTextureCoords;
-uniform mat4 vModelMatrix;
-uniform vec4 outerColor;
-uniform vec4 innerColor;
-uniform vec4 options;
+in mat4 vModelMatrix;
+in vec4 outerColor;
+in vec4 innerColor;
+in vec4 options;
 
 layout (std140) uniform projectionMatrix{
     mat4 vProjectionMatrix;

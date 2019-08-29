@@ -29,6 +29,7 @@ public abstract class Shader {
         GLES31.glValidateProgram(programHandle);
         getAllUniformsHandle();
         getAllUniformBlocksIndex();
+
     }
 
     protected abstract void bindAttributes();

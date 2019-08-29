@@ -16,6 +16,8 @@ public class StaticTextures extends StaticModel {
     private GameControlObjects leftCannonButton = new GameControlObjects();
     private GameControlObjects rightCannonButton = new GameControlObjects();
 
+    private float[] modelMatrix = new float[16];
+
     private boolean rotateLeft = false;
     private boolean rotateRight = false;
     private boolean isLeftCannonLoaded = true;
@@ -42,22 +44,22 @@ public class StaticTextures extends StaticModel {
     }
 
     @Override
-    protected void drawElements(ObjectsLoader loader, Transformations transformations) {
+    protected void drawElements(ObjectsLoader loader) {
 
         staticShader.start();
         GLES31.glEnable(GLES31.GL_BLEND);
         GLES31.glBlendFunc(GLES31.GL_SRC_ALPHA, GLES31.GL_ONE_MINUS_SRC_ALPHA);
 
-        drawBackground(loader, transformations);
-        drawTowerBase(loader, transformations);
-        drawLeftCannon(loader, transformations);
-        drawRightCannon(loader, transformations);
-        drawTurret(loader, transformations);
-        drawRadar(loader, transformations);
-        drawLeftRotateButton(loader, transformations);
-        drawRightRotateButton(loader, transformations);
-        drawLeftCannonButton(loader, transformations);
-        drawRightCannonButton(loader, transformations);
+        drawBackground(loader);
+        drawTowerBase(loader);
+        drawLeftCannon(loader);
+        drawRightCannon(loader);
+        drawTurret(loader);
+        drawRadar(loader);
+        drawLeftRotateButton(loader);
+        drawRightRotateButton(loader);
+        drawLeftCannonButton(loader);
+        drawRightCannonButton(loader);
 
         GLES31.glDisable(GLES31.GL_BLEND);
         staticShader.stop();
@@ -70,76 +72,76 @@ public class StaticTextures extends StaticModel {
         super.disableVertexArray(1);
     }
 
-    private void drawBackground(ObjectsLoader loader, Transformations transformations) {
-        transformations.setModelTranslation(0, 0, 0, 0, transformations.getRatio(), transformations.getRatio());
-        loader.loadUniformMatrix4fv(staticShader.getModelMatrixHandle(), transformations.getModelMatrix());
+    private void drawBackground(ObjectsLoader loader) {
+        Transformations.setModelTranslation(modelMatrix,0, 0, 0, 0, Transformations.getRatio(), Transformations.getRatio());
+        loader.loadUniformMatrix4fv(staticShader.getModelMatrixHandle(),modelMatrix);
         GLES31.glBindTexture(GLES31.GL_TEXTURE_2D, loader.getTextureID(BitmapID.textureNames.BACKGROUND.getValue()));
         GLES31.glDrawElements(GLES31.GL_TRIANGLES, StaticTextures.DRAW_ORDER.length, GLES31.GL_UNSIGNED_SHORT, 0);
     }
 
-    private void drawTowerBase(ObjectsLoader loader, Transformations transformations) {
-        transformations.setModelTranslation(0, 0, 0, 0, TOWER_SIZE, TOWER_SIZE);
-        loader.loadUniformMatrix4fv(staticShader.getModelMatrixHandle(), transformations.getModelMatrix());
+    private void drawTowerBase(ObjectsLoader loader) {
+        Transformations.setModelTranslation(modelMatrix,0, 0, 0, 0, TOWER_SIZE, TOWER_SIZE);
+        loader.loadUniformMatrix4fv(staticShader.getModelMatrixHandle(), modelMatrix);
         GLES31.glBindTexture(GLES31.GL_TEXTURE_2D, loader.getTextureID(BitmapID.textureNames.TOWER_BASE.getValue()));
         GLES31.glDrawElements(GLES31.GL_TRIANGLES, StaticTextures.DRAW_ORDER.length, GLES31.GL_UNSIGNED_SHORT, 0);
     }
 
-    private void drawLeftCannon(ObjectsLoader loader, Transformations transformations) {
-        transformations.setModelTranslation(turretAngle, 0, 0, 0, TOWER_SIZE, TOWER_SIZE);
-        loader.loadUniformMatrix4fv(staticShader.getModelMatrixHandle(), transformations.getModelMatrix());
+    private void drawLeftCannon(ObjectsLoader loader) {
+        Transformations.setModelTranslation(modelMatrix,turretAngle, 0, 0, 0, TOWER_SIZE, TOWER_SIZE);
+        loader.loadUniformMatrix4fv(staticShader.getModelMatrixHandle(), modelMatrix);
         GLES31.glBindTexture(GLES31.GL_TEXTURE_2D, loader.getTextureID(BitmapID.textureNames.TOWER_LEFT_CANNON.getValue()));
         GLES31.glDrawElements(GLES31.GL_TRIANGLES, StaticTextures.DRAW_ORDER.length, GLES31.GL_UNSIGNED_SHORT, 0);
     }
 
-    private void drawRightCannon(ObjectsLoader loader, Transformations transformations) {
-        transformations.setModelTranslation(turretAngle, 0, 0, 0, TOWER_SIZE, TOWER_SIZE);
-        loader.loadUniformMatrix4fv(staticShader.getModelMatrixHandle(), transformations.getModelMatrix());
+    private void drawRightCannon(ObjectsLoader loader) {
+        Transformations.setModelTranslation(modelMatrix,turretAngle, 0, 0, 0, TOWER_SIZE, TOWER_SIZE);
+        loader.loadUniformMatrix4fv(staticShader.getModelMatrixHandle(), modelMatrix);
         GLES31.glBindTexture(GLES31.GL_TEXTURE_2D, loader.getTextureID(BitmapID.textureNames.TOWER_RIGHT_CANNON.getValue()));
         GLES31.glDrawElements(GLES31.GL_TRIANGLES, StaticTextures.DRAW_ORDER.length, GLES31.GL_UNSIGNED_SHORT, 0);
     }
 
-    private void drawTurret(ObjectsLoader loader, Transformations transformations) {
-        transformations.setModelTranslation(turretAngle, 0, 0, 0, TOWER_SIZE, TOWER_SIZE);
-        loader.loadUniformMatrix4fv(staticShader.getModelMatrixHandle(), transformations.getModelMatrix());
+    private void drawTurret(ObjectsLoader loader) {
+        Transformations.setModelTranslation(modelMatrix, turretAngle, 0, 0, 0, TOWER_SIZE, TOWER_SIZE);
+        loader.loadUniformMatrix4fv(staticShader.getModelMatrixHandle(), modelMatrix);
         GLES31.glBindTexture(GLES31.GL_TEXTURE_2D, loader.getTextureID(BitmapID.textureNames.TURRET.getValue()));
         GLES31.glDrawElements(GLES31.GL_TRIANGLES, StaticTextures.DRAW_ORDER.length, GLES31.GL_UNSIGNED_SHORT, 0);
     }
 
-    private void drawRadar(ObjectsLoader loader, Transformations transformations) {
-        transformations.setModelTranslation(turretAngle, radarAngle, 0.065f, -0.1f, RADAR_SIZE, RADAR_SIZE);
-        loader.loadUniformMatrix4fv(staticShader.getModelMatrixHandle(), transformations.getModelMatrix());
+    private void drawRadar(ObjectsLoader loader) {
+        Transformations.setModelTranslation(modelMatrix, turretAngle, radarAngle, 0.065f, -0.1f, RADAR_SIZE, RADAR_SIZE);
+        loader.loadUniformMatrix4fv(staticShader.getModelMatrixHandle(), modelMatrix);
         GLES31.glBindTexture(GLES31.GL_TEXTURE_2D, loader.getTextureID(BitmapID.textureNames.RADAR.getValue()));
         GLES31.glDrawElements(GLES31.GL_TRIANGLES, StaticTextures.DRAW_ORDER.length, GLES31.GL_UNSIGNED_SHORT, 0);
     }
 
-    private void drawLeftRotateButton(ObjectsLoader loader, Transformations transformations) {
-        transformations.setModelTranslation(0, turretAngle, leftArrow.getOpenGLPosition().x, leftArrow.getOpenGLPosition().y,
+    private void drawLeftRotateButton(ObjectsLoader loader) {
+        Transformations.setModelTranslation(modelMatrix,0, turretAngle, leftArrow.getOpenGLPosition().x, leftArrow.getOpenGLPosition().y,
                 GAME_CONTROL_OBJECT_SIZE, GAME_CONTROL_OBJECT_SIZE);
-        loader.loadUniformMatrix4fv(staticShader.getModelMatrixHandle(), transformations.getModelMatrix());
+        loader.loadUniformMatrix4fv(staticShader.getModelMatrixHandle(),modelMatrix);
         GLES31.glBindTexture(GLES31.GL_TEXTURE_2D, loader.getTextureID(BitmapID.textureNames.LEFT_ARROW.getValue()));
         GLES31.glDrawElements(GLES31.GL_TRIANGLES, StaticTextures.DRAW_ORDER.length, GLES31.GL_UNSIGNED_SHORT, 0);
     }
 
-    private void drawRightRotateButton(ObjectsLoader loader, Transformations transformations) {
-        transformations.setModelTranslation(0, turretAngle, rightArrow.getOpenGLPosition().x, rightArrow.getOpenGLPosition().y,
+    private void drawRightRotateButton(ObjectsLoader loader) {
+        Transformations.setModelTranslation(modelMatrix,0, turretAngle, rightArrow.getOpenGLPosition().x, rightArrow.getOpenGLPosition().y,
                 GAME_CONTROL_OBJECT_SIZE, GAME_CONTROL_OBJECT_SIZE);
-        loader.loadUniformMatrix4fv(staticShader.getModelMatrixHandle(), transformations.getModelMatrix());
+        loader.loadUniformMatrix4fv(staticShader.getModelMatrixHandle(), modelMatrix);
         GLES31.glBindTexture(GLES31.GL_TEXTURE_2D, loader.getTextureID(BitmapID.textureNames.RIGHT_ARROW.getValue()));
         GLES31.glDrawElements(GLES31.GL_TRIANGLES, StaticTextures.DRAW_ORDER.length, GLES31.GL_UNSIGNED_SHORT, 0);
     }
 
-    private void drawLeftCannonButton(ObjectsLoader loader, Transformations transformations) {
-        transformations.setModelTranslation(0, 0, leftCannonButton.getOpenGLPosition().x, leftCannonButton.getOpenGLPosition().y,
+    private void drawLeftCannonButton(ObjectsLoader loader) {
+        Transformations.setModelTranslation(modelMatrix, 0, 0, leftCannonButton.getOpenGLPosition().x, leftCannonButton.getOpenGLPosition().y,
                 GAME_CONTROL_OBJECT_SIZE, GAME_CONTROL_OBJECT_SIZE);
-        loader.loadUniformMatrix4fv(staticShader.getModelMatrixHandle(), transformations.getModelMatrix());
+        loader.loadUniformMatrix4fv(staticShader.getModelMatrixHandle(),modelMatrix);
         GLES31.glBindTexture(GLES31.GL_TEXTURE_2D, loader.getTextureID(BitmapID.textureNames.LEFT_CANNON_BUTTON.getValue()));
         GLES31.glDrawElements(GLES31.GL_TRIANGLES, StaticTextures.DRAW_ORDER.length, GLES31.GL_UNSIGNED_SHORT, 0);
     }
 
-    private void drawRightCannonButton(ObjectsLoader loader, Transformations transformations) {
-        transformations.setModelTranslation(0, 0, rightCannonButton.getOpenGLPosition().x, rightArrow.getOpenGLPosition().y,
+    private void drawRightCannonButton(ObjectsLoader loader) {
+        Transformations.setModelTranslation(modelMatrix,0, 0, rightCannonButton.getOpenGLPosition().x, rightArrow.getOpenGLPosition().y,
                 GAME_CONTROL_OBJECT_SIZE, GAME_CONTROL_OBJECT_SIZE);
-        loader.loadUniformMatrix4fv(staticShader.getModelMatrixHandle(), transformations.getModelMatrix());
+        loader.loadUniformMatrix4fv(staticShader.getModelMatrixHandle(), modelMatrix);
         GLES31.glBindTexture(GLES31.GL_TEXTURE_2D, loader.getTextureID(BitmapID.textureNames.RIGHT_CANNON_BUTTON.getValue()));
         GLES31.glDrawElements(GLES31.GL_TRIANGLES, StaticTextures.DRAW_ORDER.length, GLES31.GL_UNSIGNED_SHORT, 0);
     }
@@ -198,14 +200,16 @@ public class StaticTextures extends StaticModel {
     }
 
     public void fireFromLeft() {
-        particleModel.addPArticleEffect(new ParticleEffect(Transformations.setModelTranslation(0, 0, -0.5f, 0, 0.4f, 0.4f),
-                ParticleEffect.WHITE, ParticleEffect.WHITE, ParticleEffect.RELOAD));
+        ParticleEffect effect = new ParticleEffect(ParticleEffect.WHITE, ParticleEffect.WHITE, ParticleEffect.RELOAD);
+        Transformations.setModelTranslation(effect.getModelMatrix(),0, 0, -0.5f, 0, 0.4f, 0.4f);
+        particleModel.addPArticleEffect(effect);
+
     }
 
     public void fireFromRight() {
-        particleModel.addPArticleEffect(new ParticleEffect(Transformations.setModelTranslation(0, 0, 0.5f, 0, 0.4f, 0.4f),
-                ParticleEffect.WHITE, ParticleEffect.WHITE, ParticleEffect.RELOAD));
-
+        ParticleEffect effect = new ParticleEffect(ParticleEffect.WHITE, ParticleEffect.WHITE, ParticleEffect.RELOAD);
+        Transformations.setModelTranslation(effect.getModelMatrix(),0, 0, 0.5f, 0, 0.4f, 0.4f);
+        particleModel.addPArticleEffect(effect);
     }
 
     public void turretStateUpdate() {

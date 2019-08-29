@@ -47,7 +47,10 @@ public class ObjectsLoader {
         bindDrawOrdersBuffer(drawOrder);
         storeDataInAttribute(0, size, coords);
         storeDataInAttribute(1, size, textureCoords);
-        int vboId = createEmptyVBO(particlesMaxCount);
+
+        unbindVertexArray();
+
+        int vboId = createEmptyVBO(particlesMaxCount*ParticleModel.PARTICLE_DATA_LENGHT);
 
         addAttribPointer(vaoID,vboId,2,4,ParticleModel.PARTICLE_DATA_LENGHT,0,1);
         addAttribPointer(vaoID,vboId,3,4,ParticleModel.PARTICLE_DATA_LENGHT,4,1);
@@ -57,7 +60,6 @@ public class ObjectsLoader {
         addAttribPointer(vaoID,vboId,7,4,ParticleModel.PARTICLE_DATA_LENGHT,20,1);
         addAttribPointer(vaoID,vboId,8,4,ParticleModel.PARTICLE_DATA_LENGHT,24,1);
 
-        unbindVertexArray();
 
         return new ParticleModel(vaoID,particlesMaxCount,vboId);
     }
@@ -165,16 +167,14 @@ public class ObjectsLoader {
         return vboID;
     }
 
-    public void updateVBOMatrix(int vaoID, int vboID, float[] matrix) {
+    public void updateVBOMatrix(int vboID, float[] matrix) {
 
-        bindVertexArray(vaoID);
         GLES31.glBindBuffer(GLES31.GL_ARRAY_BUFFER, vboID);
 
         FloatBuffer dataBuffer = createDataBuffer(matrix);
         GLES31.glBufferData(GLES31.GL_ARRAY_BUFFER, matrix.length * 4, dataBuffer, GLES31.GL_DYNAMIC_DRAW);
 
         GLES31.glBindBuffer(GLES31.GL_ARRAY_BUFFER, 0);
-        unbindVertexArray();
     }
 
     public void addAttribPointer(int vaoID, int vboID, int attrib, int dataSize, int stride, int offset, int divisor){

@@ -41,11 +41,11 @@ public abstract class StaticModel {
         this.particleShader = particleShader;
     }
 
-    public void drawClassElements(ObjectsLoader loader, Transformations transformations) {
+    public void drawClassElements(ObjectsLoader loader) {
         GLES31.glBindVertexArray(vao);
         enableVertexArrays();
         GLES31.glActiveTexture(GLES31.GL_TEXTURE0);
-        drawElements(loader, transformations);
+        drawElements(loader);
         disableVertexArrays();
         GLES31.glBindVertexArray(0);
     }
@@ -53,7 +53,7 @@ public abstract class StaticModel {
 
     protected abstract void enableVertexArrays();
 
-    protected abstract void drawElements(ObjectsLoader loader, Transformations transformations);
+    protected abstract void drawElements(ObjectsLoader loader);
 
     protected abstract void disableVertexArrays();
 

@@ -1,6 +1,7 @@
 package pmos0011.biox;
 
 import android.content.Context;
+import android.util.Log;
 
 public class ParticleShader extends Shader {
 
