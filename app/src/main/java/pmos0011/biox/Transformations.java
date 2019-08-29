@@ -8,7 +8,7 @@ public class Transformations {
 
     private float ratio;
     private float[] projectionMatrix = new float[16];
-    private float[] modelMatrix = new float[16];
+    private static float[] modelMatrix = new float[16];
 
     public Transformations(float ratio) {
         this.ratio = ratio;
@@ -28,12 +28,14 @@ public class Transformations {
         return ratio;
     }
 
-    public void setModelTranslation(float wordAngle, float objectAngle, float xPos, float yPos, float xScale, float yScale) {
+    public static float[] setModelTranslation(float wordAngle, float objectAngle, float xPos, float yPos, float xScale, float yScale) {
         Matrix.setIdentityM(modelMatrix, 0);
         Matrix.rotateM(modelMatrix, 0, wordAngle, 0, 0, 1.0f);
         Matrix.translateM(modelMatrix, 0, xPos, yPos, Z_DIMENSION);
         Matrix.rotateM(modelMatrix, 0, objectAngle, 0, 0, 1.0f);
         Matrix.scaleM(modelMatrix, 0, xScale, yScale, 1);
+
+        return modelMatrix;
     }
 
 }

@@ -4,7 +4,8 @@ import android.opengl.GLES31;
 
 public abstract class StaticModel {
 
-    protected StaticShader shader;
+    protected StaticShader staticShader;
+    protected ParticleShader particleShader;
     protected int vao;
 
     public final static float SQUERE_CORDS[] = {
@@ -32,19 +33,21 @@ public abstract class StaticModel {
         this.vao = vaoID;
     }
 
-    public void setShader(StaticShader shader) {
-        this.shader = shader;
+    public void setStaticShader(StaticShader staticShader) {
+        this.staticShader = staticShader;
+    }
+
+    public void setParticleShader(ParticleShader particleShader) {
+        this.particleShader = particleShader;
     }
 
     public void drawClassElements(ObjectsLoader loader, Transformations transformations) {
-        shader.start();
         GLES31.glBindVertexArray(vao);
         enableVertexArrays();
         GLES31.glActiveTexture(GLES31.GL_TEXTURE0);
         drawElements(loader, transformations);
         disableVertexArrays();
         GLES31.glBindVertexArray(0);
-        shader.stop();
     }
 
 

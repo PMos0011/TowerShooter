@@ -6,7 +6,6 @@ import javax.microedition.khronos.opengles.GL10;
 import android.content.Context;
 import android.opengl.GLES31;
 import android.opengl.GLSurfaceView;
-import android.util.Log;
 
 
 public class GameLoopRenderer implements GLSurfaceView.Renderer {
@@ -15,7 +14,9 @@ public class GameLoopRenderer implements GLSurfaceView.Renderer {
 
     private ObjectsLoader loader;
     private StaticShader staticShader;
+    private ParticleShader particleShader;
     private StaticTextures staticTextures;
+    private ParticleModel particleModel;
     private Transformations textureTransformations;
 
 
@@ -28,8 +29,13 @@ public class GameLoopRenderer implements GLSurfaceView.Renderer {
 
         loader = new ObjectsLoader(context, BitmapID.getStaticBitmapID());
         staticShader = new StaticShader(context, R.raw.texture_vertex_shader, R.raw.texture_fragment_shader);
+        particleShader =  new ParticleShader(context, R.raw.particle_vertex_shader, R.raw.particle_framgent_shader);
         staticTextures = loader.loadToVAO(StaticTextures.SQUERE_CORDS, StaticTextures.COORDS_PER_VERTEX, StaticTextures.TEXTURE_COORDS, StaticTextures.DRAW_ORDER);
-        staticTextures.setShader(staticShader);
+        particleModel = loader.loadTOVAO(StaticTextures.SQUERE_CORDS, StaticTextures.COORDS_PER_VERTEX, StaticTextures.TEXTURE_COORDS, StaticTextures.DRAW_ORDER,2);
+        staticTextures.setStaticShader(staticShader);
+        particleModel.setParticleShader(particleShader);
+
+        staticTextures.setParticleModel(particleModel);
     }
 
     public void onDrawFrame(GL10 unused) {
@@ -37,6 +43,8 @@ public class GameLoopRenderer implements GLSurfaceView.Renderer {
 
         staticTextures.drawClassElements(loader, textureTransformations);
         staticTextures.turretStateUpdate();
+
+        particleModel.drawClassElements(loader,textureTransformations);
 
     }
 

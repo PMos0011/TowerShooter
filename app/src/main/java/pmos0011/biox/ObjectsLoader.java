@@ -41,6 +41,27 @@ public class ObjectsLoader {
         return new StaticTextures(vaoID);
     }
 
+    public  ParticleModel loadTOVAO(float[] coords, int size, float[] textureCoords, short[] drawOrder, int particlesMaxCount){
+        int vaoID = createVAO();
+        bindVertexArray(vaoID);
+        bindDrawOrdersBuffer(drawOrder);
+        storeDataInAttribute(0, size, coords);
+        storeDataInAttribute(1, size, textureCoords);
+        int vboId = createEmptyVBO(particlesMaxCount);
+
+        addAttribPointer(vaoID,vboId,2,4,ParticleModel.PARTICLE_DATA_LENGHT,0,1);
+        addAttribPointer(vaoID,vboId,3,4,ParticleModel.PARTICLE_DATA_LENGHT,4,1);
+        addAttribPointer(vaoID,vboId,4,4,ParticleModel.PARTICLE_DATA_LENGHT,8,1);
+        addAttribPointer(vaoID,vboId,5,4,ParticleModel.PARTICLE_DATA_LENGHT,12,1);
+        addAttribPointer(vaoID,vboId,6,4,ParticleModel.PARTICLE_DATA_LENGHT,16,1);
+        addAttribPointer(vaoID,vboId,7,4,ParticleModel.PARTICLE_DATA_LENGHT,20,1);
+        addAttribPointer(vaoID,vboId,8,4,ParticleModel.PARTICLE_DATA_LENGHT,24,1);
+
+        unbindVertexArray();
+
+        return new ParticleModel(vaoID,particlesMaxCount,vboId);
+    }
+
     private int createVAO() {
         int[] vao = new int[1];
         GLES31.glGenVertexArrays(1, vao, 0);
