@@ -7,6 +7,9 @@ import android.content.Context;
 import android.opengl.GLES31;
 import android.opengl.GLSurfaceView;
 
+import java.util.Random;
+
+import pmos0011.biox.AbstractClasses.ParticleEffects;
 import pmos0011.biox.AbstractClasses.StaticModel;
 import pmos0011.biox.CommonObjects.BitmapID;
 import pmos0011.biox.CommonObjects.ObjectsLoader;
@@ -18,6 +21,9 @@ import pmos0011.biox.StaticTextures.StaticTextures;
 
 
 public class GameLoopRenderer implements GLSurfaceView.Renderer {
+
+    public static final float WIND_FLOW_X = new Random().nextFloat() / 1000f;
+    public static final float WIND_FLOW_Y = new Random().nextFloat() / 1000f;
 
     private Context context;
 
@@ -40,7 +46,7 @@ public class GameLoopRenderer implements GLSurfaceView.Renderer {
         staticShader = new StaticShader(context, R.raw.texture_vertex_shader, R.raw.texture_fragment_shader);
         particleShader =  new ParticleShader(context, R.raw.particle_vertex_shader, R.raw.particle_framgent_shader);
         staticTextures = loader.loadToVAO(StaticModel.SQUERE_CORDS, StaticModel.COORDS_PER_VERTEX, StaticModel.TEXTURE_COORDS, StaticModel.DRAW_ORDER);
-        particleModel = loader.loadTOVAO(StaticModel.SQUERE_CORDS, StaticModel.COORDS_PER_VERTEX, StaticModel.TEXTURE_COORDS, StaticModel.DRAW_ORDER,2);
+        particleModel = loader.loadTOVAO(StaticModel.SQUERE_CORDS, StaticModel.COORDS_PER_VERTEX, StaticModel.TEXTURE_COORDS, StaticModel.DRAW_ORDER, ParticleEffects.PARTICLE_MAX_COUNT);
         staticTextures.setStaticShader(staticShader);
         particleModel.setParticleShader(particleShader);
 
@@ -51,6 +57,7 @@ public class GameLoopRenderer implements GLSurfaceView.Renderer {
         GLES31.glClear(GLES31.GL_COLOR_BUFFER_BIT);
 
         staticTextures.drawClassElements(loader);
+
         staticTextures.turretStateUpdate();
 
         particleModel.drawClassElements(loader);
@@ -70,4 +77,5 @@ public class GameLoopRenderer implements GLSurfaceView.Renderer {
     public StaticTextures getStaticTextures() {
         return staticTextures;
     }
+
 }

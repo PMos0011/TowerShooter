@@ -1,5 +1,6 @@
 package pmos0011.biox.CommonObjects;
 
+import android.graphics.PointF;
 import android.opengl.Matrix;
 
 public class Transformations {
@@ -31,6 +32,18 @@ public class Transformations {
         Matrix.rotateM(matrix, 0, objectAngle, 0, 0, 1.0f);
         Matrix.scaleM(matrix, 0, xScale, yScale, 1);
 
+    }
+
+    public static PointF calculatePoint(float angle, float param) {
+
+        PointF point = new PointF();
+
+        double radians = Math.toRadians(angle);
+        point.x = param * (float) Math.sin(radians);
+        point.y = param * (float) Math.cos(radians);
+        point.x = -point.x;
+
+        return point;
     }
 
 }

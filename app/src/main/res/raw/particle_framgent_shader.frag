@@ -12,7 +12,7 @@ uniform sampler2D textureSampler;
 
 vec4 transparentColor = vec4(0.0, 0.0, 0.0, 0.0);
 
-float innerThreshold = 0.35;
+float innerThreshold = 0.30;
 float outerThreshold = 0.15;
 float softEdge = 0.05;
 
@@ -57,7 +57,20 @@ float overlay(float base, float top) {
 float circle(vec2 coord, float radius){
     float dist;
 
-    dist = (radius - distance(coord, vec2(0.5))) *options[1];
+    if(options[2]>0.0){
+        vec2 diff = abs(coord - vec2(0.5, 0.8));
+
+        diff.x*=options[2];
+
+        if (coord.y < 0.8){
+            diff.y /= 1.6;
+        } else {
+            diff.y *= 2.0;
+        }
+        dist = sqrt(diff.x * diff.x + diff.y * diff.y) / radius;
+        dist=(1.-dist)*options[1];
+    }else{
+        dist = (radius - distance(coord, vec2(0.5))) *options[1];}
     return clamp(dist, 0.0, 1.0);
 }
 

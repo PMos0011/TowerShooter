@@ -14,6 +14,7 @@ import java.nio.ShortBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
+import pmos0011.biox.AbstractClasses.ParticleEffects;
 import pmos0011.biox.ParticleEffect.ParticleModel;
 import pmos0011.biox.StaticTextures.StaticTextures;
 
@@ -22,6 +23,9 @@ public class ObjectsLoader {
     private List<Integer> vaoList = new ArrayList<>();
     private List<Integer> vboList = new ArrayList<>();
     private int[] textureIds;
+
+    private ByteBuffer buffer;
+    FloatBuffer dataBuffer;
 
     public ObjectsLoader(Context context, int[] texturesId) {
         this.textureIds = new int[texturesId.length];
@@ -53,18 +57,18 @@ public class ObjectsLoader {
 
         unbindVertexArray();
 
-        int vboId = createEmptyVBO(particlesMaxCount*ParticleModel.PARTICLE_DATA_LENGTH);
+        int vboId = createEmptyVBO(particlesMaxCount* ParticleEffects.PARTICLE_DATA_LENGTH);
 
-        addAttribPointer(vaoID,vboId,2,4,ParticleModel.PARTICLE_DATA_LENGTH,0,1);
-        addAttribPointer(vaoID,vboId,3,4,ParticleModel.PARTICLE_DATA_LENGTH,4,1);
-        addAttribPointer(vaoID,vboId,4,4,ParticleModel.PARTICLE_DATA_LENGTH,8,1);
-        addAttribPointer(vaoID,vboId,5,4,ParticleModel.PARTICLE_DATA_LENGTH,12,1);
-        addAttribPointer(vaoID,vboId,6,4,ParticleModel.PARTICLE_DATA_LENGTH,16,1);
-        addAttribPointer(vaoID,vboId,7,4,ParticleModel.PARTICLE_DATA_LENGTH,20,1);
-        addAttribPointer(vaoID,vboId,8,4,ParticleModel.PARTICLE_DATA_LENGTH,24,1);
+        addAttribPointer(vaoID,vboId,2,4,ParticleEffects.PARTICLE_DATA_LENGTH,0,1);
+        addAttribPointer(vaoID,vboId,3,4,ParticleEffects.PARTICLE_DATA_LENGTH,4,1);
+        addAttribPointer(vaoID,vboId,4,4,ParticleEffects.PARTICLE_DATA_LENGTH,8,1);
+        addAttribPointer(vaoID,vboId,5,4,ParticleEffects.PARTICLE_DATA_LENGTH,12,1);
+        addAttribPointer(vaoID,vboId,6,4,ParticleEffects.PARTICLE_DATA_LENGTH,16,1);
+        addAttribPointer(vaoID,vboId,7,4,ParticleEffects.PARTICLE_DATA_LENGTH,20,1);
+        addAttribPointer(vaoID,vboId,8,4,ParticleEffects.PARTICLE_DATA_LENGTH,24,1);
 
 
-        return new ParticleModel(vaoID,particlesMaxCount,vboId);
+        return new ParticleModel(vaoID,vboId);
     }
 
     private int createVAO() {
@@ -85,7 +89,7 @@ public class ObjectsLoader {
         int vboID = createVBO();
         GLES31.glBindBuffer(GLES31.GL_ELEMENT_ARRAY_BUFFER, vboID);
 
-        ByteBuffer buffer = ByteBuffer.allocateDirect(drawOrder.length * 2);
+        buffer = ByteBuffer.allocateDirect(drawOrder.length * 2);
         buffer.order(ByteOrder.nativeOrder());
         ShortBuffer indices = buffer.asShortBuffer();
         indices.put(drawOrder);
@@ -115,9 +119,9 @@ public class ObjectsLoader {
     }
 
     private FloatBuffer createDataBuffer(float[] data) {
-        ByteBuffer buffer = ByteBuffer.allocateDirect(data.length * 4);
+        buffer = ByteBuffer.allocateDirect(data.length * 4);
         buffer.order(ByteOrder.nativeOrder());
-        FloatBuffer dataBuffer = buffer.asFloatBuffer();
+        dataBuffer = buffer.asFloatBuffer();
         dataBuffer.put(data);
         dataBuffer.position(0);
 
@@ -174,7 +178,7 @@ public class ObjectsLoader {
 
         GLES31.glBindBuffer(GLES31.GL_ARRAY_BUFFER, vboID);
 
-        FloatBuffer dataBuffer = createDataBuffer(matrix);
+        dataBuffer = createDataBuffer(matrix);
         GLES31.glBufferData(GLES31.GL_ARRAY_BUFFER, matrix.length * 4, dataBuffer, GLES31.GL_DYNAMIC_DRAW);
 
         GLES31.glBindBuffer(GLES31.GL_ARRAY_BUFFER, 0);
