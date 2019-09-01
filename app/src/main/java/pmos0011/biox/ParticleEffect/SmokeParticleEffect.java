@@ -11,24 +11,21 @@ import pmos0011.biox.Weapons.Shells;
 
 public class SmokeParticleEffect extends ParticleEffects {
 
-    private float scaleX;
-    private float scaleY;
-
-    public SmokeParticleEffect(effectKind effect, float worldAngle, float objectAngle, float effectOffset, float xPos, float yPos, float travelDistance) {
-        super(effect, worldAngle, objectAngle, effectOffset, xPos, yPos, travelDistance);
+    public SmokeParticleEffect(effectKind effect, float worldAngle, float objectAngle, float effectOffset, float xPos, float yPos, float size, float travelDistance) {
+        super(effect, worldAngle, objectAngle, effectOffset, xPos, yPos, size, travelDistance);
     }
 
 
     @Override
-    protected void particleInitial(float effectOffset, float xPos, float yPos) {
+    protected void particleInitial(float effectOffset, float xPos, float yPos, float size) {
         switch (effect) {
             case CANNON_SMOKE:
 
                 particlePosition = Transformations.calculatePoint(worldAngle, effectOffset);
                 particlePosition.x += xPos;
                 particlePosition.y += yPos;
-                scaleX = 0.35f;
-                scaleY = 0.35f;
+                scaleX = 35*size;
+                scaleY = 35*size;
 
                 Transformations.setModelTranslation(modelMatrix, 0, 0, particlePosition.x, particlePosition.y, scaleX, scaleY);
 
@@ -60,8 +57,8 @@ public class SmokeParticleEffect extends ParticleEffects {
                 this.innerColor[3] = 0.5f;
                 this.outerColor[3] = 0.4f;
                 this.options = SHEL_STREAK.clone();
-                scaleX = Shells.getScale().x * 4;
-                scaleY = Shells.getScale().y * 8 * this.travelDistance;
+                scaleX = size * 4;
+                scaleY = size * Shells.SHELL_ASPECT * 8 * this.travelDistance;
 
                 Transformations.setModelTranslation(modelMatrix, 0, objectAngle, particlePosition.x, particlePosition.y, scaleX, scaleY);
                 break;

@@ -53,9 +53,12 @@ public class StaticTextures extends StaticModel {
     private float rightCannonPosition = 0.0f;
 
     private List<Shells> shells = new ArrayList<>();
+    private List<Enemy> enemies = new ArrayList<>();
 
     public StaticTextures(int vaoID) {
         super(vaoID);
+
+        addTestEnemies();
     }
 
     public void setParticleModel(ParticleModel particleModel) {
@@ -82,6 +85,7 @@ public class StaticTextures extends StaticModel {
         drawRightCannon(loader);
         drawTurret(loader);
         drawRadar(loader);
+        drawEnemies(loader);
         drawLeftRotateButton(loader);
         drawRightRotateButton(loader);
         drawLeftCannonButton(loader);
@@ -183,14 +187,47 @@ public class StaticTextures extends StaticModel {
             GLES31.glBindTexture(GLES31.GL_TEXTURE_2D, loader.getTextureID(BitmapID.textureNames.SHELL.getValue()));
             GLES31.glDrawElements(GLES31.GL_TRIANGLES, StaticTextures.DRAW_ORDER.length, GLES31.GL_UNSIGNED_SHORT, 0);
 
+            if (shell.getPosition().equals(shell.getStartPosition())) {
+
+                particleModel.addParticleEffect(new FireParticleEffect(ParticleEffects.effectKind.CANNON_FIRE, shell.getAngle(), 0,
+                        shell.getOffset(), shell.getStartPosition().x, shell.getStartPosition().y, shell.getScale().x, 0));
+                particleModel.addParticleEffect(new SmokeParticleEffect(ParticleEffects.effectKind.CANNON_SMOKE, shell.getAngle(), 0,
+                        shell.getOffset(), shell.getStartPosition().x, shell.getStartPosition().y, shell.getScale().x, 0));
+            }
             shell.getPosition().x += shell.getDeltaSpeed().x;
             shell.getPosition().y += shell.getDeltaSpeed().y;
-            if (shell.getPosition().x > 2 * Transformations.getRatio() || shell.getPosition().y > 2
-                    || shell.getPosition().x < -2 * Transformations.getRatio() || shell.getPosition().y < -2) {
+
+            if (shell.getStartPosition().x < 0 && shell.getPosition().x > 0 || shell.getStartPosition().x > 0 && shell.getPosition().x < 0) {
+                particleModel.addParticleEffect(new SmokeParticleEffect(ParticleEffects.effectKind.SHELL_STREAK, 0, shell.getAngle(),
+                        shell.getOffset(), shell.getStartPosition().x, shell.getStartPosition().y, shell.getScale().x, shell.getTravelDisatnce()));
                 shellsIterator.remove();
-                particleModel.addParticleEffect(new SmokeParticleEffect(ParticleEffects.effectKind.SHELL_STREAK, 0, shell.getAngle(), 0.55f,
-                        shell.getStartPosition().x, shell.getStartPosition().y, shell.getTravelDisatnce()));
+            } else {
+                if (shell.getPosition().x > 2 * Transformations.getRatio() || shell.getPosition().y > 2
+                        || shell.getPosition().x < -2 * Transformations.getRatio() || shell.getPosition().y < -2) {
+                    particleModel.addParticleEffect(new SmokeParticleEffect(ParticleEffects.effectKind.SHELL_STREAK, 0, shell.getAngle(),
+                            shell.getOffset(), shell.getStartPosition().x, shell.getStartPosition().y, shell.getScale().x, shell.getTravelDisatnce()));
+                    shellsIterator.remove();
+                }
             }
+        }
+    }
+
+    private void drawEnemies(ObjectsLoader loader) {
+        Iterator<Enemy> enemyIterator = enemies.iterator();
+        while (enemyIterator.hasNext()) {
+            Enemy enemy = enemyIterator.next();
+
+            Transformations.setModelTranslation(modelMatrix, 0, 0, enemy.getPosition().x, enemy.getPosition().y, enemy.getScale().x, enemy.getScale().y);
+            loader.loadUniformMatrix4fv(staticShader.getModelMatrixHandle(), modelMatrix);
+            GLES31.glBindTexture(GLES31.GL_TEXTURE_2D, loader.getTextureID(BitmapID.textureNames.TANK_CHASSIS.getValue()));
+            GLES31.glDrawElements(GLES31.GL_TRIANGLES, StaticTextures.DRAW_ORDER.length, GLES31.GL_UNSIGNED_SHORT, 0);
+
+            Transformations.setModelTranslation(modelMatrix, 0, enemy.getTurretAngle(), enemy.getPosition().x, enemy.getPosition().y, enemy.getScale().x, enemy.getScale().y);
+            loader.loadUniformMatrix4fv(staticShader.getModelMatrixHandle(), modelMatrix);
+            GLES31.glBindTexture(GLES31.GL_TEXTURE_2D, loader.getTextureID(BitmapID.textureNames.TANK_TURRET.getValue()));
+            GLES31.glDrawElements(GLES31.GL_TRIANGLES, StaticTextures.DRAW_ORDER.length, GLES31.GL_UNSIGNED_SHORT, 0);
+
+            enemy.enemyMove();
         }
     }
 
@@ -248,22 +285,18 @@ public class StaticTextures extends StaticModel {
     }
 
     public void fireFromLeft() {
-        particleModel.addParticleEffect(new FireParticleEffect(ParticleEffects.effectKind.CANNON_FIRE, turretAngle, 0, 0, 0, 0.55f, 0));
-        particleModel.addParticleEffect(new SmokeParticleEffect(ParticleEffects.effectKind.CANNON_SMOKE, turretAngle, 0, 0.55f, 0, 0, 0));
         particleModel.addParticleEffect(new SmokeParticleEffect(ParticleEffects.effectKind.RELOAD_STATUS, 0, 0, 0,
-                leftCannonButton.getOpenGLPosition().x, leftCannonButton.getOpenGLPosition().y, 0));
-        shells.add(new Shells(turretAngle, true, Weapons.SHELL_SPEED));
+                leftCannonButton.getOpenGLPosition().x, leftCannonButton.getOpenGLPosition().y, 0, 0));
+        shells.add(new Shells(turretAngle, true, Shells.SHELL_SPEED));
         isLeftCannonLoaded = false;
         leftCannonPosition = -0.038f;
 
     }
 
     public void fireFromRight() {
-        particleModel.addParticleEffect(new FireParticleEffect(ParticleEffects.effectKind.CANNON_FIRE, turretAngle, 0, 0, 0, 0.55f, 0));
-        particleModel.addParticleEffect(new SmokeParticleEffect(ParticleEffects.effectKind.CANNON_SMOKE, turretAngle, 0, 0.55f, 0, 0, 0));
         particleModel.addParticleEffect(new SmokeParticleEffect(ParticleEffects.effectKind.RELOAD_STATUS, 0, 0, 0,
-                rightCannonButton.getOpenGLPosition().x, rightCannonButton.getOpenGLPosition().y, 0));
-        shells.add(new Shells(turretAngle, false, Weapons.SHELL_SPEED));
+                rightCannonButton.getOpenGLPosition().x, rightCannonButton.getOpenGLPosition().y, 0, 0));
+        shells.add(new Shells(turretAngle, false, Shells.SHELL_SPEED));
         isRightCannonLoaded = false;
         rightCannonPosition = -0.038f;
     }
@@ -317,6 +350,21 @@ public class StaticTextures extends StaticModel {
             if (rightCannonPosition < 0.0f)
                 rightCannonPosition += 0.001f;
         }
+    }
+
+    private void addTestEnemies() {
+        enemies.add(new Enemy(0, -1, 0, 0, this));
+        enemies.add(new Enemy(0, -1.5f, -0.5f, 0, this));
+        enemies.add(new Enemy(0, -0.5f, 0.5f, 0, this));
+        enemies.add(new Enemy(0, 1, 0, 0, this));
+        enemies.add(new Enemy(0, 1.5f, 0.5f, 0, this));
+        enemies.add(new Enemy(0, 0.5f, -0.5f, 0, this));
+
+    }
+
+    public void addShell(float angle, float xPos, float yPos, float speed) {
+
+        shells.add(new Shells(angle, xPos, yPos, speed));
     }
 
 }

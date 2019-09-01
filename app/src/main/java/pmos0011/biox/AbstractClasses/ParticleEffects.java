@@ -16,12 +16,14 @@ public abstract class ParticleEffects {
     protected float worldAngle;
     protected float objectAngle;
     protected float travelDistance;
+    protected float scaleX;
+    protected float scaleY;
 
     protected PointF particlePosition = new PointF();
 
     protected effectKind effect;
 
-    public ParticleEffects(effectKind effect, float worldAngle, float objectAngle, float effectOffset, float xPos, float yPos, float travelDistance) {
+    public ParticleEffects(effectKind effect, float worldAngle, float objectAngle, float effectOffset, float xPos, float yPos, float size, float travelDistance) {
         this.effect = effect;
         this.worldAngle = worldAngle;
         this.objectAngle = objectAngle;
@@ -29,12 +31,12 @@ public abstract class ParticleEffects {
 
         int start_time = new Random().nextInt(500);
 
-        particleInitial(effectOffset, xPos, yPos);
+        particleInitial(effectOffset, xPos, yPos, size);
 
         this.options[0] += start_time;
     }
 
-    protected abstract void particleInitial(float effectOffset, float xPos, float yPos);
+    protected abstract void particleInitial(float effectOffset, float xPos, float yPos, float size);
 
     public float[] getModelMatrix() {
         return modelMatrix;
