@@ -16,7 +16,7 @@ public class SmokeParticleEffect extends ParticleEffects {
         particlePosition.x+=xPos;
         particlePosition.y+=yPos;
 
-        Transformations.setModelTranslation(modelMatrix, this.worldAngle, 0, particlePosition.x, particlePosition.y, scale, scale);
+        Transformations.setModelTranslation(getModelMatrix(), 0, 0, particlePosition.x, particlePosition.y, scale, scale);
     }
 
     public void particleUpdate() {
@@ -35,15 +35,15 @@ public class SmokeParticleEffect extends ParticleEffects {
         particlePosition.y+=GameLoopRenderer.WIND_FLOW_Y;
 
         if(getInnerOpacity()<0.8f && getVisibility()==3.0f){
-            changeOpacity(0.05f, 0.04f);
+            changeOpacity(0.03f, 0.02f);
         }else{
             changeVisibility(-0.002f);
-            //changeOpacity(-0.01f,-0.12f);
+            changeOpacity(-0.003f,-0.007f);
             scale+=0.001f;
         }
 
 
-        Transformations.setModelTranslation(modelMatrix, this.worldAngle, 0, particlePosition.x, particlePosition.y, scale, scale);
+        Transformations.setModelTranslation(getModelMatrix(), 0, 0, particlePosition.x, particlePosition.y, scale, scale);
 
     }
 }

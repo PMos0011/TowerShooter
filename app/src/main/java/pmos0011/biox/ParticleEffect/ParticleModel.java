@@ -150,7 +150,7 @@ public class ParticleModel extends StaticModel {
             updateParticleMatrix(effect);
             effect.particleUpdate();
 
-            if(effect.getVisibility()<=0.0f)
+            if(effect.getVisibility()<=0.0f || effect.getInnerOpacity()<=0.0f)
                 particleEffectIterator.remove();
 
         }

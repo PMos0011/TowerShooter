@@ -215,17 +215,17 @@ public class StaticTextures extends StaticModel {
     }
 
     public void fireFromLeft() {
-        particleModel.addParticleEffect(new FireParticleEffect(ParticleEffects.effectKind.CANNON_FIRE, turretAngle, 0,0, 0, 0.45f));
-        //particleModel.addParticleEffect(new SmokeParticleEffect(ParticleEffects.effectKind.CANNON_SMOKE, turretAngle, 0,0.5f, 0, 0));
-        //isLeftCannonLoaded = false;
+        particleModel.addParticleEffect(new FireParticleEffect(ParticleEffects.effectKind.CANNON_FIRE, turretAngle, 0,0, 0, 0.55f));
+        particleModel.addParticleEffect(new SmokeParticleEffect(ParticleEffects.effectKind.CANNON_SMOKE, turretAngle, 0,0.55f, 0, 0));
+        isLeftCannonLoaded = false;
         leftCannonPosition = -0.038f;
 
     }
 
     public void fireFromRight() {
-        particleModel.addParticleEffect(new FireParticleEffect(ParticleEffects.effectKind.CANNON_FIRE, turretAngle, 0,0, 0, 0.45f));
-        //particleModel.addParticleEffect(new SmokeParticleEffect(ParticleEffects.effectKind.CANNON_SMOKE, turretAngle, 0,0.5f, 0, 0));
-        //isRightCannonLoaded = false;
+        particleModel.addParticleEffect(new FireParticleEffect(ParticleEffects.effectKind.CANNON_FIRE, turretAngle, 0,0, 0, 0.55f));
+        particleModel.addParticleEffect(new SmokeParticleEffect(ParticleEffects.effectKind.CANNON_SMOKE, turretAngle, 0,0.55f, 0, 0));
+        isRightCannonLoaded = false;
         rightCannonPosition = -0.038f;
     }
 

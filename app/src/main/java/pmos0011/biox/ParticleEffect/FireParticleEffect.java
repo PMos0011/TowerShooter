@@ -9,7 +9,7 @@ public class FireParticleEffect extends ParticleEffects {
     public FireParticleEffect(effectKind effect, float worldAngle, float objectAngle, float effectOffset, float xPos, float yPos) {
         super(effect, worldAngle, objectAngle, effectOffset, xPos, yPos);
 
-        Transformations.setModelTranslation(modelMatrix, worldAngle, objectAngle, xPos, yPos, 0.2f, -0.25f);
+        Transformations.setModelTranslation(getModelMatrix(), worldAngle, objectAngle, xPos, yPos, 0.2f, -0.25f);
     }
 
     public void particleUpdate() {
@@ -23,7 +23,7 @@ public class FireParticleEffect extends ParticleEffects {
     private void fire() {
 
         addTime(0.04f);
-        //changeVisibility(-0.08f);
+        changeVisibility(-0.08f);
     }
 }
 

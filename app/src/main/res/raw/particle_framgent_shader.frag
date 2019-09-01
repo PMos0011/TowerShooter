@@ -12,8 +12,8 @@ uniform sampler2D textureSampler;
 
 vec4 transparentColor = vec4(0.0, 0.0, 0.0, 0.0);
 
-float innerThreshold = 0.30;
-float outerThreshold = 0.15;
+float innerThreshold = 0.50;
+float outerThreshold = 0.25;
 float softEdge = 0.05;
 
 float random(vec2 coord){
@@ -34,30 +34,12 @@ float noise(vec2 coord){
     return mix(a, b, cubic.x) + (c - a) * cubic.y * (1.0 - cubic.x) + (d - b) * cubic.x * cubic.y;
 }
 
-float fbm(vec2 coord){
-    float value = 0.0;
-    float scale = 0.5;
-
-    for (int i = 0; i < 6; i++){
-        value += noise(coord) * scale;
-        coord *= 2.0;
-        scale *= 0.5;
-    }
-    return value;
-}
-
-float overlay(float base, float top) {
-    if (base < 0.5) {
-        return 2.0 * base * top;
-    } else {
-        return 1.0 - 2.0 * (1.0 - base) * (1.0 - top);
-    }
-}
 
 float circle(vec2 coord, float radius){
     float dist;
 
-    if(options[2]>0.0){
+
+    if (options[2]>0.0){
         vec2 diff = abs(coord - vec2(0.5, 0.8));
 
         diff.x*=options[2];
@@ -69,38 +51,31 @@ float circle(vec2 coord, float radius){
         }
         dist = sqrt(diff.x * diff.x + diff.y * diff.y) / radius;
         dist=(1.-dist)*options[1];
-    }else{
-        dist = (radius - distance(coord, vec2(0.5))) *options[1];}
+    } else {
+        dist = (radius - distance(coord, vec2(0.5)))*options[1]; }
     return clamp(dist, 0.0, 1.0);
 }
 
 void main() {
 
-    vec2 coord = fTextureCoords * 8.0;
-    vec2 fbmcoord = coord / 6.0;
-    float c = circle(fTextureCoords, 0.5f);
-    c+= circle(fTextureCoords, 0.3f)/2.;
+        vec2 coord = fTextureCoords * 7.0;
+        float c = circle(fTextureCoords, 0.5f);
+    c += circle(fTextureCoords, 0.25f)/2.0;
 
-    float noise1 = noise(coord + vec2(options[0] * 0.25, options[0] * 4.0));
-    float noise2 = noise(coord + vec2(options[0] * 0.5, options[0] *7.0));
-    float combinedNoise = (noise1 + noise2) / 2.0;
+        float noise = noise(coord + vec2(options[0] * 0.25, options[0] * 4.0));
 
-    float fbmNoise = fbm(fbmcoord + vec2(0.0, options[0]));
-    fbmNoise = overlay(fbmNoise, fTextureCoords.y);
+        float everythingCombined = noise * c;
 
-    float everythingCombined = combinedNoise * c * fbmNoise;
-
-    if (everythingCombined < outerThreshold){
-        outColor = transparentColor;
-    } else if (everythingCombined < outerThreshold + softEdge){
-        outColor = mix(transparentColor, outerColor, (everythingCombined - outerThreshold) / softEdge);
-    } else if (everythingCombined < innerThreshold){
-        outColor = outerColor;
-    } else if (everythingCombined < innerThreshold + softEdge){
-        outColor = mix(outerColor, innerColor, (everythingCombined - innerThreshold) / softEdge);
-    } else {
-        outColor = innerColor;
-    }
-
-    // outColor = texture(textureSampler, fTextureCoords);
+        if (everythingCombined < outerThreshold){
+            outColor = transparentColor;
+        } else if (everythingCombined < outerThreshold + softEdge){
+            outColor = mix(transparentColor, outerColor, (everythingCombined - outerThreshold) / softEdge);
+        } else if (everythingCombined < innerThreshold){
+            outColor = outerColor;
+        } else if (everythingCombined < innerThreshold + softEdge){
+            outColor = mix(outerColor, innerColor, (everythingCombined - innerThreshold) / softEdge);
+        } else {
+            outColor = innerColor;
+        }
+    //outColor = texture(textureSampler, fTextureCoords);
 }

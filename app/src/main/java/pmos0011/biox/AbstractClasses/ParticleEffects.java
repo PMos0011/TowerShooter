@@ -9,12 +9,12 @@ public abstract class ParticleEffects {
     public final static int PARTICLE_DATA_LENGTH = 28;
     public final static int PARTICLE_MAX_COUNT = 100;
 
-    protected float[] modelMatrix = new float[16];
+    private float[] modelMatrix = new float[16];
     private float[] innerColor = new float[4];
     private float[] outerColor = new float[4];
     private float[] options = new float[4];
-    protected float worldAngle;
-    protected float objectAngle;
+    private float worldAngle;
+    private float objectAngle;
 
     protected  PointF particlePosition = new PointF();
 
@@ -29,15 +29,15 @@ public abstract class ParticleEffects {
 
         switch (effect) {
             case CANNON_FIRE:
-                this.innerColor = YELLOW.clone();
-                this.outerColor = RED.clone();
+                this.innerColor = LIGHT_YELLOW.clone();
+                this.outerColor = LIGHT_RED.clone();
                 this.options = CANNON_FIRE.clone();
                 break;
             case CANNON_SMOKE:
                 this.innerColor = GRAY.clone();
-                this.outerColor = LIGHT_GRAY.clone();
+                this.outerColor = GRAY.clone();
                 this.options = GRAY_SMOKE.clone();
-                this.innerColor[3]=0.0f;
+                this.innerColor[3]=0.01f;
                 this.outerColor[3]=0.0f;
                 break;
         }
@@ -90,17 +90,19 @@ public abstract class ParticleEffects {
         outerColor[3]+=outerOpacity;
     }
 
-    protected float getInnerOpacity(){
+    public float getInnerOpacity(){
         return innerColor[3];
     }
 
-    private final static float[] WHITE = {1.0f, 1.0f, 1.0f, 0.7f};
-    private final static float[] GRAY = {0.75f, 0.75f, 0.75f, 0.7f};
-    private final static float[] LIGHT_GRAY = {0.6f, 0.6f, 0.6f, 0.7f};
-    private final static float[] RED = {1.0f, 0.0f, 0.0f, 0.7f};
-    private final static float[] YELLOW = {0.8f, 0.8f, 0.0f, 0.7f};
+    private final static float[] WHITE = {1.0f, 1.0f, 1.0f, 0.9f};
+    private final static float[] GRAY = {0.85f, 0.85f, 0.85f, 0.9f};
+    private final static float[] LIGHT_GRAY = {0.6f, 0.6f, 0.6f, 0.9f};
+    private final static float[] RED = {1.0f, 0.0f, 0.0f, 0.9f};
+    private final static float[] YELLOW = {1.0f, 1.0f, 0.0f, 0.9f};
+    private final static float[] LIGHT_RED = {1.0f, 0.25f, 0.15f, 0.9f};
+    private final static float[] LIGHT_YELLOW = {1.0f, 0.8f, 0.3f, 0.9f};
 
-    private final static float[] CANNON_FIRE = {0.0f, 2.6f, 0.0f, 0.0f};
+    private final static float[] CANNON_FIRE = {0.0f, 2.6f, 1.4f, 0.0f};
     private final static float[] GRAY_SMOKE = {0.0f, 3.0f, 0.0f, 0.0f};
 
     public enum effectKind {
