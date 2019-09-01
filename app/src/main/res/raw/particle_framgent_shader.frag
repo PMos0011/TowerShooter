@@ -58,9 +58,18 @@ float circle(vec2 coord, float radius){
 
 void main() {
 
-        vec2 coord = fTextureCoords * 7.0;
+    if (options[3]==0.0){
+
+        vec2 coord;
+
+        if (options[0]<0.0){
+            coord = fTextureCoords * 200.0;
+        } else {
+            coord = fTextureCoords * 7.0;
+        }
+
         float c = circle(fTextureCoords, 0.5f);
-    c += circle(fTextureCoords, 0.25f)/2.0;
+        c += circle(fTextureCoords, 0.25f)/2.0;
 
         float noise = noise(coord + vec2(options[0] * 0.25, options[0] * 4.0));
 
@@ -77,5 +86,8 @@ void main() {
         } else {
             outColor = innerColor;
         }
+    } else {
+        outColor=innerColor;
+    }
     //outColor = texture(textureSampler, fTextureCoords);
 }

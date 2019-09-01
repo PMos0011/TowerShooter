@@ -28,7 +28,7 @@ public class ParticleShader extends Shader {
 
     @Override
     protected void getAllUniformBlocksIndex() {
-        uniformBlockProjectionMatrixIndex =super.getUniformBlockIndex("projectionMatrix");
-        super.uniformBlockBinding(uniformBlockProjectionMatrixIndex,0);
+        uniformBlockProjectionMatrixIndex = super.getUniformBlockIndex("projectionMatrix");
+        super.uniformBlockBinding(uniformBlockProjectionMatrixIndex, 0);
     }
 }

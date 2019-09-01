@@ -13,7 +13,7 @@ public class GameControlObjects {
     public void setObject(int width, int height, float size_mod, float xPosition, float yPosition, float[] projectionMatrix) {
 
         halfDimension = (int) (height * size_mod) / 2;
-        this.openGLPosition = new PointF(xPosition,yPosition);
+        this.openGLPosition = new PointF(xPosition, yPosition);
 
         float[] mModelMatrix = new float[16];
 

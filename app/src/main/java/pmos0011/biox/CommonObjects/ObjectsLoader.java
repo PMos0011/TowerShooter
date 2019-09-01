@@ -48,7 +48,7 @@ public class ObjectsLoader {
         return new StaticTextures(vaoID);
     }
 
-    public ParticleModel loadTOVAO(float[] coords, int size, float[] textureCoords, short[] drawOrder, int particlesMaxCount){
+    public ParticleModel loadTOVAO(float[] coords, int size, float[] textureCoords, short[] drawOrder, int particlesMaxCount) {
         int vaoID = createVAO();
         bindVertexArray(vaoID);
         bindDrawOrdersBuffer(drawOrder);
@@ -57,18 +57,17 @@ public class ObjectsLoader {
 
         unbindVertexArray();
 
-        int vboId = createEmptyVBO(particlesMaxCount* ParticleEffects.PARTICLE_DATA_LENGTH);
+        int vboId = createEmptyVBO(particlesMaxCount * ParticleEffects.PARTICLE_DATA_LENGTH);
 
-        addAttribPointer(vaoID,vboId,2,4,ParticleEffects.PARTICLE_DATA_LENGTH,0,1);
-        addAttribPointer(vaoID,vboId,3,4,ParticleEffects.PARTICLE_DATA_LENGTH,4,1);
-        addAttribPointer(vaoID,vboId,4,4,ParticleEffects.PARTICLE_DATA_LENGTH,8,1);
-        addAttribPointer(vaoID,vboId,5,4,ParticleEffects.PARTICLE_DATA_LENGTH,12,1);
-        addAttribPointer(vaoID,vboId,6,4,ParticleEffects.PARTICLE_DATA_LENGTH,16,1);
-        addAttribPointer(vaoID,vboId,7,4,ParticleEffects.PARTICLE_DATA_LENGTH,20,1);
-        addAttribPointer(vaoID,vboId,8,4,ParticleEffects.PARTICLE_DATA_LENGTH,24,1);
+        addAttribPointer(vaoID, vboId, 2, 4, ParticleEffects.PARTICLE_DATA_LENGTH, 0, 1);
+        addAttribPointer(vaoID, vboId, 3, 4, ParticleEffects.PARTICLE_DATA_LENGTH, 4, 1);
+        addAttribPointer(vaoID, vboId, 4, 4, ParticleEffects.PARTICLE_DATA_LENGTH, 8, 1);
+        addAttribPointer(vaoID, vboId, 5, 4, ParticleEffects.PARTICLE_DATA_LENGTH, 12, 1);
+        addAttribPointer(vaoID, vboId, 6, 4, ParticleEffects.PARTICLE_DATA_LENGTH, 16, 1);
+        addAttribPointer(vaoID, vboId, 7, 4, ParticleEffects.PARTICLE_DATA_LENGTH, 20, 1);
+        addAttribPointer(vaoID, vboId, 8, 4, ParticleEffects.PARTICLE_DATA_LENGTH, 24, 1);
 
-
-        return new ParticleModel(vaoID,vboId);
+        return new ParticleModel(vaoID, vboId);
     }
 
     private int createVAO() {
@@ -184,12 +183,12 @@ public class ObjectsLoader {
         GLES31.glBindBuffer(GLES31.GL_ARRAY_BUFFER, 0);
     }
 
-    public void addAttribPointer(int vaoID, int vboID, int attrib, int dataSize, int stride, int offset, int divisor){
+    public void addAttribPointer(int vaoID, int vboID, int attrib, int dataSize, int stride, int offset, int divisor) {
 
         bindVertexArray(vaoID);
         GLES31.glBindBuffer(GLES31.GL_ARRAY_BUFFER, vboID);
 
-        GLES31.glVertexAttribPointer(attrib, dataSize, GLES31.GL_FLOAT, false, stride*4, offset*4);
+        GLES31.glVertexAttribPointer(attrib, dataSize, GLES31.GL_FLOAT, false, stride * 4, offset * 4);
         GLES31.glVertexAttribDivisor(attrib, divisor);
 
         GLES31.glBindBuffer(GLES31.GL_ARRAY_BUFFER, 0);

@@ -107,12 +107,12 @@ public class ParticleModel extends StaticModel {
             fireParticleEffects.add(effect);
     }
 
-    public void addParticleEffect(SmokeParticleEffect effect){
+    public void addParticleEffect(SmokeParticleEffect effect) {
         if (smokeParticleEffects.size() < ParticleEffects.PARTICLE_MAX_COUNT)
             smokeParticleEffects.add(effect);
     }
 
-    private void updateFireParticleEffects(ObjectsLoader loader){
+    private void updateFireParticleEffects(ObjectsLoader loader) {
 
         resetCounter();
 
@@ -122,50 +122,43 @@ public class ParticleModel extends StaticModel {
             updateParticleMatrix(effect);
             effect.particleUpdate();
 
-            if(effect.getVisibility()<=0.0f)
+            if (effect.getVisibility() <= 0.0f)
                 particleEffectIterator.remove();
-
         }
 
         loader.updateVBOMatrix(VBO, modelMatrices);
-
     }
 
-    private void drawFireParticleEffects(){
+    private void drawFireParticleEffects() {
 
         GLES31.glEnable(GLES31.GL_BLEND);
         GLES31.glBlendFunc(GLES31.GL_SRC_ALPHA, GLES31.GL_ONE);
         GLES31.glDrawElementsInstanced(GLES31.GL_TRIANGLES, StaticTextures.DRAW_ORDER.length, GLES31.GL_UNSIGNED_SHORT, 0, fireParticleEffects.size());
         GLES31.glDisable(GLES31.GL_BLEND);
-
     }
 
-    private void updateSmokeParticleEffects(ObjectsLoader loader){
+    private void updateSmokeParticleEffects(ObjectsLoader loader) {
 
         resetCounter();
 
-        Iterator<SmokeParticleEffect> particleEffectIterator =smokeParticleEffects.iterator();
+        Iterator<SmokeParticleEffect> particleEffectIterator = smokeParticleEffects.iterator();
         while (particleEffectIterator.hasNext()) {
             SmokeParticleEffect effect = particleEffectIterator.next();
             updateParticleMatrix(effect);
             effect.particleUpdate();
 
-            if(effect.getVisibility()<=0.0f || effect.getInnerOpacity()<=0.0f)
+            if (effect.getVisibility() <= 0.0f || effect.getInnerOpacity() <= 0.0f)
                 particleEffectIterator.remove();
-
         }
 
         loader.updateVBOMatrix(VBO, modelMatrices);
-
     }
 
-    private void drawSmokeParticleEffects(){
+    private void drawSmokeParticleEffects() {
 
         GLES31.glEnable(GLES31.GL_BLEND);
         GLES31.glBlendFunc(GLES31.GL_SRC_ALPHA, GLES31.GL_ONE_MINUS_SRC_ALPHA);
         GLES31.glDrawElementsInstanced(GLES31.GL_TRIANGLES, StaticTextures.DRAW_ORDER.length, GLES31.GL_UNSIGNED_SHORT, 0, smokeParticleEffects.size());
         GLES31.glDisable(GLES31.GL_BLEND);
-
     }
-
 }

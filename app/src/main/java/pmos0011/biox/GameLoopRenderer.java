@@ -44,7 +44,7 @@ public class GameLoopRenderer implements GLSurfaceView.Renderer {
 
         loader = new ObjectsLoader(context, BitmapID.getStaticBitmapID());
         staticShader = new StaticShader(context, R.raw.texture_vertex_shader, R.raw.texture_fragment_shader);
-        particleShader =  new ParticleShader(context, R.raw.particle_vertex_shader, R.raw.particle_framgent_shader);
+        particleShader = new ParticleShader(context, R.raw.particle_vertex_shader, R.raw.particle_framgent_shader);
         staticTextures = loader.loadToVAO(StaticModel.SQUERE_CORDS, StaticModel.COORDS_PER_VERTEX, StaticModel.TEXTURE_COORDS, StaticModel.DRAW_ORDER);
         particleModel = loader.loadTOVAO(StaticModel.SQUERE_CORDS, StaticModel.COORDS_PER_VERTEX, StaticModel.TEXTURE_COORDS, StaticModel.DRAW_ORDER, ParticleEffects.PARTICLE_MAX_COUNT);
         staticTextures.setStaticShader(staticShader);
@@ -57,9 +57,7 @@ public class GameLoopRenderer implements GLSurfaceView.Renderer {
         GLES31.glClear(GLES31.GL_COLOR_BUFFER_BIT);
 
         staticTextures.drawClassElements(loader);
-
         staticTextures.turretStateUpdate();
-
         particleModel.drawClassElements(loader);
 
     }
@@ -70,7 +68,7 @@ public class GameLoopRenderer implements GLSurfaceView.Renderer {
         textureTransformations = new Transformations(ratio);
 
         loader.addUniformBlockBuffer(0, textureTransformations.getProjectionMatrix());
-        staticTextures.setGameButtons(width,height,ratio,textureTransformations.getProjectionMatrix());
+        staticTextures.setGameButtons(width, height, ratio, textureTransformations.getProjectionMatrix());
 
     }
 

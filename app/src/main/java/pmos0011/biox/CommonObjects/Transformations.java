@@ -31,7 +31,6 @@ public class Transformations {
         Matrix.translateM(matrix, 0, xPos, yPos, Z_DIMENSION);
         Matrix.rotateM(matrix, 0, objectAngle, 0, 0, 1.0f);
         Matrix.scaleM(matrix, 0, xScale, yScale, 1);
-
     }
 
     public static PointF calculatePoint(float angle, float param) {

@@ -24,14 +24,14 @@ public class StaticShader extends Shader {
     @Override
     protected void getAllUniformsHandle() {
         //colorHandle=super.getUniformHandle("vColor");
-        modelMatrixHandle=super.getUniformHandle("vModelMatrix");
+        modelMatrixHandle = super.getUniformHandle("vModelMatrix");
 
     }
 
     @Override
     protected void getAllUniformBlocksIndex() {
-        uniformBlockProjectionMatrixIndex =super.getUniformBlockIndex("projectionMatrix");
-        super.uniformBlockBinding(uniformBlockProjectionMatrixIndex,0);
+        uniformBlockProjectionMatrixIndex = super.getUniformBlockIndex("projectionMatrix");
+        super.uniformBlockBinding(uniformBlockProjectionMatrixIndex, 0);
 
     }
 

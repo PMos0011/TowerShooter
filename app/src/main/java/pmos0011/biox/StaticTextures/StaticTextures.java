@@ -1,8 +1,15 @@
 package pmos0011.biox.StaticTextures;
 
 import android.opengl.GLES31;
+import android.opengl.Matrix;
+import android.util.Log;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 import pmos0011.biox.AbstractClasses.ParticleEffects;
+import pmos0011.biox.AbstractClasses.Weapons;
 import pmos0011.biox.CommonObjects.BitmapID;
 import pmos0011.biox.GameControlObjects;
 import pmos0011.biox.CommonObjects.ObjectsLoader;
@@ -11,6 +18,7 @@ import pmos0011.biox.ParticleEffect.ParticleModel;
 import pmos0011.biox.AbstractClasses.StaticModel;
 import pmos0011.biox.CommonObjects.Transformations;
 import pmos0011.biox.ParticleEffect.SmokeParticleEffect;
+import pmos0011.biox.Weapons.Shells;
 
 public class StaticTextures extends StaticModel {
 
@@ -44,6 +52,8 @@ public class StaticTextures extends StaticModel {
     private float leftCannonPosition = 0.0f;
     private float rightCannonPosition = 0.0f;
 
+    private List<Shells> shells = new ArrayList<>();
+
     public StaticTextures(int vaoID) {
         super(vaoID);
     }
@@ -67,6 +77,7 @@ public class StaticTextures extends StaticModel {
 
         drawBackground(loader);
         drawTowerBase(loader);
+        drawShells(loader);
         drawLeftCannon(loader);
         drawRightCannon(loader);
         drawTurret(loader);
@@ -78,7 +89,6 @@ public class StaticTextures extends StaticModel {
 
         GLES31.glDisable(GLES31.GL_BLEND);
         staticShader.stop();
-
     }
 
     @Override
@@ -161,6 +171,29 @@ public class StaticTextures extends StaticModel {
         GLES31.glDrawElements(GLES31.GL_TRIANGLES, StaticTextures.DRAW_ORDER.length, GLES31.GL_UNSIGNED_SHORT, 0);
     }
 
+    private void drawShells(ObjectsLoader loader) {
+
+        Iterator<Shells> shellsIterator = shells.iterator();
+        while (shellsIterator.hasNext()) {
+            Shells shell = shellsIterator.next();
+
+            Transformations.setModelTranslation(modelMatrix, 0, shell.getAngle(), shell.getPosition().x, shell.getPosition().y,
+                    shell.getScale().x, shell.getScale().y);
+            loader.loadUniformMatrix4fv(staticShader.getModelMatrixHandle(), modelMatrix);
+            GLES31.glBindTexture(GLES31.GL_TEXTURE_2D, loader.getTextureID(BitmapID.textureNames.SHELL.getValue()));
+            GLES31.glDrawElements(GLES31.GL_TRIANGLES, StaticTextures.DRAW_ORDER.length, GLES31.GL_UNSIGNED_SHORT, 0);
+
+            shell.getPosition().x += shell.getDeltaSpeed().x;
+            shell.getPosition().y += shell.getDeltaSpeed().y;
+            if (shell.getPosition().x > 2 * Transformations.getRatio() || shell.getPosition().y > 2
+                    || shell.getPosition().x < -2 * Transformations.getRatio() || shell.getPosition().y < -2) {
+                shellsIterator.remove();
+                particleModel.addParticleEffect(new SmokeParticleEffect(ParticleEffects.effectKind.SHELL_STREAK, 0, shell.getAngle(), 0.55f,
+                        shell.getStartPosition().x, shell.getStartPosition().y, shell.getTravelDisatnce()));
+            }
+        }
+    }
+
     public void setGameButtons(int width, int height, float ratio, float[] projectionMatrix) {
         leftArrow.setObject(width, height, GAME_CONTROL_OBJECT_SIZE, -ratio + 1.2f * GAME_CONTROL_OBJECT_SIZE,
                 -1 + GAME_CONTROL_OBJECT_SIZE, projectionMatrix);
@@ -215,16 +248,22 @@ public class StaticTextures extends StaticModel {
     }
 
     public void fireFromLeft() {
-        particleModel.addParticleEffect(new FireParticleEffect(ParticleEffects.effectKind.CANNON_FIRE, turretAngle, 0,0, 0, 0.55f));
-        particleModel.addParticleEffect(new SmokeParticleEffect(ParticleEffects.effectKind.CANNON_SMOKE, turretAngle, 0,0.55f, 0, 0));
+        particleModel.addParticleEffect(new FireParticleEffect(ParticleEffects.effectKind.CANNON_FIRE, turretAngle, 0, 0, 0, 0.55f, 0));
+        particleModel.addParticleEffect(new SmokeParticleEffect(ParticleEffects.effectKind.CANNON_SMOKE, turretAngle, 0, 0.55f, 0, 0, 0));
+        particleModel.addParticleEffect(new SmokeParticleEffect(ParticleEffects.effectKind.RELOAD_STATUS, 0, 0, 0,
+                leftCannonButton.getOpenGLPosition().x, leftCannonButton.getOpenGLPosition().y, 0));
+        shells.add(new Shells(turretAngle, true, Weapons.SHELL_SPEED));
         isLeftCannonLoaded = false;
         leftCannonPosition = -0.038f;
 
     }
 
     public void fireFromRight() {
-        particleModel.addParticleEffect(new FireParticleEffect(ParticleEffects.effectKind.CANNON_FIRE, turretAngle, 0,0, 0, 0.55f));
-        particleModel.addParticleEffect(new SmokeParticleEffect(ParticleEffects.effectKind.CANNON_SMOKE, turretAngle, 0,0.55f, 0, 0));
+        particleModel.addParticleEffect(new FireParticleEffect(ParticleEffects.effectKind.CANNON_FIRE, turretAngle, 0, 0, 0, 0.55f, 0));
+        particleModel.addParticleEffect(new SmokeParticleEffect(ParticleEffects.effectKind.CANNON_SMOKE, turretAngle, 0, 0.55f, 0, 0, 0));
+        particleModel.addParticleEffect(new SmokeParticleEffect(ParticleEffects.effectKind.RELOAD_STATUS, 0, 0, 0,
+                rightCannonButton.getOpenGLPosition().x, rightCannonButton.getOpenGLPosition().y, 0));
+        shells.add(new Shells(turretAngle, false, Weapons.SHELL_SPEED));
         isRightCannonLoaded = false;
         rightCannonPosition = -0.038f;
     }
@@ -265,8 +304,8 @@ public class StaticTextures extends StaticModel {
                 leftCannonReloadStatus = 1.0f;
                 isLeftCannonLoaded = true;
             }
-            if(leftCannonPosition<0.0f)
-                leftCannonPosition+=0.001f;
+            if (leftCannonPosition < 0.0f)
+                leftCannonPosition += 0.001f;
         }
 
         if (!isRightCannonLoaded()) {
@@ -275,8 +314,8 @@ public class StaticTextures extends StaticModel {
                 rightCannonReloadStatus = 1.0f;
                 isRightCannonLoaded = true;
             }
-            if(rightCannonPosition<0.0f)
-                rightCannonPosition+=0.001f;
+            if (rightCannonPosition < 0.0f)
+                rightCannonPosition += 0.001f;
         }
     }
 
