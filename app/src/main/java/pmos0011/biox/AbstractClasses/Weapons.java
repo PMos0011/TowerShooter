@@ -10,11 +10,11 @@ public abstract class Weapons {
 
     private final static float CANNON_X_POSITION = 0.0265f;
 
-    protected PointF position = new PointF(0f, 0f);
-    protected PointF deltaSpeed;
-    protected PointF scale= new PointF();
-    protected PointF startPosition;
-    protected float angle;
+    private PointF position = new PointF(0f, 0f);
+    private PointF deltaSpeed;
+    private PointF scale = new PointF();
+    private PointF startPosition;
+    private float angle;
     private float offset;
 
     public Weapons(float angle, boolean isLeft, float speed) {
@@ -29,6 +29,7 @@ public abstract class Weapons {
             position.x += tempPoint.y;
             position.y += -tempPoint.x;
         }
+
         this.angle = angle;
         this.startPosition = new PointF(position.x, position.y);
     }
@@ -41,6 +42,7 @@ public abstract class Weapons {
         position.y += yPos;
         this.angle = angle;
         this.startPosition = new PointF(position.x, position.y);
+
     }
 
     public PointF getPosition() {

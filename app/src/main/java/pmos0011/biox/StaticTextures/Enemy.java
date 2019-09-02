@@ -3,6 +3,7 @@ package pmos0011.biox.StaticTextures;
 import java.util.Random;
 
 import pmos0011.biox.AbstractClasses.Weapons;
+import pmos0011.biox.Weapons.Shells;
 
 public class Enemy extends Weapons {
 
@@ -31,16 +32,16 @@ public class Enemy extends Weapons {
     }
 
     public void enemyMove() {
-        position.y += 0.0008f;
+        getPosition().y += 0.0008f;
 
-        if (position.y > 1)
-            position.y = -1;
+        if (getPosition().y > 1)
+            getPosition().y = -1;
 
         getTarget();
 
 
         if (reloadingStatus < 0) {
-            staticTextures.addShell(turretAngle, position.x, position.y, 0.1f);
+            staticTextures.addShell(turretAngle, getPosition().x, getPosition().y, Shells.SHELL_SPEED);
             reloadingStatus = 1;
         }
 

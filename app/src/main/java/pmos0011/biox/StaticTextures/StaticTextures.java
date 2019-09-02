@@ -197,7 +197,8 @@ public class StaticTextures extends StaticModel {
             shell.getPosition().x += shell.getDeltaSpeed().x;
             shell.getPosition().y += shell.getDeltaSpeed().y;
 
-            if (shell.getStartPosition().x < 0 && shell.getPosition().x > 0 || shell.getStartPosition().x > 0 && shell.getPosition().x < 0) {
+            if (shell.isEnemy() &&
+                    (shell.getStartPosition().x < 0 && shell.getPosition().x > 0 || shell.getStartPosition().x > 0 && shell.getPosition().x < 0)) {
                 particleModel.addParticleEffect(new SmokeParticleEffect(ParticleEffects.effectKind.SHELL_STREAK, 0, shell.getAngle(),
                         shell.getOffset(), shell.getStartPosition().x, shell.getStartPosition().y, shell.getScale().x, shell.getTravelDisatnce()));
                 shellsIterator.remove();
