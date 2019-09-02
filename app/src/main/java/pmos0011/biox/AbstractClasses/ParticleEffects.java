@@ -90,6 +90,7 @@ public abstract class ParticleEffects {
     protected final static float[] WHITE = {1.0f, 1.0f, 1.0f, 0.9f};
     protected final static float[] GRAY = {0.85f, 0.85f, 0.85f, 0.9f};
     protected final static float[] LIGHT_GRAY = {0.6f, 0.6f, 0.6f, 0.9f};
+    protected final static float[] LIGHT_DUST_GRAY = {0.5f, 0.5f, 0.5f, 0.9f};
     protected final static float[] EXHAUST_LIGHT_BLUE = {0.3f, 0.4f, 0.5f, 0.9f};
     protected final static float[] EXHAUST_DARK_GRAY = {0.3f, 0.3f, 0.3f, 0.9f};
     protected final static float[] RED = {1.0f, 0.0f, 0.0f, 0.75f};
@@ -107,9 +108,10 @@ public abstract class ParticleEffects {
     protected final static float[] GRAY_SMOKE = {0.0f, 3.0f, 0.0f, 0.0f};
     protected final static float[] RELOAD_STATUS = {0.0f, 1.0f, 0.0f, 1.0f};
     protected final static float[] SHEL_STREAK = {-1000.0f, 3.0f, 0.0f, 0.0f};
-    protected final static float[] TANK_EXHAUST = {.0f, 1.0f, 2.0f, 0.0f};
+    protected final static float[] TANK_EXHAUST = {0.0f, 1.0f, 2.0f, 0.0f};
+    protected final static float[] TRACK_DUST = {0.0f, 1.0f, 4.0f, 0.0f};
 
     public enum effectKind {
-        CANNON_FIRE, CANNON_SMOKE, RELOAD_STATUS, SHELL_STREAK, TANK_EXHAUST
+        CANNON_FIRE, CANNON_SMOKE, RELOAD_STATUS, SHELL_STREAK, TANK_EXHAUST, TRACK_DUST
     }
 }

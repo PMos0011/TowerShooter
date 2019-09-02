@@ -21,8 +21,8 @@ public class SmokeParticleEffect extends ParticleEffects {
                 particlePosition = Transformations.calculatePoint(worldAngle, effectOffset);
                 particlePosition.x += xPos;
                 particlePosition.y += yPos;
-                scaleX = 35*size;
-                scaleY = 35*size;
+                scaleX = 35 * size;
+                scaleY = 35 * size;
 
                 Transformations.setModelTranslation(modelMatrix, 0, 0, particlePosition.x, particlePosition.y, scaleX, scaleY);
 
@@ -70,7 +70,20 @@ public class SmokeParticleEffect extends ParticleEffects {
                 this.outerColor[3] = 0.5f;
                 this.options = TANK_EXHAUST.clone();
                 scaleX = size;
-                scaleY = size*2;
+                scaleY = size * 2;
+                break;
+
+            case TRACK_DUST:
+                particlePosition = Transformations.calculatePoint(objectAngle, effectOffset + travelDistance / 5);
+                particlePosition.x += xPos;
+                particlePosition.y += yPos;
+                this.innerColor = LIGHT_GRAY.clone();
+                this.outerColor = LIGHT_DUST_GRAY.clone();
+                this.innerColor[3] = 0.5f;
+                this.outerColor[3] = 0.4f;
+                this.options = TRACK_DUST.clone();
+                scaleX = size;
+                scaleY = size*1.5f;
                 break;
         }
     }
@@ -91,6 +104,10 @@ public class SmokeParticleEffect extends ParticleEffects {
 
             case TANK_EXHAUST:
                 tankExhaust();
+                break;
+
+            case TRACK_DUST:
+                truckDust();
                 break;
         }
     }
@@ -127,10 +144,15 @@ public class SmokeParticleEffect extends ParticleEffects {
         changeOpacity(-0.01f, -0.01f);
     }
 
-    private void tankExhaust(){
+    private void tankExhaust() {
         addTime(0.04f);
+        Transformations.setModelTranslation(getModelMatrix(), 0, objectAngle,
+                getParticlePosition().x, getParticlePosition().y, getScaleX(), getScaleY());
+    }
 
-        Transformations.setModelTranslation(getModelMatrix(),0,objectAngle,
-                getParticlePosition().x, getParticlePosition().y,getScaleX(),getScaleY());
+    private void truckDust() {
+        addTime(0.01f);
+        Transformations.setModelTranslation(getModelMatrix(), 0, objectAngle,
+                getParticlePosition().x, getParticlePosition().y, getScaleX(), getScaleY());
     }
 }
