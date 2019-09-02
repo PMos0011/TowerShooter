@@ -1,10 +1,7 @@
 package pmos0011.biox.ParticleEffect;
 
-import android.util.Log;
-
 import pmos0011.biox.AbstractClasses.ParticleEffects;
 import pmos0011.biox.CommonObjects.Transformations;
-import pmos0011.biox.GameControlObjects;
 import pmos0011.biox.GameLoopRenderer;
 import pmos0011.biox.StaticTextures.StaticTextures;
 import pmos0011.biox.Weapons.Shells;
@@ -62,6 +59,19 @@ public class SmokeParticleEffect extends ParticleEffects {
 
                 Transformations.setModelTranslation(modelMatrix, 0, objectAngle, particlePosition.x, particlePosition.y, scaleX, scaleY);
                 break;
+
+            case TANK_EXHAUST:
+                particlePosition = Transformations.calculatePoint(objectAngle, effectOffset + travelDistance / 5);
+                particlePosition.x += xPos;
+                particlePosition.y += yPos;
+                this.innerColor = EXHAUST_LIGHT_BLUE.clone();
+                this.outerColor = EXHAUST_DARK_GRAY.clone();
+                this.innerColor[3] = 0.5f;
+                this.outerColor[3] = 0.5f;
+                this.options = TANK_EXHAUST.clone();
+                scaleX = size;
+                scaleY = size*2;
+                break;
         }
     }
 
@@ -77,6 +87,10 @@ public class SmokeParticleEffect extends ParticleEffects {
 
             case SHELL_STREAK:
                 shellStreak();
+                break;
+
+            case TANK_EXHAUST:
+                tankExhaust();
                 break;
         }
     }
@@ -111,5 +125,12 @@ public class SmokeParticleEffect extends ParticleEffects {
 
     private void shellStreak() {
         changeOpacity(-0.01f, -0.01f);
+    }
+
+    private void tankExhaust(){
+        addTime(0.04f);
+
+        Transformations.setModelTranslation(getModelMatrix(),0,objectAngle,
+                getParticlePosition().x, getParticlePosition().y,getScaleX(),getScaleY());
     }
 }

@@ -58,11 +58,12 @@ public class StaticTextures extends StaticModel {
     public StaticTextures(int vaoID) {
         super(vaoID);
 
-        addTestEnemies();
+
     }
 
     public void setParticleModel(ParticleModel particleModel) {
         this.particleModel = particleModel;
+        addTestEnemies();
     }
 
     @Override
@@ -218,7 +219,7 @@ public class StaticTextures extends StaticModel {
         while (enemyIterator.hasNext()) {
             Enemy enemy = enemyIterator.next();
 
-            Transformations.setModelTranslation(modelMatrix, 0, 0, enemy.getPosition().x, enemy.getPosition().y, enemy.getScale().x, enemy.getScale().y);
+            Transformations.setModelTranslation(modelMatrix, 0, enemy.getAngle(), enemy.getPosition().x, enemy.getPosition().y, enemy.getScale().x, enemy.getScale().y);
             loader.loadUniformMatrix4fv(staticShader.getModelMatrixHandle(), modelMatrix);
             GLES31.glBindTexture(GLES31.GL_TEXTURE_2D, loader.getTextureID(BitmapID.textureNames.TANK_CHASSIS.getValue()));
             GLES31.glDrawElements(GLES31.GL_TRIANGLES, StaticTextures.DRAW_ORDER.length, GLES31.GL_UNSIGNED_SHORT, 0);
@@ -354,12 +355,12 @@ public class StaticTextures extends StaticModel {
     }
 
     private void addTestEnemies() {
-        enemies.add(new Enemy(0, -1, 0, 0, this));
-        enemies.add(new Enemy(0, -1.5f, -0.5f, 0, this));
-        enemies.add(new Enemy(0, -0.5f, 0.5f, 0, this));
-        enemies.add(new Enemy(0, 1, 0, 0, this));
-        enemies.add(new Enemy(0, 1.5f, 0.5f, 0, this));
-        enemies.add(new Enemy(0, 0.5f, -0.5f, 0, this));
+        enemies.add(new Enemy(0, -1, 0, 0.0008f, this, particleModel));
+        enemies.add(new Enemy(350, -1.5f, -0.5f, 0.0008f, this, particleModel));
+        enemies.add(new Enemy(0, -0.5f, 0.5f, 0.0008f, this, particleModel));
+        enemies.add(new Enemy(0, 1, 0, 0.0008f, this, particleModel));
+        enemies.add(new Enemy(10, 1.5f, 0.5f, 0.0008f, this, particleModel));
+        enemies.add(new Enemy(0, 0.5f, -0.5f, 0.0008f, this, particleModel));
 
     }
 

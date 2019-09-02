@@ -54,6 +54,18 @@ public abstract class ParticleEffects {
         return options;
     }
 
+    public PointF getParticlePosition() {
+        return particlePosition;
+    }
+
+    public float getScaleX() {
+        return scaleX;
+    }
+
+    public float getScaleY() {
+        return scaleY;
+    }
+
     protected void addTime(float time) {
         options[0] += time;
     }
@@ -78,17 +90,26 @@ public abstract class ParticleEffects {
     protected final static float[] WHITE = {1.0f, 1.0f, 1.0f, 0.9f};
     protected final static float[] GRAY = {0.85f, 0.85f, 0.85f, 0.9f};
     protected final static float[] LIGHT_GRAY = {0.6f, 0.6f, 0.6f, 0.9f};
+    protected final static float[] EXHAUST_LIGHT_BLUE = {0.3f, 0.4f, 0.5f, 0.9f};
+    protected final static float[] EXHAUST_DARK_GRAY = {0.3f, 0.3f, 0.3f, 0.9f};
     protected final static float[] RED = {1.0f, 0.0f, 0.0f, 0.75f};
     protected final static float[] YELLOW = {1.0f, 1.0f, 0.0f, 0.9f};
     protected final static float[] LIGHT_RED = {1.0f, 0.25f, 0.15f, 0.9f};
     protected final static float[] LIGHT_YELLOW = {1.0f, 0.8f, 0.3f, 0.9f};
 
+    //shader options:
+    //{time, visibility, size_mod, reload_status}
+    //time - use for animation, below 0 affects noise
+    //visibility - increasing cause colors more intensive
+    //size_mode - makes "egg shape"
+    //reload_status - fill texture with innerColor from 0 to 1
     protected final static float[] CANNON_FIRE = {0.0f, 2.6f, 1.4f, 0.0f};
     protected final static float[] GRAY_SMOKE = {0.0f, 3.0f, 0.0f, 0.0f};
     protected final static float[] RELOAD_STATUS = {0.0f, 1.0f, 0.0f, 1.0f};
     protected final static float[] SHEL_STREAK = {-1000.0f, 3.0f, 0.0f, 0.0f};
+    protected final static float[] TANK_EXHAUST = {.0f, 1.0f, 2.0f, 0.0f};
 
     public enum effectKind {
-        CANNON_FIRE, CANNON_SMOKE, RELOAD_STATUS, SHELL_STREAK
+        CANNON_FIRE, CANNON_SMOKE, RELOAD_STATUS, SHELL_STREAK, TANK_EXHAUST
     }
 }
