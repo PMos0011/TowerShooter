@@ -42,11 +42,11 @@ public class ParticleModel extends StaticModel {
         particleShader.start();
         GLES31.glBindTexture(GLES31.GL_TEXTURE_2D, loader.getTextureID(BitmapID.textureNames.LEFT_ARROW.getValue()));
 
-        updateFireParticleEffects(loader);
-        drawFireParticleEffects();
-
         updateSmokeParticleEffects(loader);
         drawSmokeParticleEffects();
+
+        updateFireParticleEffects(loader);
+        drawFireParticleEffects();
 
         particleShader.stop();
     }
@@ -140,17 +140,19 @@ public class ParticleModel extends StaticModel {
     private void updateSmokeParticleEffects(ObjectsLoader loader) {
 
         resetCounter();
+        try {
+            Iterator<SmokeParticleEffect> particleEffectIterator = smokeParticleEffects.iterator();
+            while (particleEffectIterator.hasNext()) {
+                SmokeParticleEffect effect = particleEffectIterator.next();
+                updateParticleMatrix(effect);
+                effect.particleUpdate();
 
-        Iterator<SmokeParticleEffect> particleEffectIterator = smokeParticleEffects.iterator();
-        while (particleEffectIterator.hasNext()) {
-            SmokeParticleEffect effect = particleEffectIterator.next();
-            updateParticleMatrix(effect);
-            effect.particleUpdate();
+                if (effect.getVisibility() <= 0.0f || effect.getInnerOpacity() <= 0.0f)
+                    particleEffectIterator.remove();
+            }
+        } catch (Exception e) {
 
-            if (effect.getVisibility() <= 0.0f || effect.getInnerOpacity() <= 0.0f)
-                particleEffectIterator.remove();
         }
-
         loader.updateVBOMatrix(VBO, modelMatrices);
     }
 

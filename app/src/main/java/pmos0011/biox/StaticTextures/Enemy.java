@@ -4,15 +4,23 @@ import java.util.Random;
 
 import pmos0011.biox.AbstractClasses.ParticleEffects;
 import pmos0011.biox.AbstractClasses.Weapons;
-import pmos0011.biox.CommonObjects.Transformations;
 import pmos0011.biox.ParticleEffect.ParticleModel;
 import pmos0011.biox.ParticleEffect.SmokeParticleEffect;
 import pmos0011.biox.Weapons.Shells;
 
 public class Enemy extends Weapons {
 
+    public static final float TANK_HIT_SIZE = 0.1f;
+
     private static final float TANK_SIZE = 0.13f;
     private static final float TANK_ASPECT = 1900.0f / 800.f;
+    private static final float TANK_EXHAUST_Y_OFFSET = -0.25f;
+    private static final float TANK_EXHAUST_X_OFFSET = 0.018f;
+    private static final float TANK_EXHAUST_SIZE = 0.04f;
+    private static final float TANK_TRUCK_DUST_Y_OFFSET = -0.15f;
+    private static final float TANK_TRUCK_DUST_X_OFFSET = 0.1f;
+    private static final float TANK_TRUCK_DUST_SIZE = 0.15f;
+    private static final float TANK_TRUCK_DUST_ANGLE_OFFSET = 10;
 
     private float turretAngle;
     private float reloadingStatus;
@@ -49,7 +57,6 @@ public class Enemy extends Weapons {
         methodForTests();
         getTarget();
 
-
         if (reloadingStatus < 0) {
             staticTextures.addShell(turretAngle, getPosition().x, getPosition().y, Shells.SHELL_SPEED);
             reloadingStatus = 1;
@@ -76,19 +83,19 @@ public class Enemy extends Weapons {
 
             turretAngle += 90;
         }
-
     }
 
     private void addExhaustsEffects() {
 
         leftExhaust = new SmokeParticleEffect(ParticleEffects.effectKind.TANK_EXHAUST,
-                0, getAngle(), -0.25f, getPosition().x - 0.018f, getPosition().y, 0.04f, 0);
+                0, getAngle(), TANK_EXHAUST_Y_OFFSET, getPosition().x, getPosition().y,
+                TANK_EXHAUST_SIZE, -TANK_EXHAUST_X_OFFSET);
         particleModel.addParticleEffect(leftExhaust);
 
         rightExhaust = new SmokeParticleEffect(ParticleEffects.effectKind.TANK_EXHAUST,
-                0, getAngle(), -0.25f, getPosition().x + 0.018f, getPosition().y, 0.04f, 0);
+                0, getAngle(), TANK_EXHAUST_Y_OFFSET, getPosition().x, getPosition().y,
+                TANK_EXHAUST_SIZE, TANK_EXHAUST_X_OFFSET);
         particleModel.addParticleEffect(rightExhaust);
-
     }
 
     private void methodForTests() {
@@ -107,7 +114,6 @@ public class Enemy extends Weapons {
         rightTruckDust.getParticlePosition().x += getDeltaSpeed().x;
         rightTruckDust.getParticlePosition().y += getDeltaSpeed().y;
 
-
         if (getPosition().y > 1)
             getPosition().y = -1;
 
@@ -122,17 +128,17 @@ public class Enemy extends Weapons {
 
         if (rightTruckDust.getParticlePosition().y > 1)
             rightTruckDust.getParticlePosition().y = -1;
-
-
     }
 
     private void addTankDust() {
 
         leftTruckDust = new SmokeParticleEffect(ParticleEffects.effectKind.TRACK_DUST,
-                0, getAngle()+5, -0.25f, getPosition().x + 0.1f, getPosition().y, 0.2f, 0);
+                0, getAngle() - TANK_TRUCK_DUST_ANGLE_OFFSET, TANK_TRUCK_DUST_Y_OFFSET, getPosition().x, getPosition().y,
+                TANK_TRUCK_DUST_SIZE, TANK_TRUCK_DUST_X_OFFSET);
         particleModel.addParticleEffect(leftTruckDust);
         rightTruckDust = new SmokeParticleEffect(ParticleEffects.effectKind.TRACK_DUST,
-                0, getAngle()-5, -0.25f, getPosition().x - 0.1f, getPosition().y, 0.2f, 0);
+                0, getAngle() + TANK_TRUCK_DUST_ANGLE_OFFSET, TANK_TRUCK_DUST_Y_OFFSET, getPosition().x, getPosition().y,
+                TANK_TRUCK_DUST_SIZE, -TANK_TRUCK_DUST_X_OFFSET);
         particleModel.addParticleEffect(rightTruckDust);
     }
 }

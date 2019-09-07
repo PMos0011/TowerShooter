@@ -1,15 +1,14 @@
 package pmos0011.biox.StaticTextures;
 
+import android.graphics.PointF;
 import android.opengl.GLES31;
-import android.opengl.Matrix;
-import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Random;
 
 import pmos0011.biox.AbstractClasses.ParticleEffects;
-import pmos0011.biox.AbstractClasses.Weapons;
 import pmos0011.biox.CommonObjects.BitmapID;
 import pmos0011.biox.GameControlObjects;
 import pmos0011.biox.CommonObjects.ObjectsLoader;
@@ -23,6 +22,7 @@ import pmos0011.biox.Weapons.Shells;
 public class StaticTextures extends StaticModel {
 
     public static final float GAME_CONTROL_OBJECT_SIZE = 0.18f;
+    public static final float TOWER_HIT_SIZE = 0.1f;
 
     private final float TOWER_SIZE = 0.4f;
     private final float RADAR_SIZE = 0.065f;
@@ -40,6 +40,7 @@ public class StaticTextures extends StaticModel {
     private boolean rotateRight = false;
     private boolean isLeftCannonLoaded = true;
     private boolean isRightCannonLoaded = true;
+    private boolean shellRemove;
 
     private float turretAngle = 0;
     private float rotateLeftSpeedDelta = 0;
@@ -182,35 +183,88 @@ public class StaticTextures extends StaticModel {
         while (shellsIterator.hasNext()) {
             Shells shell = shellsIterator.next();
 
-            Transformations.setModelTranslation(modelMatrix, 0, shell.getAngle(), shell.getPosition().x, shell.getPosition().y,
-                    shell.getScale().x, shell.getScale().y);
-            loader.loadUniformMatrix4fv(staticShader.getModelMatrixHandle(), modelMatrix);
-            GLES31.glBindTexture(GLES31.GL_TEXTURE_2D, loader.getTextureID(BitmapID.textureNames.SHELL.getValue()));
-            GLES31.glDrawElements(GLES31.GL_TRIANGLES, StaticTextures.DRAW_ORDER.length, GLES31.GL_UNSIGNED_SHORT, 0);
+            drawShell(shell, loader);
+            addFireEffects(shell);
 
-            if (shell.getPosition().equals(shell.getStartPosition())) {
-
-                particleModel.addParticleEffect(new FireParticleEffect(ParticleEffects.effectKind.CANNON_FIRE, shell.getAngle(), 0,
-                        shell.getOffset(), shell.getStartPosition().x, shell.getStartPosition().y, shell.getScale().x, 0));
-                particleModel.addParticleEffect(new SmokeParticleEffect(ParticleEffects.effectKind.CANNON_SMOKE, shell.getAngle(), 0,
-                        shell.getOffset(), shell.getStartPosition().x, shell.getStartPosition().y, shell.getScale().x, 0));
-            }
             shell.getPosition().x += shell.getDeltaSpeed().x;
             shell.getPosition().y += shell.getDeltaSpeed().y;
 
-            if (shell.isEnemy() &&
-                    (shell.getStartPosition().x < 0 && shell.getPosition().x > 0 || shell.getStartPosition().x > 0 && shell.getPosition().x < 0)) {
-                particleModel.addParticleEffect(new SmokeParticleEffect(ParticleEffects.effectKind.SHELL_STREAK, 0, shell.getAngle(),
-                        shell.getOffset(), shell.getStartPosition().x, shell.getStartPosition().y, shell.getScale().x, shell.getTravelDisatnce()));
-                shellsIterator.remove();
-            } else {
-                if (shell.getPosition().x > 2 * Transformations.getRatio() || shell.getPosition().y > 2
-                        || shell.getPosition().x < -2 * Transformations.getRatio() || shell.getPosition().y < -2) {
-                    particleModel.addParticleEffect(new SmokeParticleEffect(ParticleEffects.effectKind.SHELL_STREAK, 0, shell.getAngle(),
-                            shell.getOffset(), shell.getStartPosition().x, shell.getStartPosition().y, shell.getScale().x, shell.getTravelDisatnce()));
-                    shellsIterator.remove();
+            checkHit(shell, shellsIterator);
+        }
+    }
+
+    private void drawShell(Shells shell, ObjectsLoader loader) {
+        Transformations.setModelTranslation(modelMatrix, 0, shell.getAngle(), shell.getPosition().x, shell.getPosition().y,
+                shell.getScale().x, shell.getScale().y);
+        loader.loadUniformMatrix4fv(staticShader.getModelMatrixHandle(), modelMatrix);
+        GLES31.glBindTexture(GLES31.GL_TEXTURE_2D, loader.getTextureID(BitmapID.textureNames.SHELL.getValue()));
+        GLES31.glDrawElements(GLES31.GL_TRIANGLES, StaticTextures.DRAW_ORDER.length, GLES31.GL_UNSIGNED_SHORT, 0);
+    }
+
+    private void addFireEffects(Shells shell) {
+        if (shell.getPosition().equals(shell.getStartPosition())) {
+
+            particleModel.addParticleEffect(new FireParticleEffect(ParticleEffects.effectKind.CANNON_FIRE, shell.getAngle(), 0,
+                    shell.getOffset(), shell.getStartPosition().x, shell.getStartPosition().y, shell.getScale().x, 0));
+            particleModel.addParticleEffect(new SmokeParticleEffect(ParticleEffects.effectKind.CANNON_SMOKE, shell.getAngle(), 0,
+                    shell.getOffset(), shell.getStartPosition().x, shell.getStartPosition().y, shell.getScale().x, 0));
+        }
+    }
+
+    private void checkHit(Shells shell, Iterator<Shells> shellsIterator) {
+        if (shell.isEnemy())
+            shellRemove = checkTowerHit(shell);
+        else {
+            shellRemove = checkEnemyHit(shell);
+            if (!shellRemove)
+                shellRemove = checkOutOfBounds(shell);
+        }
+        if (shellRemove) {
+            shellsIterator.remove();
+            particleModel.addParticleEffect(new SmokeParticleEffect(ParticleEffects.effectKind.SHELL_STREAK, 0, shell.getAngle(),
+                    shell.getOffset(), shell.getStartPosition().x, shell.getStartPosition().y, shell.getScale().x, shell.getTravelDistance()));
+        }
+    }
+
+    private boolean checkTowerHit(Shells shell) {
+        if (shell.getStartPosition().x < 0 && shell.getPosition().x > 0 || shell.getStartPosition().x > 0 && shell.getPosition().x < 0) {
+            addSparks(shell);
+            return true;
+        }
+        return false;
+    }
+
+    private boolean checkOutOfBounds(Shells shell) {
+        return shell.getPosition().x > 2 * Transformations.getRatio() || shell.getPosition().y > 2
+                || shell.getPosition().x < -2 * Transformations.getRatio() || shell.getPosition().y < -2;
+    }
+
+    private boolean checkEnemyHit(Shells shell) {
+        Iterator<Enemy> enemyIterator = enemies.iterator();
+        while (enemyIterator.hasNext()) {
+            Enemy enemy = enemyIterator.next();
+            if (shell.getPosition().y > enemy.getPosition().y - Enemy.TANK_HIT_SIZE && shell.getPosition().y < enemy.getPosition().y + Enemy.TANK_HIT_SIZE)
+                if (shell.getPosition().x > enemy.getPosition().x - Enemy.TANK_HIT_SIZE && shell.getPosition().x < enemy.getPosition().x + Enemy.TANK_HIT_SIZE) {
+                    addSparks(shell);
+                    return true;
                 }
+        }
+        return false;
+    }
+
+    private void addSparks(Shells shell) {
+        PointF deltaPosition = new PointF(0, 0);
+        int sparksCount = new Random().nextInt(8) + 4;
+        float deltaAngle = 60 / sparksCount;
+        float currentAngle = shell.getAngle() - sparksCount * deltaAngle;
+        for (int i = 0; i < 2 * sparksCount + 1; i++) {
+            if (shell.isEnemy()) {
+                deltaPosition = Transformations.calculatePoint(shell.getAngle(), -TOWER_HIT_SIZE);
             }
+            particleModel.addParticleEffect(new FireParticleEffect(ParticleEffects.effectKind.HIT_SPARK, currentAngle, 0, 0,
+                    shell.getPosition().x + deltaPosition.x, shell.getPosition().y + deltaPosition.y,
+                    shell.getScale().x, 0));
+            currentAngle += deltaAngle;
         }
     }
 
@@ -292,7 +346,6 @@ public class StaticTextures extends StaticModel {
         shells.add(new Shells(turretAngle, true, Shells.SHELL_SPEED));
         isLeftCannonLoaded = false;
         leftCannonPosition = -0.038f;
-
     }
 
     public void fireFromRight() {
@@ -355,12 +408,12 @@ public class StaticTextures extends StaticModel {
     }
 
     private void addTestEnemies() {
-        enemies.add(new Enemy(0, -1, 0, 0.0008f, this, particleModel));
-        enemies.add(new Enemy(350, -1.5f, -0.5f, 0.0008f, this, particleModel));
+        enemies.add(new Enemy(0, -1, 0, 0.001f, this, particleModel));
+        enemies.add(new Enemy(0, -1.5f, -0.5f, 0.001f, this, particleModel));
         enemies.add(new Enemy(0, -0.5f, 0.5f, 0.0008f, this, particleModel));
         enemies.add(new Enemy(0, 1, 0, 0.0008f, this, particleModel));
-        enemies.add(new Enemy(10, 1.5f, 0.5f, 0.0008f, this, particleModel));
-        enemies.add(new Enemy(0, 0.5f, -0.5f, 0.0008f, this, particleModel));
+        enemies.add(new Enemy(0, 1.5f, 0.5f, 0.0006f, this, particleModel));
+        enemies.add(new Enemy(0, 0.5f, -0.5f, 0.0006f, this, particleModel));
 
     }
 

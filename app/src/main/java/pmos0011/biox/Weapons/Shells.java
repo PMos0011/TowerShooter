@@ -6,7 +6,7 @@ public class Shells extends Weapons {
 
     public static final float SHELL_SIZE = 0.009f;
     public static final float SHELL_ASPECT = 300.0f / 76.0f;
-    public static final float SHELL_SPEED = 0.1f;
+    public static final float SHELL_SPEED = 0.08f;
 
     private boolean isEnemy;
 

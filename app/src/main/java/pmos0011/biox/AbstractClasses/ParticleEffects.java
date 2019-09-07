@@ -9,25 +9,27 @@ public abstract class ParticleEffects {
     public final static int PARTICLE_DATA_LENGTH = 28;
     public final static int PARTICLE_MAX_COUNT = 100;
 
-    protected float[] modelMatrix = new float[16];
-    protected float[] innerColor = new float[4];
-    protected float[] outerColor = new float[4];
-    protected float[] options = new float[4];
-    protected float worldAngle;
-    protected float objectAngle;
-    protected float travelDistance;
-    protected float scaleX;
-    protected float scaleY;
+    private float[] modelMatrix = new float[16];
+    private float[] innerColor = new float[4];
+    private float[] outerColor = new float[4];
+    private float[] options = new float[4];
+    private float worldAngle;
+    private float objectAngle;
+    private float distanceParameter;
+    private float scaleX;
+    private float scaleY;
+    private float hitSize;
 
-    protected PointF particlePosition = new PointF();
+    private PointF particlePosition = new PointF();
+    private PointF deltaSpeed = new PointF();
 
-    protected effectKind effect;
+    private effectKind effect;
 
-    public ParticleEffects(effectKind effect, float worldAngle, float objectAngle, float effectOffset, float xPos, float yPos, float size, float travelDistance) {
+    public ParticleEffects(effectKind effect, float worldAngle, float objectAngle, float effectOffset, float xPos, float yPos, float size, float distanceParameter) {
         this.effect = effect;
         this.worldAngle = worldAngle;
         this.objectAngle = objectAngle;
-        this.travelDistance = travelDistance;
+        this.distanceParameter = distanceParameter;
 
         int start_time = new Random().nextInt(500);
 
@@ -58,12 +60,95 @@ public abstract class ParticleEffects {
         return particlePosition;
     }
 
+    public void setModelMatrix(float[] modelMatrix) {
+        this.modelMatrix = modelMatrix;
+    }
+
+    public void setInnerColor(float[] innerColor) {
+        this.innerColor = innerColor;
+    }
+
+    public void setOuterColor(float[] outerColor) {
+        this.outerColor = outerColor;
+    }
+
+    public void setOptions(float[] options) {
+        this.options = options;
+    }
+
+    public float getWorldAngle() {
+        return worldAngle;
+    }
+
+    public void setWorldAngle(float worldAngle) {
+        this.worldAngle = worldAngle;
+    }
+
+    public float getObjectAngle() {
+        return objectAngle;
+    }
+
+    public void setObjectAngle(float objectAngle) {
+        this.objectAngle = objectAngle;
+    }
+
+    public float getDistanceParameter() {
+        return distanceParameter;
+    }
+
+    public void setDistanceParameter(float distanceParameter) {
+        this.distanceParameter = distanceParameter;
+    }
+
+    public void setParticlePosition(PointF particlePosition) {
+        this.particlePosition = particlePosition;
+    }
+
+    public PointF getDeltaSpeed() {
+        return deltaSpeed;
+    }
+
+    public void setDeltaSpeed(PointF deltaSpeed) {
+        this.deltaSpeed = deltaSpeed;
+    }
+
+    public void setScaleX(float scaleX) {
+        this.scaleX = scaleX;
+    }
+
+    public void changeScaleX(float scale){
+        this.scaleX+=scale;
+    }
+    public void changeScaleY(float scale){
+        this.scaleY+=scale;
+    }
+
+    public void setScaleY(float scaleY) {
+        this.scaleY = scaleY;
+    }
+
+    public float getHitSize() {
+        return hitSize;
+    }
+
+    public void setHitSize(float hitSize) {
+        this.hitSize = hitSize;
+    }
+
     public float getScaleX() {
         return scaleX;
     }
 
     public float getScaleY() {
         return scaleY;
+    }
+
+    public effectKind getEffect() {
+        return effect;
+    }
+
+    public void setEffect(effectKind effect) {
+        this.effect = effect;
     }
 
     protected void addTime(float time) {
@@ -110,8 +195,9 @@ public abstract class ParticleEffects {
     protected final static float[] SHEL_STREAK = {-1000.0f, 3.0f, 0.0f, 0.0f};
     protected final static float[] TANK_EXHAUST = {0.0f, 1.0f, 2.0f, 0.0f};
     protected final static float[] TRACK_DUST = {0.0f, 1.0f, 4.0f, 0.0f};
+    protected final static float[] HIT_SPARK = {0.0f, 2.0f, 4.0f, 0.0f};
 
     public enum effectKind {
-        CANNON_FIRE, CANNON_SMOKE, RELOAD_STATUS, SHELL_STREAK, TANK_EXHAUST, TRACK_DUST
+        CANNON_FIRE, CANNON_SMOKE, RELOAD_STATUS, SHELL_STREAK, TANK_EXHAUST, TRACK_DUST, HIT_SPARK
     }
 }

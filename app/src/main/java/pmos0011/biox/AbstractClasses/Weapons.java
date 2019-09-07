@@ -1,7 +1,6 @@
 package pmos0011.biox.AbstractClasses;
 
 import android.graphics.PointF;
-import android.util.Log;
 
 import pmos0011.biox.CommonObjects.Transformations;
 import pmos0011.biox.Weapons.Shells;
@@ -9,6 +8,8 @@ import pmos0011.biox.Weapons.Shells;
 public abstract class Weapons {
 
     private final static float CANNON_X_POSITION = 0.0265f;
+    private final static float TANK_SHELL_OFFSET = 0.35f;
+    private final static float TURRET_SHELL_OFFSET = 0.55f;
 
     private PointF position = new PointF(0f, 0f);
     private PointF deltaSpeed;
@@ -20,14 +21,14 @@ public abstract class Weapons {
     public Weapons(float angle, boolean isLeft, float speed) {
 
         deltaSpeed = Transformations.calculatePoint(angle, speed);
-        PointF tempPoint = Transformations.calculatePoint(angle, CANNON_X_POSITION);
+        PointF deltaPosition = Transformations.calculatePoint(angle, CANNON_X_POSITION);
 
         if (isLeft) {
-            position.x -= tempPoint.y;
-            position.y -= -tempPoint.x;
+            position.x -= deltaPosition.y;
+            position.y -= -deltaPosition.x;
         } else {
-            position.x += tempPoint.y;
-            position.y += -tempPoint.x;
+            position.x += deltaPosition.y;
+            position.y += -deltaPosition.x;
         }
 
         this.angle = angle;
@@ -74,13 +75,13 @@ public abstract class Weapons {
         scale.y = x * aspect;
 
         if (getScale().x < Shells.SHELL_SIZE)
-            offset = 0.35f;
+            offset = TANK_SHELL_OFFSET;
         else
-            offset = 0.55f;
+            offset = TURRET_SHELL_OFFSET;
 
     }
 
-    public float getTravelDisatnce() {
+    public float getTravelDistance() {
         float distanceX = position.x - startPosition.x;
         float distanceY = position.y - startPosition.y;
         return (float) Math.sqrt(distanceX * distanceX + distanceY * distanceY);

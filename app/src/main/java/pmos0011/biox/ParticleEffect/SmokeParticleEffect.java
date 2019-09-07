@@ -1,5 +1,7 @@
 package pmos0011.biox.ParticleEffect;
 
+import android.graphics.PointF;
+
 import pmos0011.biox.AbstractClasses.ParticleEffects;
 import pmos0011.biox.CommonObjects.Transformations;
 import pmos0011.biox.GameLoopRenderer;
@@ -8,6 +10,8 @@ import pmos0011.biox.Weapons.Shells;
 
 public class SmokeParticleEffect extends ParticleEffects {
 
+    private PointF deltaPosition;
+
     public SmokeParticleEffect(effectKind effect, float worldAngle, float objectAngle, float effectOffset, float xPos, float yPos, float size, float travelDistance) {
         super(effect, worldAngle, objectAngle, effectOffset, xPos, yPos, size, travelDistance);
     }
@@ -15,81 +19,83 @@ public class SmokeParticleEffect extends ParticleEffects {
 
     @Override
     protected void particleInitial(float effectOffset, float xPos, float yPos, float size) {
-        switch (effect) {
+        switch (getEffect()) {
             case CANNON_SMOKE:
 
-                particlePosition = Transformations.calculatePoint(worldAngle, effectOffset);
-                particlePosition.x += xPos;
-                particlePosition.y += yPos;
-                scaleX = 35 * size;
-                scaleY = 35 * size;
+                setParticlePosition(Transformations.calculatePoint(getWorldAngle(), effectOffset));
+                getParticlePosition().x += xPos;
+                getParticlePosition().y += yPos;
+                setScaleX(35 * size);
+                setScaleY(35 * size);
 
-                Transformations.setModelTranslation(modelMatrix, 0, 0, particlePosition.x, particlePosition.y, scaleX, scaleY);
+                Transformations.setModelTranslation(getModelMatrix(), 0, 0, getParticlePosition().x, getParticlePosition().y, getScaleX(), getScaleY());
 
-                this.innerColor = GRAY.clone();
-                this.outerColor = GRAY.clone();
-                this.options = GRAY_SMOKE.clone();
-                this.innerColor[3] = 0.01f;
-                this.outerColor[3] = 0.0f;
+                setInnerColor(GRAY.clone());
+                setOuterColor(GRAY.clone());
+                setOptions(GRAY_SMOKE.clone());
+                getInnerColor()[3] = 0.01f;
+                getOuterColor()[3] = 0.0f;
                 break;
 
             case RELOAD_STATUS:
-                particlePosition.x = xPos;
-                particlePosition.y = yPos;
-                scaleX = StaticTextures.GAME_CONTROL_OBJECT_SIZE;
-                scaleY = StaticTextures.GAME_CONTROL_OBJECT_SIZE;
+                getParticlePosition().x = xPos;
+                getParticlePosition().y = yPos;
+                setScaleX(StaticTextures.GAME_CONTROL_OBJECT_SIZE);
+                setScaleY(StaticTextures.GAME_CONTROL_OBJECT_SIZE);
 
-                this.innerColor = RED.clone();
-                this.options = RELOAD_STATUS.clone();
+                setInnerColor(RED.clone());
+                setOptions(RELOAD_STATUS.clone());
 
-                Transformations.setModelTranslation(modelMatrix, worldAngle, objectAngle, particlePosition.x, particlePosition.y, scaleX, scaleY);
+                Transformations.setModelTranslation(getModelMatrix(), getWorldAngle(), getObjectAngle(), getParticlePosition().x, getParticlePosition().y, getScaleX(), getScaleY());
                 break;
 
             case SHELL_STREAK:
-                particlePosition = Transformations.calculatePoint(objectAngle, effectOffset + travelDistance / 5);
-                particlePosition.x += xPos;
-                particlePosition.y += yPos;
-                this.innerColor = GRAY.clone();
-                this.outerColor = GRAY.clone();
-                this.innerColor[3] = 0.5f;
-                this.outerColor[3] = 0.4f;
-                this.options = SHEL_STREAK.clone();
-                scaleX = size * 4;
-                scaleY = size * Shells.SHELL_ASPECT * 8 * this.travelDistance;
+                setParticlePosition(Transformations.calculatePoint(getObjectAngle(), effectOffset + getDistanceParameter() / 5));
+                getParticlePosition().x += xPos;
+                getParticlePosition().y += yPos;
+                setInnerColor(GRAY.clone());
+                setOuterColor(GRAY.clone());
+                getInnerColor()[3] = 0.5f;
+                getOuterColor()[3] = 0.4f;
+                setOptions(SHEL_STREAK.clone());
+                setScaleX(size * 4);
+                setScaleY(size * Shells.SHELL_ASPECT * 8 * getDistanceParameter());
 
-                Transformations.setModelTranslation(modelMatrix, 0, objectAngle, particlePosition.x, particlePosition.y, scaleX, scaleY);
+                Transformations.setModelTranslation(getModelMatrix(), 0, getObjectAngle(), getParticlePosition().x, getParticlePosition().y, getScaleX(), getScaleY());
                 break;
 
             case TANK_EXHAUST:
-                particlePosition = Transformations.calculatePoint(objectAngle, effectOffset + travelDistance / 5);
-                particlePosition.x += xPos;
-                particlePosition.y += yPos;
-                this.innerColor = EXHAUST_LIGHT_BLUE.clone();
-                this.outerColor = EXHAUST_DARK_GRAY.clone();
-                this.innerColor[3] = 0.5f;
-                this.outerColor[3] = 0.5f;
-                this.options = TANK_EXHAUST.clone();
-                scaleX = size;
-                scaleY = size * 2;
+                setParticlePosition(Transformations.calculatePoint(getObjectAngle(), effectOffset + getDistanceParameter() / 5));
+                deltaPosition = Transformations.calculatePoint(getObjectAngle(), getDistanceParameter());
+                getParticlePosition().x += xPos -deltaPosition.y;
+                getParticlePosition().y += yPos + deltaPosition.x;
+                setInnerColor(EXHAUST_LIGHT_BLUE.clone());
+                setOuterColor(EXHAUST_DARK_GRAY.clone());
+                getInnerColor()[3] = 0.5f;
+                getOuterColor()[3] = 0.5f;
+                setOptions(TANK_EXHAUST.clone());
+                setScaleX(size);
+                setScaleY(size * 2);
                 break;
 
             case TRACK_DUST:
-                particlePosition = Transformations.calculatePoint(objectAngle, effectOffset + travelDistance / 5);
-                particlePosition.x += xPos;
-                particlePosition.y += yPos;
-                this.innerColor = LIGHT_GRAY.clone();
-                this.outerColor = LIGHT_DUST_GRAY.clone();
-                this.innerColor[3] = 0.5f;
-                this.outerColor[3] = 0.4f;
-                this.options = TRACK_DUST.clone();
-                scaleX = size;
-                scaleY = size*1.5f;
+                setParticlePosition(Transformations.calculatePoint(getObjectAngle(), effectOffset + getDistanceParameter() / 5));
+                deltaPosition = Transformations.calculatePoint(getObjectAngle(), getDistanceParameter());
+                getParticlePosition().x += xPos -deltaPosition.y;
+                getParticlePosition().y += yPos + deltaPosition.x;
+                setInnerColor(LIGHT_GRAY.clone());
+                setOuterColor(LIGHT_DUST_GRAY.clone());
+                getInnerColor()[3] = 0.4f;
+                getOuterColor()[3] = 0.3f;
+                setOptions(TRACK_DUST.clone());
+                setScaleX(size);
+                setScaleY(size * 1.5f);
                 break;
         }
     }
 
     public void particleUpdate() {
-        switch (effect) {
+        switch (getEffect()) {
             case CANNON_SMOKE:
                 cannonSmoke();
                 break;
@@ -116,28 +122,28 @@ public class SmokeParticleEffect extends ParticleEffects {
 
         addTime(0.004f);
 
-        particlePosition.x += GameLoopRenderer.WIND_FLOW_X;
-        particlePosition.y += GameLoopRenderer.WIND_FLOW_Y;
+        getParticlePosition().x += GameLoopRenderer.WIND_FLOW_X;
+        getParticlePosition().y += GameLoopRenderer.WIND_FLOW_Y;
 
         if (getInnerOpacity() < 0.8f && getVisibility() == 3.0f) {
             changeOpacity(0.03f, 0.028f);
         } else {
             changeVisibility(-0.002f);
             changeOpacity(-0.003f, -0.004f);
-            scaleX += 0.0005f;
-            scaleY += 0.0005f;
+            changeScaleX(0.0005f);
+            changeScaleY(0.0005f);
         }
 
-        Transformations.setModelTranslation(modelMatrix, 0, 0, particlePosition.x, particlePosition.y, scaleX, scaleY);
+        Transformations.setModelTranslation(getModelMatrix(), 0, 0, getParticlePosition().x, getParticlePosition().y, getScaleX(), getScaleY());
     }
 
     private void reloadStatus() {
         changeVisibility(-0.002f);
-        scaleX = StaticTextures.GAME_CONTROL_OBJECT_SIZE * getVisibility();
+        setScaleX(StaticTextures.GAME_CONTROL_OBJECT_SIZE * getVisibility());
 
-        particlePosition.x += StaticTextures.GAME_CONTROL_OBJECT_SIZE * 0.002f;
+        getParticlePosition().x += StaticTextures.GAME_CONTROL_OBJECT_SIZE * 0.002f;
 
-        Transformations.setModelTranslation(modelMatrix, worldAngle, objectAngle, particlePosition.x, particlePosition.y, scaleX, scaleY);
+        Transformations.setModelTranslation(getModelMatrix(), getWorldAngle(), getObjectAngle(), getParticlePosition().x, getParticlePosition().y, getScaleX(), getScaleY());
     }
 
     private void shellStreak() {
@@ -146,13 +152,13 @@ public class SmokeParticleEffect extends ParticleEffects {
 
     private void tankExhaust() {
         addTime(0.04f);
-        Transformations.setModelTranslation(getModelMatrix(), 0, objectAngle,
+        Transformations.setModelTranslation(getModelMatrix(), 0, getObjectAngle(),
                 getParticlePosition().x, getParticlePosition().y, getScaleX(), getScaleY());
     }
 
     private void truckDust() {
         addTime(0.01f);
-        Transformations.setModelTranslation(getModelMatrix(), 0, objectAngle,
+        Transformations.setModelTranslation(getModelMatrix(), 0, getObjectAngle(),
                 getParticlePosition().x, getParticlePosition().y, getScaleX(), getScaleY());
     }
 }
