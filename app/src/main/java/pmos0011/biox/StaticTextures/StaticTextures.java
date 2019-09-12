@@ -35,12 +35,12 @@ public class StaticTextures extends StaticModel {
     private GameControlObjects rightCannonButton = new GameControlObjects();
 
     private float[] modelMatrix = new float[16];
+    private float[] color = {1.0f, 1.0f, 1.0f, 1.0f};
 
     private boolean rotateLeft = false;
     private boolean rotateRight = false;
     private boolean isLeftCannonLoaded = true;
     private boolean isRightCannonLoaded = true;
-    private boolean shellRemove;
 
     private float turretAngle = 0;
     private float rotateLeftSpeedDelta = 0;
@@ -64,7 +64,11 @@ public class StaticTextures extends StaticModel {
 
     public void setParticleModel(ParticleModel particleModel) {
         this.particleModel = particleModel;
+
         addTestEnemies();
+        //EnemyGenerator enemyGenerator = new EnemyGenerator(enemies,this,particleModel);
+        // Thread t = new Thread(enemyGenerator);
+        //t.start();
     }
 
     @Override
@@ -212,17 +216,22 @@ public class StaticTextures extends StaticModel {
     }
 
     private void checkHit(Shells shell, Iterator<Shells> shellsIterator) {
-        if (shell.isEnemy())
-            shellRemove = checkTowerHit(shell);
-        else {
-            shellRemove = checkEnemyHit(shell);
-            if (!shellRemove)
-                shellRemove = checkOutOfBounds(shell);
-        }
-        if (shellRemove) {
-            shellsIterator.remove();
-            particleModel.addParticleEffect(new SmokeParticleEffect(ParticleEffects.effectKind.SHELL_STREAK, 0, shell.getAngle(),
-                    shell.getOffset(), shell.getStartPosition().x, shell.getStartPosition().y, shell.getScale().x, shell.getTravelDistance()));
+        try {
+            boolean shellRemove;
+            if (shell.isEnemy())
+                shellRemove = checkTowerHit(shell);
+            else {
+                shellRemove = checkEnemyHit(shell);
+                if (!shellRemove)
+                    shellRemove = checkOutOfBounds(shell);
+            }
+            if (shellRemove) {
+                shellsIterator.remove();
+                particleModel.addParticleEffect(new SmokeParticleEffect(ParticleEffects.effectKind.SHELL_STREAK, 0, shell.getAngle(),
+                        shell.getOffset(), shell.getStartPosition().x, shell.getStartPosition().y, shell.getScale().x, shell.getTravelDistance()));
+            }
+        } catch (Exception e) {
+
         }
     }
 
@@ -245,6 +254,7 @@ public class StaticTextures extends StaticModel {
             Enemy enemy = enemyIterator.next();
             if (shell.getPosition().y > enemy.getPosition().y - Enemy.TANK_HIT_SIZE && shell.getPosition().y < enemy.getPosition().y + Enemy.TANK_HIT_SIZE)
                 if (shell.getPosition().x > enemy.getPosition().x - Enemy.TANK_HIT_SIZE && shell.getPosition().x < enemy.getPosition().x + Enemy.TANK_HIT_SIZE) {
+                    enemy.hitCalculation(shell.getPosition().y);
                     addSparks(shell);
                     return true;
                 }
@@ -269,21 +279,29 @@ public class StaticTextures extends StaticModel {
     }
 
     private void drawEnemies(ObjectsLoader loader) {
-        Iterator<Enemy> enemyIterator = enemies.iterator();
-        while (enemyIterator.hasNext()) {
-            Enemy enemy = enemyIterator.next();
 
-            Transformations.setModelTranslation(modelMatrix, 0, enemy.getAngle(), enemy.getPosition().x, enemy.getPosition().y, enemy.getScale().x, enemy.getScale().y);
-            loader.loadUniformMatrix4fv(staticShader.getModelMatrixHandle(), modelMatrix);
-            GLES31.glBindTexture(GLES31.GL_TEXTURE_2D, loader.getTextureID(BitmapID.textureNames.TANK_CHASSIS.getValue()));
-            GLES31.glDrawElements(GLES31.GL_TRIANGLES, StaticTextures.DRAW_ORDER.length, GLES31.GL_UNSIGNED_SHORT, 0);
+        try {
+            Iterator<Enemy> enemyIterator = enemies.iterator();
+            while (enemyIterator.hasNext()) {
+                Enemy enemy = enemyIterator.next();
+                color[3] = enemy.getOpacity();
+                Transformations.setModelTranslation(modelMatrix, 0, enemy.getAngle(), enemy.getPosition().x, enemy.getPosition().y, enemy.getScale().x, enemy.getScale().y);
+                loader.loadUniform4fv(staticShader.getColorHandle(), color);
+                loader.loadUniformMatrix4fv(staticShader.getModelMatrixHandle(), modelMatrix);
+                GLES31.glBindTexture(GLES31.GL_TEXTURE_2D, loader.getTextureID(BitmapID.textureNames.TANK_CHASSIS.getValue()));
+                GLES31.glDrawElements(GLES31.GL_TRIANGLES, StaticTextures.DRAW_ORDER.length, GLES31.GL_UNSIGNED_SHORT, 0);
 
-            Transformations.setModelTranslation(modelMatrix, 0, enemy.getTurretAngle(), enemy.getPosition().x, enemy.getPosition().y, enemy.getScale().x, enemy.getScale().y);
-            loader.loadUniformMatrix4fv(staticShader.getModelMatrixHandle(), modelMatrix);
-            GLES31.glBindTexture(GLES31.GL_TEXTURE_2D, loader.getTextureID(BitmapID.textureNames.TANK_TURRET.getValue()));
-            GLES31.glDrawElements(GLES31.GL_TRIANGLES, StaticTextures.DRAW_ORDER.length, GLES31.GL_UNSIGNED_SHORT, 0);
+                Transformations.setModelTranslation(modelMatrix, 0, enemy.getTurretAngle(), enemy.getPosition().x, enemy.getPosition().y, enemy.getScale().x, enemy.getScale().y);
+                loader.loadUniformMatrix4fv(staticShader.getModelMatrixHandle(), modelMatrix);
+                GLES31.glBindTexture(GLES31.GL_TEXTURE_2D, loader.getTextureID(BitmapID.textureNames.TANK_TURRET.getValue()));
+                GLES31.glDrawElements(GLES31.GL_TRIANGLES, StaticTextures.DRAW_ORDER.length, GLES31.GL_UNSIGNED_SHORT, 0);
 
-            enemy.enemyMove();
+                enemy.enemyMove();
+
+                if (enemy.getOpacity() <= 0)
+                    enemyIterator.remove();
+            }
+        } catch (Exception e) {
         }
     }
 

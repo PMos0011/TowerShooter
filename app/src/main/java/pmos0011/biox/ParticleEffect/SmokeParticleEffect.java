@@ -40,6 +40,21 @@ public class SmokeParticleEffect extends ParticleEffects {
                 getOuterColor()[3] = 0.0f;
                 break;
 
+            case TANK_EXPLOSION_SMOKE:
+                getParticlePosition().x += xPos;
+                getParticlePosition().y += yPos;
+                setScaleX(size*1.3f);
+                setScaleY(size*1.3f);
+
+                Transformations.setModelTranslation(getModelMatrix(), 0, 0, getParticlePosition().x, getParticlePosition().y, getScaleX(), getScaleY());
+
+                setInnerColor(BLACK.clone());
+                setOuterColor(MEDIUM_BLACK.clone());
+                setOptions(TANK_EXPLOSION_SMOKE.clone());
+                getInnerColor()[3] = 0.01f;
+                getOuterColor()[3] = 0.0f;
+                break;
+
             case RELOAD_STATUS:
                 getParticlePosition().x = xPos;
                 getParticlePosition().y = yPos;
@@ -59,7 +74,7 @@ public class SmokeParticleEffect extends ParticleEffects {
                 getParticlePosition().x = xPos;
                 getParticlePosition().y = yPos - getScaleY() - getScaleY() * 0.1f;
 
-                setInnerColor(LIGHT_BLACK.clone());
+                setInnerColor(BLACK.clone());
                 setOptions(RELOAD_STATUS.clone());
 
                 Transformations.setModelTranslation(getModelMatrix(), getWorldAngle(), getObjectAngle(), getParticlePosition().x, getParticlePosition().y, getScaleX(), getScaleY());
@@ -136,7 +151,22 @@ public class SmokeParticleEffect extends ParticleEffects {
                 setScaleX(size);
                 setScaleY(size * 1.5f);
                 break;
+
+                case HIT_POINTS:
+                    getParticlePosition().x = xPos;
+                    getParticlePosition().y = yPos+effectOffset;
+                    setScaleX(size);
+                    setScaleY(size/8);
+
+                    setInnerColor(RED.clone());
+                    setOptions(RELOAD_STATUS.clone());
+
+                    Transformations.setModelTranslation(getModelMatrix(), getWorldAngle(), getObjectAngle(), getParticlePosition().x, getParticlePosition().y, getScaleX(), getScaleY());
+
+                break;
         }
+
+
     }
 
     public void particleUpdate() {
@@ -163,6 +193,14 @@ public class SmokeParticleEffect extends ParticleEffects {
 
             case ENEMY_DOT:
                 enemyDot();
+                break;
+
+            case HIT_POINTS:
+                hitPoints();
+                break;
+
+            case TANK_EXPLOSION_SMOKE:
+                tankSmoke();
                 break;
         }
     }
@@ -219,5 +257,29 @@ public class SmokeParticleEffect extends ParticleEffects {
 
         Transformations.setModelTranslation(getModelMatrix(), 0, 0,
                 getParticlePosition().x, getParticlePosition().y, getScaleX(), getScaleY());
+    }
+
+    private void hitPoints(){
+
+        Transformations.setModelTranslation(getModelMatrix(), 0, getObjectAngle(),
+                getParticlePosition().x, getParticlePosition().y, getScaleX(), getScaleY());
+    }
+
+    private void tankSmoke(){
+        addTime(0.004f);
+
+        getParticlePosition().x += GameLoopRenderer.WIND_FLOW_X;
+        getParticlePosition().y += GameLoopRenderer.WIND_FLOW_Y;
+
+        if (getInnerOpacity() < 0.9f && getVisibility() == 4.0f) {
+            changeOpacity(0.03f, 0.028f);
+        } else {
+            changeVisibility(-0.0015f);
+            changeOpacity(-0.002f, -0.003f);
+            changeScaleX(0.0005f);
+            changeScaleY(0.0005f);
+        }
+
+        Transformations.setModelTranslation(getModelMatrix(), 0, 0, getParticlePosition().x, getParticlePosition().y, getScaleX(), getScaleY());
     }
 }

@@ -4,6 +4,7 @@ import java.util.Random;
 
 import pmos0011.biox.AbstractClasses.ParticleEffects;
 import pmos0011.biox.AbstractClasses.Weapons;
+import pmos0011.biox.ParticleEffect.FireParticleEffect;
 import pmos0011.biox.ParticleEffect.ParticleModel;
 import pmos0011.biox.ParticleEffect.SmokeParticleEffect;
 import pmos0011.biox.Weapons.Shells;
@@ -22,8 +23,13 @@ public class Enemy extends Weapons {
     private static final float TANK_TRUCK_DUST_SIZE = 0.15f;
     private static final float TANK_TRUCK_DUST_ANGLE_OFFSET = 10;
 
+    private boolean isDestroyed;
+
     private float turretAngle;
     private float reloadingStatus;
+    private float hp;
+    private float hitStrength;
+    private float opacity;
 
     private StaticTextures staticTextures;
     private ParticleModel particleModel;
@@ -33,11 +39,16 @@ public class Enemy extends Weapons {
     private SmokeParticleEffect leftTruckDust;
     private SmokeParticleEffect rightTruckDust;
     private SmokeParticleEffect radarDot;
+    private SmokeParticleEffect hitPoints;
 
     public Enemy(float angle, float xPos, float yPos, float speed, StaticTextures staticTextures, ParticleModel particleModel) {
         super(angle, xPos, yPos, speed);
 
         setScale(TANK_SIZE, TANK_ASPECT);
+        hp = 1;
+        hitStrength = 10;
+        isDestroyed=false;
+        opacity=1.0f;
 
         this.staticTextures = staticTextures;
         this.particleModel = particleModel;
@@ -48,10 +59,15 @@ public class Enemy extends Weapons {
         addExhaustsEffects();
         addTankDust();
         addRadarDot();
+        addHitPointPanel();
     }
 
     public float getTurretAngle() {
         return turretAngle;
+    }
+
+    public float getOpacity() {
+        return opacity;
     }
 
     public void enemyMove() {
@@ -108,12 +124,37 @@ public class Enemy extends Weapons {
         addDeltaSpeed(leftTruckDust);
         addDeltaSpeed(rightTruckDust);
         addDeltaSpeed(rightExhaust);
+        addDeltaSpeed(hitPoints);
 
         if (getPosition().y > 1)
             getPosition().y = -1;
 
-        radarDot.getParticlePosition().x=getPosition().x;
-        radarDot.getParticlePosition().y=getPosition().y;
+        radarDot.getParticlePosition().x = getPosition().x;
+        radarDot.getParticlePosition().y = getPosition().y;
+
+        hitPoints.setScaleX(ParticleEffects.HIT_POINT_SIZE * hp);
+
+        if (hp <= 0 && !isDestroyed) {
+            getDeltaSpeed().x = 0;
+            getDeltaSpeed().y = 0;
+
+            removeEffect(leftTruckDust);
+            removeEffect(rightTruckDust);
+            removeEffect(rightExhaust);
+            removeEffect(leftExhaust);
+            removeEffect(hitPoints);
+            removeEffect(radarDot);
+
+            addExplosion();
+            isDestroyed=true;
+        }
+
+        if(isDestroyed){
+            opacity-=0.01f;
+
+            if(opacity<0)
+                opacity=0;
+        }
 
     }
 
@@ -137,10 +178,52 @@ public class Enemy extends Weapons {
     }
 
     private void addDeltaSpeed(SmokeParticleEffect effect) {
-        effect.getParticlePosition().x += getDeltaSpeed().x;
-        effect.getParticlePosition().y += getDeltaSpeed().y;
 
-        if (effect.getParticlePosition().y > 1)
-            effect.getParticlePosition().y = -1;
+        if (effect != null) {
+            effect.getParticlePosition().x += getDeltaSpeed().x;
+            effect.getParticlePosition().y += getDeltaSpeed().y;
+
+            if (effect.getParticlePosition().y > 1)
+                effect.getParticlePosition().y = -1;
+        }
+    }
+
+    private void addHitPointPanel() {
+        hitPoints = new SmokeParticleEffect(ParticleEffects.effectKind.HIT_POINTS,
+                0, 0, 0.18f, getPosition().x, getPosition().y,
+                ParticleEffects.HIT_POINT_SIZE, 0);
+        particleModel.addParticleEffect(hitPoints);
+    }
+
+    public void hitCalculation(float hitPoint) {
+        if (hitPoint > getPosition().y)
+            hitPoint = hitPoint - getPosition().y;
+        else
+            hitPoint = getPosition().y - hitPoint;
+
+        hitPoint *= hitStrength;
+
+        if (hitPoint < 0.35)
+            hitPoint = 0;
+        else if (hitPoint > 0.75)
+            hitPoint = 0.75f;
+
+        hp -= 1 - hitPoint;
+        if (hp < 0)
+            hp = 0;
+    }
+
+    private void removeEffect(SmokeParticleEffect effect){
+        effect.set0Visibility();
+    }
+
+    private void addExplosion(){
+
+        particleModel.addParticleEffect(new FireParticleEffect(ParticleEffects.effectKind.TANK_EXPLOSION, 0, 0,
+                0, getPosition().x, getPosition().y, ParticleEffects.TANK_EXPLOSION_SIZE, 0));
+        particleModel.addParticleEffect(new SmokeParticleEffect(ParticleEffects.effectKind.TANK_EXPLOSION_SMOKE, 0, 0,
+               0, getPosition().x, getPosition().y, ParticleEffects.TANK_EXPLOSION_SIZE, 0));
+
+
     }
 }

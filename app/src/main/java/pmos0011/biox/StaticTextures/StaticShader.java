@@ -23,7 +23,7 @@ public class StaticShader extends Shader {
 
     @Override
     protected void getAllUniformsHandle() {
-        //colorHandle=super.getUniformHandle("vColor");
+        colorHandle=super.getUniformHandle("vColor");
         modelMatrixHandle = super.getUniformHandle("vModelMatrix");
 
     }

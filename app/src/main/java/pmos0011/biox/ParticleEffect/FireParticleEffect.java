@@ -51,6 +51,19 @@ public class FireParticleEffect extends ParticleEffects {
                 getOuterColor()[3] = 0.6f;
                 setOptions(HIT_SPARK.clone());
                 break;
+
+            case TANK_EXPLOSION:
+                getParticlePosition().x += xPos;
+                getParticlePosition().y += yPos;
+                setScaleX(size);
+                setScaleY(size);
+
+                Transformations.setModelTranslation(getModelMatrix(), 0, 0, getParticlePosition().x, getParticlePosition().y, getScaleX(), getScaleY());
+
+                setInnerColor(LIGHT_YELLOW.clone());
+                setOuterColor(RED.clone());
+                setOptions(TANK_EXPLOSION.clone());
+                break;
         }
     }
 
@@ -61,6 +74,9 @@ public class FireParticleEffect extends ParticleEffects {
                 break;
             case HIT_SPARK:
                 hitSpark();
+                break;
+            case TANK_EXPLOSION:
+                tankExplosion();
                 break;
         }
     }
@@ -86,6 +102,11 @@ public class FireParticleEffect extends ParticleEffects {
             changeVisibility(-0.04f);
         }
         Transformations.setModelTranslation(getModelMatrix(), 0, getWorldAngle(), getParticlePosition().x, getParticlePosition().y, getScaleX(), getScaleY());
+    }
+
+    private void tankExplosion(){
+        addTime(0.01f);
+        changeVisibility(-0.025f);
     }
 }
 

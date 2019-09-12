@@ -115,15 +115,18 @@ public class ParticleModel extends StaticModel {
     private void updateFireParticleEffects(ObjectsLoader loader) {
 
         resetCounter();
+        try {
+            Iterator<FireParticleEffect> particleEffectIterator = fireParticleEffects.iterator();
+            while (particleEffectIterator.hasNext()) {
+                FireParticleEffect effect = particleEffectIterator.next();
+                updateParticleMatrix(effect);
+                effect.particleUpdate();
 
-        Iterator<FireParticleEffect> particleEffectIterator = fireParticleEffects.iterator();
-        while (particleEffectIterator.hasNext()) {
-            FireParticleEffect effect = particleEffectIterator.next();
-            updateParticleMatrix(effect);
-            effect.particleUpdate();
+                if (effect.getVisibility() <= 0.0f)
+                    particleEffectIterator.remove();
+            }
+        } catch (Exception e) {
 
-            if (effect.getVisibility() <= 0.0f)
-                particleEffectIterator.remove();
         }
 
         loader.updateVBOMatrix(VBO, modelMatrices);
@@ -164,7 +167,7 @@ public class ParticleModel extends StaticModel {
         GLES31.glDisable(GLES31.GL_BLEND);
     }
 
-    public void drawRadar(){
+    public void drawRadar() {
         addParticleEffect(new SmokeParticleEffect(ParticleEffects.effectKind.RADAR_BACKGROUND, 0, 0, 0,
                 0, 1, ParticleEffects.RADAR_SIZE, 0));
         addParticleEffect(new SmokeParticleEffect(ParticleEffects.effectKind.TOWER_DOT, 0, 0, 0,
