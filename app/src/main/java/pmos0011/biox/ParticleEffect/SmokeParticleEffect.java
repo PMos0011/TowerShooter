@@ -9,8 +9,11 @@ import pmos0011.biox.StaticTextures.StaticTextures;
 import pmos0011.biox.Weapons.Shells;
 
 public class SmokeParticleEffect extends ParticleEffects {
+    private final static float GREEN_DOT_SIZE = 20;
+    private final static float BLUE_DOT_SIZE = 15;
 
     private PointF deltaPosition;
+    private float radarYOffset;
 
     public SmokeParticleEffect(effectKind effect, float worldAngle, float objectAngle, float effectOffset, float xPos, float yPos, float size, float travelDistance) {
         super(effect, worldAngle, objectAngle, effectOffset, xPos, yPos, size, travelDistance);
@@ -49,6 +52,48 @@ public class SmokeParticleEffect extends ParticleEffects {
                 Transformations.setModelTranslation(getModelMatrix(), getWorldAngle(), getObjectAngle(), getParticlePosition().x, getParticlePosition().y, getScaleX(), getScaleY());
                 break;
 
+            case RADAR_BACKGROUND:
+                setScaleX(size * Transformations.getRatio() * 1.5f);
+                setScaleY(size * 1.5f);
+
+                getParticlePosition().x = xPos;
+                getParticlePosition().y = yPos - getScaleY() - getScaleY() * 0.1f;
+
+                setInnerColor(LIGHT_BLACK.clone());
+                setOptions(RELOAD_STATUS.clone());
+
+                Transformations.setModelTranslation(getModelMatrix(), getWorldAngle(), getObjectAngle(), getParticlePosition().x, getParticlePosition().y, getScaleX(), getScaleY());
+                break;
+
+            case TOWER_DOT:
+                getParticlePosition().x = xPos;
+                getParticlePosition().y = yPos - (size * 1.5f) - (size * 1.5f * 0.1f);
+
+                setScaleX(size / GREEN_DOT_SIZE);
+                setScaleY(size / GREEN_DOT_SIZE);
+
+                setInnerColor(GREEN.clone());
+                setOptions(RELOAD_STATUS.clone());
+
+                Transformations.setModelTranslation(getModelMatrix(), getWorldAngle(), getObjectAngle(), getParticlePosition().x, getParticlePosition().y, getScaleX(), getScaleY());
+                break;
+
+            case ENEMY_DOT:
+                getParticlePosition().x = xPos * ParticleEffects.RADAR_SIZE;
+                getParticlePosition().y = (yPos + 1.5f) / 2;
+                getParticlePosition().y *= ParticleEffects.RADAR_SIZE;
+                radarYOffset = 1 - (size * 1.5f) - (0.5f * size * 1.5f) - (size * 0.1f);
+                getParticlePosition().y += radarYOffset;
+
+                setScaleX(size / BLUE_DOT_SIZE);
+                setScaleY(size / BLUE_DOT_SIZE);
+
+                setInnerColor(BLUE.clone());
+                setOptions(RELOAD_STATUS.clone());
+
+                Transformations.setModelTranslation(getModelMatrix(), getWorldAngle(), getObjectAngle(), getParticlePosition().x, getParticlePosition().y, getScaleX(), getScaleY());
+                break;
+
             case SHELL_STREAK:
                 setParticlePosition(Transformations.calculatePoint(getObjectAngle(), effectOffset + getDistanceParameter() / 5));
                 getParticlePosition().x += xPos;
@@ -67,7 +112,7 @@ public class SmokeParticleEffect extends ParticleEffects {
             case TANK_EXHAUST:
                 setParticlePosition(Transformations.calculatePoint(getObjectAngle(), effectOffset + getDistanceParameter() / 5));
                 deltaPosition = Transformations.calculatePoint(getObjectAngle(), getDistanceParameter());
-                getParticlePosition().x += xPos -deltaPosition.y;
+                getParticlePosition().x += xPos - deltaPosition.y;
                 getParticlePosition().y += yPos + deltaPosition.x;
                 setInnerColor(EXHAUST_LIGHT_BLUE.clone());
                 setOuterColor(EXHAUST_DARK_GRAY.clone());
@@ -81,7 +126,7 @@ public class SmokeParticleEffect extends ParticleEffects {
             case TRACK_DUST:
                 setParticlePosition(Transformations.calculatePoint(getObjectAngle(), effectOffset + getDistanceParameter() / 5));
                 deltaPosition = Transformations.calculatePoint(getObjectAngle(), getDistanceParameter());
-                getParticlePosition().x += xPos -deltaPosition.y;
+                getParticlePosition().x += xPos - deltaPosition.y;
                 getParticlePosition().y += yPos + deltaPosition.x;
                 setInnerColor(LIGHT_GRAY.clone());
                 setOuterColor(LIGHT_DUST_GRAY.clone());
@@ -114,6 +159,10 @@ public class SmokeParticleEffect extends ParticleEffects {
 
             case TRACK_DUST:
                 truckDust();
+                break;
+
+            case ENEMY_DOT:
+                enemyDot();
                 break;
         }
     }
@@ -159,6 +208,16 @@ public class SmokeParticleEffect extends ParticleEffects {
     private void truckDust() {
         addTime(0.01f);
         Transformations.setModelTranslation(getModelMatrix(), 0, getObjectAngle(),
+                getParticlePosition().x, getParticlePosition().y, getScaleX(), getScaleY());
+    }
+
+    private void enemyDot() {
+        getParticlePosition().x *= ParticleEffects.RADAR_SIZE;
+        getParticlePosition().y = (getParticlePosition().y + 1.5f) / 2;
+        getParticlePosition().y *= ParticleEffects.RADAR_SIZE;
+        getParticlePosition().y += radarYOffset;
+
+        Transformations.setModelTranslation(getModelMatrix(), 0, 0,
                 getParticlePosition().x, getParticlePosition().y, getScaleX(), getScaleY());
     }
 }

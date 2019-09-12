@@ -163,4 +163,11 @@ public class ParticleModel extends StaticModel {
         GLES31.glDrawElementsInstanced(GLES31.GL_TRIANGLES, StaticTextures.DRAW_ORDER.length, GLES31.GL_UNSIGNED_SHORT, 0, smokeParticleEffects.size());
         GLES31.glDisable(GLES31.GL_BLEND);
     }
+
+    public void drawRadar(){
+        addParticleEffect(new SmokeParticleEffect(ParticleEffects.effectKind.RADAR_BACKGROUND, 0, 0, 0,
+                0, 1, ParticleEffects.RADAR_SIZE, 0));
+        addParticleEffect(new SmokeParticleEffect(ParticleEffects.effectKind.TOWER_DOT, 0, 0, 0,
+                0, 1, ParticleEffects.RADAR_SIZE, 0));
+    }
 }

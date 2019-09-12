@@ -8,6 +8,7 @@ public abstract class ParticleEffects {
 
     public final static int PARTICLE_DATA_LENGTH = 28;
     public final static int PARTICLE_MAX_COUNT = 100;
+    public final static float RADAR_SIZE = 0.13f;
 
     private float[] modelMatrix = new float[16];
     private float[] innerColor = new float[4];
@@ -116,11 +117,12 @@ public abstract class ParticleEffects {
         this.scaleX = scaleX;
     }
 
-    public void changeScaleX(float scale){
-        this.scaleX+=scale;
+    public void changeScaleX(float scale) {
+        this.scaleX += scale;
     }
-    public void changeScaleY(float scale){
-        this.scaleY+=scale;
+
+    public void changeScaleY(float scale) {
+        this.scaleY += scale;
     }
 
     public void setScaleY(float scaleY) {
@@ -182,6 +184,9 @@ public abstract class ParticleEffects {
     protected final static float[] YELLOW = {1.0f, 1.0f, 0.0f, 0.9f};
     protected final static float[] LIGHT_RED = {1.0f, 0.25f, 0.15f, 0.9f};
     protected final static float[] LIGHT_YELLOW = {1.0f, 0.8f, 0.3f, 0.9f};
+    protected final static float[] LIGHT_BLACK = {0.3f, 0.3f, 0.3f, 0.4f};
+    protected final static float[] GREEN = {0.0f, 1.0f, 0.0f, 0.9f};
+    protected final static float[] BLUE = {0.0f, 0.2f, 1.0f, 1.0f};
 
     //shader options:
     //{time, visibility, size_mod, reload_status}
@@ -198,6 +203,6 @@ public abstract class ParticleEffects {
     protected final static float[] HIT_SPARK = {0.0f, 2.0f, 4.0f, 0.0f};
 
     public enum effectKind {
-        CANNON_FIRE, CANNON_SMOKE, RELOAD_STATUS, SHELL_STREAK, TANK_EXHAUST, TRACK_DUST, HIT_SPARK
+        CANNON_FIRE, CANNON_SMOKE, RELOAD_STATUS, SHELL_STREAK, TANK_EXHAUST, TRACK_DUST, HIT_SPARK, RADAR_BACKGROUND, TOWER_DOT, ENEMY_DOT
     }
 }

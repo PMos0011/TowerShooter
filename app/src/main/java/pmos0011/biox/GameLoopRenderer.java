@@ -69,6 +69,7 @@ public class GameLoopRenderer implements GLSurfaceView.Renderer {
 
         loader.addUniformBlockBuffer(0, textureTransformations.getProjectionMatrix());
         staticTextures.setGameButtons(width, height, ratio, textureTransformations.getProjectionMatrix());
+        particleModel.drawRadar();
 
     }
 

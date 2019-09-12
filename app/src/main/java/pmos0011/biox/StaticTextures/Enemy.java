@@ -32,6 +32,7 @@ public class Enemy extends Weapons {
     private SmokeParticleEffect rightExhaust;
     private SmokeParticleEffect leftTruckDust;
     private SmokeParticleEffect rightTruckDust;
+    private SmokeParticleEffect radarDot;
 
     public Enemy(float angle, float xPos, float yPos, float speed, StaticTextures staticTextures, ParticleModel particleModel) {
         super(angle, xPos, yPos, speed);
@@ -46,6 +47,7 @@ public class Enemy extends Weapons {
 
         addExhaustsEffects();
         addTankDust();
+        addRadarDot();
     }
 
     public float getTurretAngle() {
@@ -102,32 +104,17 @@ public class Enemy extends Weapons {
         getPosition().x += getDeltaSpeed().x;
         getPosition().y += getDeltaSpeed().y;
 
-        leftExhaust.getParticlePosition().x += getDeltaSpeed().x;
-        leftExhaust.getParticlePosition().y += getDeltaSpeed().y;
-
-        rightExhaust.getParticlePosition().x += getDeltaSpeed().x;
-        rightExhaust.getParticlePosition().y += getDeltaSpeed().y;
-
-        leftTruckDust.getParticlePosition().x += getDeltaSpeed().x;
-        leftTruckDust.getParticlePosition().y += getDeltaSpeed().y;
-
-        rightTruckDust.getParticlePosition().x += getDeltaSpeed().x;
-        rightTruckDust.getParticlePosition().y += getDeltaSpeed().y;
+        addDeltaSpeed(leftExhaust);
+        addDeltaSpeed(leftTruckDust);
+        addDeltaSpeed(rightTruckDust);
+        addDeltaSpeed(rightExhaust);
 
         if (getPosition().y > 1)
             getPosition().y = -1;
 
-        if (leftExhaust.getParticlePosition().y > 1)
-            leftExhaust.getParticlePosition().y = -1;
+        radarDot.getParticlePosition().x=getPosition().x;
+        radarDot.getParticlePosition().y=getPosition().y;
 
-        if (rightExhaust.getParticlePosition().y > 1)
-            rightExhaust.getParticlePosition().y = -1;
-
-        if (leftTruckDust.getParticlePosition().y > 1)
-            leftTruckDust.getParticlePosition().y = -1;
-
-        if (rightTruckDust.getParticlePosition().y > 1)
-            rightTruckDust.getParticlePosition().y = -1;
     }
 
     private void addTankDust() {
@@ -140,5 +127,20 @@ public class Enemy extends Weapons {
                 0, getAngle() + TANK_TRUCK_DUST_ANGLE_OFFSET, TANK_TRUCK_DUST_Y_OFFSET, getPosition().x, getPosition().y,
                 TANK_TRUCK_DUST_SIZE, -TANK_TRUCK_DUST_X_OFFSET);
         particleModel.addParticleEffect(rightTruckDust);
+    }
+
+    private void addRadarDot() {
+        radarDot = new SmokeParticleEffect(ParticleEffects.effectKind.ENEMY_DOT,
+                0, 0, 0, getPosition().x, getPosition().y,
+                ParticleEffects.RADAR_SIZE, 0);
+        particleModel.addParticleEffect(radarDot);
+    }
+
+    private void addDeltaSpeed(SmokeParticleEffect effect) {
+        effect.getParticlePosition().x += getDeltaSpeed().x;
+        effect.getParticlePosition().y += getDeltaSpeed().y;
+
+        if (effect.getParticlePosition().y > 1)
+            effect.getParticlePosition().y = -1;
     }
 }
