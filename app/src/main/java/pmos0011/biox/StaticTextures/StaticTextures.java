@@ -298,11 +298,15 @@ public class StaticTextures extends StaticModel {
 
                 enemy.enemyMove();
 
+
                 if (enemy.getOpacity() <= 0)
                     enemyIterator.remove();
             }
         } catch (Exception e) {
         }
+
+        color[3] = 1.0f;
+        loader.loadUniform4fv(staticShader.getColorHandle(), color);
     }
 
     public void setGameButtons(int width, int height, float ratio, float[] projectionMatrix) {
