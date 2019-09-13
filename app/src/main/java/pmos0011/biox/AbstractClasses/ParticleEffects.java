@@ -7,7 +7,7 @@ import java.util.Random;
 public abstract class ParticleEffects {
 
     public final static int PARTICLE_DATA_LENGTH = 28;
-    public final static int PARTICLE_MAX_COUNT = 100;
+    public final static int PARTICLE_MAX_COUNT = 150;
     public final static float RADAR_SIZE = 0.13f;
     public final static float HIT_POINT_SIZE = 0.08f;
     public final static float TANK_EXPLOSION_SIZE = 0.25f;

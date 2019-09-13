@@ -118,6 +118,7 @@ public class ObjectsLoader {
     }
 
     private FloatBuffer createDataBuffer(float[] data) {
+        buffer.clear();
         buffer = ByteBuffer.allocateDirect(data.length * 4);
         buffer.order(ByteOrder.nativeOrder());
         dataBuffer = buffer.asFloatBuffer();
@@ -167,7 +168,7 @@ public class ObjectsLoader {
     public int createEmptyVBO(int dataSize) {
         int vboID = createVBO();
         GLES31.glBindBuffer(GLES31.GL_ARRAY_BUFFER, vboID);
-        GLES31.glBufferData(GLES31.GL_ARRAY_BUFFER, dataSize * 4, null, GLES31.GL_DYNAMIC_DRAW);
+        GLES31.glBufferData(GLES31.GL_ARRAY_BUFFER, dataSize * 4, null, GLES31.GL_STREAM_DRAW);
         GLES31.glBindBuffer(GLES31.GL_ARRAY_BUFFER, 0);
 
         return vboID;
@@ -176,10 +177,10 @@ public class ObjectsLoader {
     public void updateVBOMatrix(int vboID, float[] matrix) {
 
         GLES31.glBindBuffer(GLES31.GL_ARRAY_BUFFER, vboID);
-
+        dataBuffer.clear();
         dataBuffer = createDataBuffer(matrix);
-        GLES31.glBufferData(GLES31.GL_ARRAY_BUFFER, matrix.length * 4, dataBuffer, GLES31.GL_DYNAMIC_DRAW);
-
+        GLES31.glBufferData(GLES31.GL_ARRAY_BUFFER, matrix.length * 4, dataBuffer, GLES31.GL_STREAM_DRAW);
+        GLES31.glBufferSubData(GLES31.GL_ARRAY_BUFFER, 0, matrix.length * 4, dataBuffer);
         GLES31.glBindBuffer(GLES31.GL_ARRAY_BUFFER, 0);
     }
 

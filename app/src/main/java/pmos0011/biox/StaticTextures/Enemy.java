@@ -22,6 +22,7 @@ public class Enemy extends Weapons {
     private static final float TANK_TRUCK_DUST_X_OFFSET = 0.1f;
     private static final float TANK_TRUCK_DUST_SIZE = 0.15f;
     private static final float TANK_TRUCK_DUST_ANGLE_OFFSET = 10;
+    private static final float TANK_EXPLOSION_SPARK_SIZE = 0.01f;
 
     private boolean isDestroyed;
 
@@ -75,7 +76,7 @@ public class Enemy extends Weapons {
         methodForTests();
         getTarget();
 
-        if (reloadingStatus < 0) {
+        if (reloadingStatus < 0 && !isDestroyed) {
             staticTextures.addShell(turretAngle, getPosition().x, getPosition().y, Shells.SHELL_SPEED);
             reloadingStatus = 1;
         }
@@ -149,13 +150,17 @@ public class Enemy extends Weapons {
             isDestroyed=true;
         }
 
+        if (getDeltaSpeed().x<=0){
+            removeEffect(leftTruckDust);
+            removeEffect(rightTruckDust);
+        }
+
         if(isDestroyed){
             opacity-=0.01f;
 
             if(opacity<0)
                 opacity=0;
         }
-
     }
 
     private void addTankDust() {
@@ -218,12 +223,21 @@ public class Enemy extends Weapons {
     }
 
     private void addExplosion(){
-
         particleModel.addParticleEffect(new FireParticleEffect(ParticleEffects.effectKind.TANK_EXPLOSION, 0, 0,
                 0, getPosition().x, getPosition().y, ParticleEffects.TANK_EXPLOSION_SIZE, 0));
         particleModel.addParticleEffect(new SmokeParticleEffect(ParticleEffects.effectKind.TANK_EXPLOSION_SMOKE, 0, 0,
-               0, getPosition().x, getPosition().y, ParticleEffects.TANK_EXPLOSION_SIZE, 0));
+                0, getPosition().x, getPosition().y, ParticleEffects.TANK_EXPLOSION_SIZE, 0));
 
+        int sparksCount = new Random().nextInt(50)+25;
+        float deltaAngle = 360 / sparksCount;
+        float currentAngle = 0;
+        for (int i = 0; i <sparksCount; i++) {
+
+            particleModel.addParticleEffect(new FireParticleEffect(ParticleEffects.effectKind.HIT_SPARK, currentAngle, 0, 0,
+                    getPosition().x, getPosition().y,
+                    TANK_EXPLOSION_SPARK_SIZE, 0));
+            currentAngle += deltaAngle;
+        }
 
     }
 }

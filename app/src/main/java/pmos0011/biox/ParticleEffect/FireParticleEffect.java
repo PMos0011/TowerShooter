@@ -70,7 +70,7 @@ public class FireParticleEffect extends ParticleEffects {
     public void particleUpdate() {
         switch (getEffect()) {
             case CANNON_FIRE:
-                fire();
+                cannonFire();
                 break;
             case HIT_SPARK:
                 hitSpark();
@@ -81,7 +81,7 @@ public class FireParticleEffect extends ParticleEffects {
         }
     }
 
-    private void fire() {
+    private void cannonFire() {
 
         addTime(0.04f);
         changeVisibility(-0.08f);

@@ -1,7 +1,5 @@
 package pmos0011.biox.StaticTextures;
 
-import android.util.Log;
-
 import java.util.List;
 
 import pmos0011.biox.ParticleEffect.ParticleModel;

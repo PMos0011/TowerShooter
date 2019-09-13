@@ -1,7 +1,6 @@
 package pmos0011.biox.ParticleEffect;
 
 import android.opengl.GLES31;
-import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -61,27 +60,7 @@ public class ParticleModel extends StaticModel {
         pointer = 0;
     }
 
-    private void updateParticleMatrix(FireParticleEffect effect) {
-
-        for (counter = 0; counter < 16; counter++) {
-            modelMatrices[pointer] = effect.getModelMatrix()[counter];
-            pointer++;
-        }
-        for (counter = 0; counter < 4; counter++) {
-            modelMatrices[pointer] = effect.getInnerColor()[counter];
-            pointer++;
-        }
-        for (counter = 0; counter < 4; counter++) {
-            modelMatrices[pointer] = effect.getOuterColor()[counter];
-            pointer++;
-        }
-        for (counter = 0; counter < 4; counter++) {
-            modelMatrices[pointer] = effect.getOptions()[counter];
-            pointer++;
-        }
-    }
-
-    private void updateParticleMatrix(SmokeParticleEffect effect) {
+    private void updateParticleMatrix(ParticleEffects effect) {
 
         for (counter = 0; counter < 16; counter++) {
             modelMatrices[pointer] = effect.getModelMatrix()[counter];
@@ -126,7 +105,6 @@ public class ParticleModel extends StaticModel {
                     particleEffectIterator.remove();
             }
         } catch (Exception e) {
-
         }
 
         loader.updateVBOMatrix(VBO, modelMatrices);
@@ -154,7 +132,6 @@ public class ParticleModel extends StaticModel {
                     particleEffectIterator.remove();
             }
         } catch (Exception e) {
-
         }
         loader.updateVBOMatrix(VBO, modelMatrices);
     }

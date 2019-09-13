@@ -264,13 +264,14 @@ public class StaticTextures extends StaticModel {
 
     private void addSparks(Shells shell) {
         PointF deltaPosition = new PointF(0, 0);
+        if (shell.isEnemy())
+            deltaPosition = Transformations.calculatePoint(shell.getAngle(), -TOWER_HIT_SIZE);
+
         int sparksCount = new Random().nextInt(8) + 4;
         float deltaAngle = 60 / sparksCount;
         float currentAngle = shell.getAngle() - sparksCount * deltaAngle;
         for (int i = 0; i < 2 * sparksCount + 1; i++) {
-            if (shell.isEnemy()) {
-                deltaPosition = Transformations.calculatePoint(shell.getAngle(), -TOWER_HIT_SIZE);
-            }
+
             particleModel.addParticleEffect(new FireParticleEffect(ParticleEffects.effectKind.HIT_SPARK, currentAngle, 0, 0,
                     shell.getPosition().x + deltaPosition.x, shell.getPosition().y + deltaPosition.y,
                     shell.getScale().x, 0));
@@ -443,5 +444,4 @@ public class StaticTextures extends StaticModel {
 
         shells.add(new Shells(angle, xPos, yPos, speed));
     }
-
 }
