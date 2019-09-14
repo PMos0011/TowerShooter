@@ -1,6 +1,7 @@
 package pmos0011.biox.AbstractClasses;
 
 import android.graphics.PointF;
+import android.util.Log;
 
 import pmos0011.biox.CommonObjects.Transformations;
 import pmos0011.biox.Weapons.Shells;

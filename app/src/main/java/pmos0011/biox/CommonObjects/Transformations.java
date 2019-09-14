@@ -45,4 +45,30 @@ public class Transformations {
         return point;
     }
 
+    public static float calculateAngle(float xPoint, float yPoint, float xDestPoint, float yDestPoint) {
+
+        xPoint = xPoint - xDestPoint;
+        yPoint = yPoint - yDestPoint;
+
+        float angle;
+
+        if (xPoint < 0) {
+            double mod = Math.sqrt(xPoint * xPoint + yPoint * yPoint);
+            double cos = yPoint / mod;
+
+            angle = (float) Math.toDegrees(Math.acos(cos));
+
+            angle += 180;
+        } else {
+            double mod = Math.sqrt(xPoint * xPoint + yPoint * yPoint);
+            double sin = yPoint / mod;
+
+            angle = (float) Math.toDegrees(Math.asin(sin));
+
+            angle += 90;
+        }
+
+        return angle;
+    }
+
 }

@@ -131,8 +131,6 @@ public class SmokeParticleEffect extends ParticleEffects {
                 getParticlePosition().y += yPos + deltaPosition.x;
                 setInnerColor(EXHAUST_LIGHT_BLUE.clone());
                 setOuterColor(EXHAUST_DARK_GRAY.clone());
-                getInnerColor()[3] = 0.5f;
-                getOuterColor()[3] = 0.5f;
                 setOptions(TANK_EXHAUST.clone());
                 setScaleX(size);
                 setScaleY(size * 2);

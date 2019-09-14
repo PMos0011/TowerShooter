@@ -151,10 +151,6 @@ public abstract class ParticleEffects {
         return effect;
     }
 
-    public void setEffect(effectKind effect) {
-        this.effect = effect;
-    }
-
     protected void addTime(float time) {
         options[0] += time;
     }
@@ -163,8 +159,8 @@ public abstract class ParticleEffects {
         options[1] += visibility;
     }
 
-    public void set0Visibility() {
-        options[1] = 0;
+    public void set0Visibility(float visibility) {
+        options[1] = visibility;
     }
 
     public float getVisibility() {

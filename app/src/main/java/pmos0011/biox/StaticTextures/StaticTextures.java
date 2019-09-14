@@ -2,6 +2,7 @@ package pmos0011.biox.StaticTextures;
 
 import android.graphics.PointF;
 import android.opengl.GLES31;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -10,6 +11,9 @@ import java.util.Random;
 
 import pmos0011.biox.AbstractClasses.ParticleEffects;
 import pmos0011.biox.CommonObjects.BitmapID;
+import pmos0011.biox.Enemies.Enemy;
+import pmos0011.biox.Enemies.EnemyGenerator;
+import pmos0011.biox.Enemies.EnemySupervisor;
 import pmos0011.biox.GameControlObjects;
 import pmos0011.biox.CommonObjects.ObjectsLoader;
 import pmos0011.biox.ParticleEffect.FireParticleEffect;
@@ -28,6 +32,7 @@ public class StaticTextures extends StaticModel {
     private final float RADAR_SIZE = 0.065f;
 
     private ParticleModel particleModel;
+    private EnemySupervisor enemySupervisor;
 
     private GameControlObjects rightArrow = new GameControlObjects();
     private GameControlObjects leftArrow = new GameControlObjects();
@@ -45,6 +50,7 @@ public class StaticTextures extends StaticModel {
     private float turretAngle = 0;
     private float rotateLeftSpeedDelta = 0;
     private float rotateRightSpeedDelta = 0;
+    private float towerHP = 1.0f;
 
     private float radarAngle = 0;
 
@@ -52,23 +58,23 @@ public class StaticTextures extends StaticModel {
     private float rightCannonReloadStatus = 1.0f;
     private float leftCannonPosition = 0.0f;
     private float rightCannonPosition = 0.0f;
+    private SmokeParticleEffect hitPoints;
 
     private List<Shells> shells = new ArrayList<>();
     private List<Enemy> enemies = new ArrayList<>();
 
     public StaticTextures(int vaoID) {
         super(vaoID);
-
-
     }
 
     public void setParticleModel(ParticleModel particleModel) {
         this.particleModel = particleModel;
+        enemySupervisor = new EnemySupervisor(enemies);
+        addTowerHPBar();
 
-        addTestEnemies();
-        //EnemyGenerator enemyGenerator = new EnemyGenerator(enemies,this,particleModel);
-        // Thread t = new Thread(enemyGenerator);
-        //t.start();
+        EnemyGenerator enemyGenerator = new EnemyGenerator(enemies, this, particleModel);
+        Thread t = new Thread(enemyGenerator);
+        t.start();
     }
 
     @Override
@@ -105,6 +111,10 @@ public class StaticTextures extends StaticModel {
     protected void disableVertexArrays() {
         super.disableVertexArray(0);
         super.disableVertexArray(1);
+    }
+
+    public float getTowerHP() {
+        return towerHP;
     }
 
     private void drawBackground(ObjectsLoader loader) {
@@ -238,9 +248,17 @@ public class StaticTextures extends StaticModel {
     private boolean checkTowerHit(Shells shell) {
         if (shell.getStartPosition().x < 0 && shell.getPosition().x > 0 || shell.getStartPosition().x > 0 && shell.getPosition().x < 0) {
             addSparks(shell);
+            calculateDamage();
             return true;
         }
         return false;
+    }
+
+    private void calculateDamage() {
+        float damage = new Random().nextFloat() / 10;
+        towerHP -= 0.1f - damage;
+        if (towerHP < 0)
+            towerHP = 0;
     }
 
     private boolean checkOutOfBounds(Shells shell) {
@@ -297,11 +315,13 @@ public class StaticTextures extends StaticModel {
                 GLES31.glBindTexture(GLES31.GL_TEXTURE_2D, loader.getTextureID(BitmapID.textureNames.TANK_TURRET.getValue()));
                 GLES31.glDrawElements(GLES31.GL_TRIANGLES, StaticTextures.DRAW_ORDER.length, GLES31.GL_UNSIGNED_SHORT, 0);
 
+                enemySupervisor.inspectEnemy(enemy);
                 enemy.enemyMove();
 
 
                 if (enemy.getOpacity() <= 0)
                     enemyIterator.remove();
+
             }
         } catch (Exception e) {
         }
@@ -381,6 +401,8 @@ public class StaticTextures extends StaticModel {
 
     public void turretStateUpdate() {
 
+        hitPoints.setScaleX(ParticleEffects.HIT_POINT_SIZE * towerHP);
+
         if (rotateLeft) {
             if (rotateLeftSpeedDelta < 0.3f)
                 rotateLeftSpeedDelta += 0.005f;
@@ -430,18 +452,15 @@ public class StaticTextures extends StaticModel {
         }
     }
 
-    private void addTestEnemies() {
-        enemies.add(new Enemy(0, -1, 0, 0.001f, this, particleModel));
-        enemies.add(new Enemy(0, -1.5f, -0.5f, 0.001f, this, particleModel));
-        enemies.add(new Enemy(0, -0.5f, 0.5f, 0.0008f, this, particleModel));
-        enemies.add(new Enemy(0, 1, 0, 0.0008f, this, particleModel));
-        enemies.add(new Enemy(0, 1.5f, 0.5f, 0.0006f, this, particleModel));
-        enemies.add(new Enemy(0, 0.5f, -0.5f, 0.0006f, this, particleModel));
-
-    }
-
     public void addShell(float angle, float xPos, float yPos, float speed) {
 
         shells.add(new Shells(angle, xPos, yPos, speed));
+    }
+
+    private void addTowerHPBar() {
+        hitPoints = new SmokeParticleEffect(ParticleEffects.effectKind.HIT_POINTS,
+                0, 0, 0.2f, 0, 0,
+                ParticleEffects.HIT_POINT_SIZE, 0);
+        particleModel.addParticleEffect(hitPoints);
     }
 }
