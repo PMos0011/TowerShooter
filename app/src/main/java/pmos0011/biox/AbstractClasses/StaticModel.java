@@ -8,9 +8,7 @@ import pmos0011.biox.StaticTextures.StaticShader;
 
 public abstract class StaticModel {
 
-    protected StaticShader staticShader;
-    protected ParticleShader particleShader;
-    protected int vao;
+    private int vao;
 
     public final static float SQUERE_CORDS[] = {
             -1.0f, 1.0f,
@@ -37,13 +35,6 @@ public abstract class StaticModel {
         this.vao = vaoID;
     }
 
-    public void setStaticShader(StaticShader staticShader) {
-        this.staticShader = staticShader;
-    }
-
-    public void setParticleShader(ParticleShader particleShader) {
-        this.particleShader = particleShader;
-    }
 
     public void drawClassElements(ObjectsLoader loader) {
         GLES31.glBindVertexArray(vao);

@@ -10,19 +10,20 @@ import pmos0011.biox.AbstractClasses.ParticleEffects;
 import pmos0011.biox.CommonObjects.BitmapID;
 import pmos0011.biox.CommonObjects.ObjectsLoader;
 import pmos0011.biox.AbstractClasses.StaticModel;
-import pmos0011.biox.StaticTextures.StaticTextures;
+import pmos0011.biox.StaticTextures.StaticTexturesRenderer;
 
-public class ParticleModel extends StaticModel {
+public class ParticleModelRenderer extends StaticModel {
 
     private List<FireParticleEffect> fireParticleEffects = new ArrayList<>();
     private List<SmokeParticleEffect> smokeParticleEffects = new ArrayList<>();
 
+    private ParticleShader particleShader;
     private float[] modelMatrices;
     private final int VBO;
     private int pointer;
     private int counter;
 
-    public ParticleModel(int vaoID, int vboID) {
+    public ParticleModelRenderer(int vaoID, int vboID) {
         super(vaoID);
 
         this.modelMatrices = new float[ParticleEffects.PARTICLE_MAX_COUNT * ParticleEffects.PARTICLE_DATA_LENGTH];
@@ -52,11 +53,15 @@ public class ParticleModel extends StaticModel {
 
     @Override
     protected void disableVertexArrays() {
-        for (int counter = 0; counter < 9; counter++)
+        for (counter = 0; counter < 9; counter++)
             super.disableVertexArray(counter);
     }
 
-    public void resetCounter() {
+    public void setParticleShader(ParticleShader particleShader) {
+        this.particleShader = particleShader;
+    }
+
+    private void resetCounter() {
         pointer = 0;
     }
 
@@ -103,6 +108,7 @@ public class ParticleModel extends StaticModel {
 
                 if (effect.getVisibility() <= 0.0f)
                     particleEffectIterator.remove();
+
             }
         } catch (Exception e) {
         }
@@ -114,7 +120,7 @@ public class ParticleModel extends StaticModel {
 
         GLES31.glEnable(GLES31.GL_BLEND);
         GLES31.glBlendFunc(GLES31.GL_SRC_ALPHA, GLES31.GL_ONE);
-        GLES31.glDrawElementsInstanced(GLES31.GL_TRIANGLES, StaticTextures.DRAW_ORDER.length, GLES31.GL_UNSIGNED_SHORT, 0, fireParticleEffects.size());
+        GLES31.glDrawElementsInstanced(GLES31.GL_TRIANGLES, StaticTexturesRenderer.DRAW_ORDER.length, GLES31.GL_UNSIGNED_SHORT, 0, fireParticleEffects.size());
         GLES31.glDisable(GLES31.GL_BLEND);
     }
 
@@ -140,7 +146,7 @@ public class ParticleModel extends StaticModel {
 
         GLES31.glEnable(GLES31.GL_BLEND);
         GLES31.glBlendFunc(GLES31.GL_SRC_ALPHA, GLES31.GL_ONE_MINUS_SRC_ALPHA);
-        GLES31.glDrawElementsInstanced(GLES31.GL_TRIANGLES, StaticTextures.DRAW_ORDER.length, GLES31.GL_UNSIGNED_SHORT, 0, smokeParticleEffects.size());
+        GLES31.glDrawElementsInstanced(GLES31.GL_TRIANGLES, StaticTexturesRenderer.DRAW_ORDER.length, GLES31.GL_UNSIGNED_SHORT, 0, smokeParticleEffects.size());
         GLES31.glDisable(GLES31.GL_BLEND);
     }
 

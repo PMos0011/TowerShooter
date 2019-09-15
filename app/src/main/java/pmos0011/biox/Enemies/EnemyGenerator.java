@@ -4,26 +4,26 @@ import java.util.List;
 import java.util.Random;
 
 import pmos0011.biox.CommonObjects.Transformations;
-import pmos0011.biox.ParticleEffect.ParticleModel;
-import pmos0011.biox.StaticTextures.StaticTextures;
+import pmos0011.biox.ParticleEffect.ParticleModelRenderer;
+import pmos0011.biox.StaticTextures.StaticTexturesRenderer;
 
 public class EnemyGenerator implements Runnable {
     private List<Enemy> enemyList;
-    private StaticTextures staticTextures;
-    private ParticleModel particleModel;
+    private StaticTexturesRenderer staticTexturesRenderer;
+    private ParticleModelRenderer particleModelRenderer;
     private Random random;
     private float enemiesCount1stWave;
     private float enemiesCount2ndWave;
 
-    public EnemyGenerator(List<Enemy> enemyList, StaticTextures staticTextures, ParticleModel particleModel) {
+    public EnemyGenerator(List<Enemy> enemyList, StaticTexturesRenderer staticTexturesRenderer, ParticleModelRenderer particleModelRenderer) {
 
         this.enemyList = enemyList;
-        this.staticTextures = staticTextures;
-        this.particleModel = particleModel;
+        this.staticTexturesRenderer = staticTexturesRenderer;
+        this.particleModelRenderer = particleModelRenderer;
 
         random = new Random();
 
-        enemiesCount1stWave = 3;
+        enemiesCount1stWave = 3.34f;
         enemiesCount2ndWave = 0f;
     }
 
@@ -34,9 +34,10 @@ public class EnemyGenerator implements Runnable {
 
     private void generateEnemy() {
 
-        while (staticTextures.getTowerHP() > 0) {
+        while (staticTexturesRenderer.getTowerHP() > 0) {
 
             if (enemyList.size() == 0) {
+
                 boolean leftSide = random.nextBoolean();
 
                 generateWave(leftSide, (int) enemiesCount1stWave);
@@ -85,7 +86,7 @@ public class EnemyGenerator implements Runnable {
 
             float angle = Transformations.calculateAngle(startXPoint, startYPoint, destinationXPoint, destinationYPoint);
 
-            enemyList.add(new Enemy(angle, startXPoint, startYPoint, speed, staticTextures, particleModel, destinationXPoint, destinationYPoint));
+            enemyList.add(new Enemy(angle, startXPoint, startYPoint, speed, staticTexturesRenderer, particleModelRenderer, destinationXPoint, destinationYPoint));
         }
     }
 }

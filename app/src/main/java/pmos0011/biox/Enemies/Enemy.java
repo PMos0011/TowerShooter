@@ -1,17 +1,17 @@
 package pmos0011.biox.Enemies;
 
 import android.graphics.PointF;
-import android.util.Log;
 
 import java.util.Random;
 
 import pmos0011.biox.AbstractClasses.ParticleEffects;
 import pmos0011.biox.AbstractClasses.Weapons;
 import pmos0011.biox.CommonObjects.Transformations;
+import pmos0011.biox.GameLoopRenderer;
 import pmos0011.biox.ParticleEffect.FireParticleEffect;
-import pmos0011.biox.ParticleEffect.ParticleModel;
+import pmos0011.biox.ParticleEffect.ParticleModelRenderer;
 import pmos0011.biox.ParticleEffect.SmokeParticleEffect;
-import pmos0011.biox.StaticTextures.StaticTextures;
+import pmos0011.biox.StaticTextures.StaticTexturesRenderer;
 import pmos0011.biox.Weapons.Shells;
 
 public class Enemy extends Weapons {
@@ -41,8 +41,8 @@ public class Enemy extends Weapons {
     private float currentYDeltaSpeed;
     private PointF destinationPoint;
 
-    private StaticTextures staticTextures;
-    private ParticleModel particleModel;
+    private StaticTexturesRenderer staticTexturesRenderer;
+    private ParticleModelRenderer particleModelRenderer;
 
     private SmokeParticleEffect leftExhaust;
     private SmokeParticleEffect rightExhaust;
@@ -51,7 +51,7 @@ public class Enemy extends Weapons {
     private SmokeParticleEffect radarDot;
     private SmokeParticleEffect hitPoints;
 
-    public Enemy(float angle, float xPos, float yPos, float speed, StaticTextures staticTextures, ParticleModel particleModel, float xPoint, float yPoint) {
+    public Enemy(float angle, float xPos, float yPos, float speed, StaticTexturesRenderer staticTexturesRenderer, ParticleModelRenderer particleModelRenderer, float xPoint, float yPoint) {
         super(angle, xPos, yPos, speed);
 
         setScale(TANK_SIZE, TANK_ASPECT);
@@ -64,8 +64,8 @@ public class Enemy extends Weapons {
         currentXDeltaSpeed = 0;
         currentYDeltaSpeed = 0;
 
-        this.staticTextures = staticTextures;
-        this.particleModel = particleModel;
+        this.staticTexturesRenderer = staticTexturesRenderer;
+        this.particleModelRenderer = particleModelRenderer;
         turretAngle = Transformations.calculateAngle(getPosition().x, getPosition().y, 0f, 0f);
 
         reloadingStatus = new Random().nextFloat();
@@ -110,7 +110,7 @@ public class Enemy extends Weapons {
         turretAngle = Transformations.calculateAngle(getPosition().x, getPosition().y, 0f, 0f);
 
         if (reloadingStatus < 0 && !isDestroyed && inRange) {
-            staticTextures.addShell(turretAngle, getPosition().x, getPosition().y, Shells.SHELL_SPEED);
+            staticTexturesRenderer.addShell(turretAngle, getPosition().x, getPosition().y, Shells.SHELL_SPEED);
             reloadingStatus = 1;
         }
 
@@ -123,12 +123,12 @@ public class Enemy extends Weapons {
         leftExhaust = new SmokeParticleEffect(ParticleEffects.effectKind.TANK_EXHAUST,
                 0, getAngle(), TANK_EXHAUST_Y_OFFSET, getPosition().x, getPosition().y,
                 TANK_EXHAUST_SIZE, -TANK_EXHAUST_X_OFFSET);
-        particleModel.addParticleEffect(leftExhaust);
+        particleModelRenderer.addParticleEffect(leftExhaust);
 
         rightExhaust = new SmokeParticleEffect(ParticleEffects.effectKind.TANK_EXHAUST,
                 0, getAngle(), TANK_EXHAUST_Y_OFFSET, getPosition().x, getPosition().y,
                 TANK_EXHAUST_SIZE, TANK_EXHAUST_X_OFFSET);
-        particleModel.addParticleEffect(rightExhaust);
+        particleModelRenderer.addParticleEffect(rightExhaust);
     }
 
     private void calculateBehavior() {
@@ -146,7 +146,25 @@ public class Enemy extends Weapons {
 
         hitPoints.setScaleX(ParticleEffects.HIT_POINT_SIZE * hp);
 
+
+        if (Math.abs(getCurrentXDeltaSpeed()) <= 0) {
+            leftTruckDust.set0Visibility(0.01f);
+            rightTruckDust.set0Visibility(0.01f);
+            leftExhaust.getInnerColor()[3] = 0.25f;
+            leftExhaust.getOuterColor()[3] = 0.25f;
+            rightExhaust.getInnerColor()[3] = 0.25f;
+            rightExhaust.getOuterColor()[3] = 0.25f;
+        } else if (!isDestroyed) {
+            leftTruckDust.set0Visibility(1f);
+            rightTruckDust.set0Visibility(1f);
+            leftExhaust.getInnerColor()[3] = 0.6f;
+            leftExhaust.getOuterColor()[3] = 0.6f;
+            rightExhaust.getInnerColor()[3] = 0.6f;
+            rightExhaust.getOuterColor()[3] = 0.6f;
+        }
+
         if (hp <= 0 && !isDestroyed) {
+            GameLoopRenderer.addKill();
             setSpeedTo0();
 
             removeEffect(leftTruckDust);
@@ -166,22 +184,6 @@ public class Enemy extends Weapons {
             if (opacity < 0)
                 opacity = 0;
         }
-
-        if (Math.abs(getCurrentXDeltaSpeed()) <= 0) {
-            leftTruckDust.set0Visibility(0.01f);
-            rightTruckDust.set0Visibility(0.01f);
-            leftExhaust.getInnerColor()[3] = 0.25f;
-            leftExhaust.getOuterColor()[3] = 0.25f;
-            rightExhaust.getInnerColor()[3] = 0.25f;
-            rightExhaust.getOuterColor()[3] = 0.25f;
-        } else if (!isDestroyed) {
-            leftTruckDust.set0Visibility(1f);
-            rightTruckDust.set0Visibility(1f);
-            leftExhaust.getInnerColor()[3] = 0.6f;
-            leftExhaust.getOuterColor()[3] = 0.6f;
-            rightExhaust.getInnerColor()[3] = 0.6f;
-            rightExhaust.getOuterColor()[3] = 0.6f;
-        }
     }
 
     public void setSpeedTo0() {
@@ -194,18 +196,18 @@ public class Enemy extends Weapons {
         leftTruckDust = new SmokeParticleEffect(ParticleEffects.effectKind.TRACK_DUST,
                 0, getAngle() - TANK_TRUCK_DUST_ANGLE_OFFSET, TANK_TRUCK_DUST_Y_OFFSET, getPosition().x, getPosition().y,
                 TANK_TRUCK_DUST_SIZE, TANK_TRUCK_DUST_X_OFFSET);
-        particleModel.addParticleEffect(leftTruckDust);
+        particleModelRenderer.addParticleEffect(leftTruckDust);
         rightTruckDust = new SmokeParticleEffect(ParticleEffects.effectKind.TRACK_DUST,
                 0, getAngle() + TANK_TRUCK_DUST_ANGLE_OFFSET, TANK_TRUCK_DUST_Y_OFFSET, getPosition().x, getPosition().y,
                 TANK_TRUCK_DUST_SIZE, -TANK_TRUCK_DUST_X_OFFSET);
-        particleModel.addParticleEffect(rightTruckDust);
+        particleModelRenderer.addParticleEffect(rightTruckDust);
     }
 
     private void addRadarDot() {
         radarDot = new SmokeParticleEffect(ParticleEffects.effectKind.ENEMY_DOT,
                 0, 0, 0, getPosition().x, getPosition().y,
                 ParticleEffects.RADAR_SIZE, 0);
-        particleModel.addParticleEffect(radarDot);
+        particleModelRenderer.addParticleEffect(radarDot);
     }
 
     private void addDeltaSpeed(SmokeParticleEffect effect) {
@@ -220,7 +222,7 @@ public class Enemy extends Weapons {
         hitPoints = new SmokeParticleEffect(ParticleEffects.effectKind.HIT_POINTS,
                 0, 0, 0.18f, getPosition().x, getPosition().y,
                 ParticleEffects.HIT_POINT_SIZE, 0);
-        particleModel.addParticleEffect(hitPoints);
+        particleModelRenderer.addParticleEffect(hitPoints);
     }
 
     public void hitCalculation(float hitPoint) {
@@ -242,13 +244,13 @@ public class Enemy extends Weapons {
     }
 
     private void removeEffect(SmokeParticleEffect effect) {
-        effect.set0Visibility(0);
+        effect.set0Visibility(0f);
     }
 
     private void addExplosion() {
-        particleModel.addParticleEffect(new FireParticleEffect(ParticleEffects.effectKind.TANK_EXPLOSION, 0, 0,
+        particleModelRenderer.addParticleEffect(new FireParticleEffect(ParticleEffects.effectKind.TANK_EXPLOSION, 0, 0,
                 0, getPosition().x, getPosition().y, ParticleEffects.TANK_EXPLOSION_SIZE, 0));
-        particleModel.addParticleEffect(new SmokeParticleEffect(ParticleEffects.effectKind.TANK_EXPLOSION_SMOKE, 0, 0,
+        particleModelRenderer.addParticleEffect(new SmokeParticleEffect(ParticleEffects.effectKind.TANK_EXPLOSION_SMOKE, 0, 0,
                 0, getPosition().x, getPosition().y, ParticleEffects.TANK_EXPLOSION_SIZE, 0));
 
         int sparksCount = new Random().nextInt(50) + 25;
@@ -256,7 +258,7 @@ public class Enemy extends Weapons {
         float currentAngle = 0;
         for (int i = 0; i < sparksCount; i++) {
 
-            particleModel.addParticleEffect(new FireParticleEffect(ParticleEffects.effectKind.HIT_SPARK, currentAngle, 0, 0,
+            particleModelRenderer.addParticleEffect(new FireParticleEffect(ParticleEffects.effectKind.HIT_SPARK, currentAngle, 0, 0,
                     getPosition().x, getPosition().y,
                     TANK_EXPLOSION_SPARK_SIZE, 0));
             currentAngle += deltaAngle;

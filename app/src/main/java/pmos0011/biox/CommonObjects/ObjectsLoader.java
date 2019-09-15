@@ -15,8 +15,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import pmos0011.biox.AbstractClasses.ParticleEffects;
-import pmos0011.biox.ParticleEffect.ParticleModel;
-import pmos0011.biox.StaticTextures.StaticTextures;
+import pmos0011.biox.ParticleEffect.ParticleModelRenderer;
+import pmos0011.biox.StaticTextures.StaticTexturesRenderer;
+import pmos0011.biox.TextHendler.FontRenderer;
 
 public class ObjectsLoader {
 
@@ -37,7 +38,7 @@ public class ObjectsLoader {
         }
     }
 
-    public StaticTextures loadToVAO(float[] coords, int size, float[] textureCoords, short[] drawOrder) {
+    public StaticTexturesRenderer loadToVAO(float[] coords, int size, float[] textureCoords, short[] drawOrder) {
         int vaoID = createVAO();
         bindVertexArray(vaoID);
         bindDrawOrdersBuffer(drawOrder);
@@ -45,10 +46,10 @@ public class ObjectsLoader {
         storeDataInAttribute(1, size, textureCoords);
         unbindVertexArray();
 
-        return new StaticTextures(vaoID);
+        return new StaticTexturesRenderer(vaoID);
     }
 
-    public ParticleModel loadTOVAO(float[] coords, int size, float[] textureCoords, short[] drawOrder, int particlesMaxCount) {
+    public ParticleModelRenderer loadTOVAO(float[] coords, int size, float[] textureCoords, short[] drawOrder, int particlesMaxCount) {
         int vaoID = createVAO();
         bindVertexArray(vaoID);
         bindDrawOrdersBuffer(drawOrder);
@@ -67,7 +68,29 @@ public class ObjectsLoader {
         addAttribPointer(vaoID, vboId, 7, 4, ParticleEffects.PARTICLE_DATA_LENGTH, 20, 1);
         addAttribPointer(vaoID, vboId, 8, 4, ParticleEffects.PARTICLE_DATA_LENGTH, 24, 1);
 
-        return new ParticleModel(vaoID, vboId);
+        return new ParticleModelRenderer(vaoID, vboId);
+    }
+
+    public FontRenderer loadToVAO(float[] coords, int size, float[] textureCoords, short[] drawOrder, int particlesMaxCount){
+        int vaoID = createVAO();
+        bindVertexArray(vaoID);
+        bindDrawOrdersBuffer(drawOrder);
+        storeDataInAttribute(0, size, coords);
+        storeDataInAttribute(1, size, textureCoords);
+
+        unbindVertexArray();
+
+        int vboId = createEmptyVBO(particlesMaxCount * FontRenderer.LETTERS_DATA_SIZE);
+
+        addAttribPointer(vaoID, vboId, 2, 4, FontRenderer.LETTERS_DATA_SIZE, 0, 1);
+        addAttribPointer(vaoID, vboId, 3, 4, FontRenderer.LETTERS_DATA_SIZE, 4, 1);
+        addAttribPointer(vaoID, vboId, 4, 4, FontRenderer.LETTERS_DATA_SIZE, 8, 1);
+        addAttribPointer(vaoID, vboId, 5, 4, FontRenderer.LETTERS_DATA_SIZE, 12, 1);
+        addAttribPointer(vaoID, vboId, 6, 2, FontRenderer.LETTERS_DATA_SIZE, 16, 1);
+        addAttribPointer(vaoID, vboId, 7, 2, FontRenderer.LETTERS_DATA_SIZE, 18, 1);
+        addAttribPointer(vaoID, vboId, 8, 4, FontRenderer.LETTERS_DATA_SIZE, 20, 1);
+
+        return new FontRenderer(vaoID, vboId);
     }
 
     private int createVAO() {

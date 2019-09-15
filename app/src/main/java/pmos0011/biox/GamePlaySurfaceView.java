@@ -6,12 +6,12 @@ import android.graphics.PointF;
 import android.opengl.GLSurfaceView;
 import android.view.MotionEvent;
 
-import pmos0011.biox.StaticTextures.StaticTextures;
+import pmos0011.biox.StaticTextures.StaticTexturesRenderer;
 
 public class GamePlaySurfaceView extends GLSurfaceView {
 
     private final GameLoopRenderer renderer;
-    private StaticTextures staticTextures;
+    private StaticTexturesRenderer staticTexturesRenderer;
     private Point leftRotate;
     private Point rightRotate;
     private Point leftCannon;
@@ -62,7 +62,7 @@ public class GamePlaySurfaceView extends GLSurfaceView {
 
                 case MotionEvent.ACTION_UP:
                     if (pointerID == e.getPointerId(i)) {
-                        staticTextures.disableRotation();
+                        staticTexturesRenderer.disableRotation();
                         pointerID = -1;
                     }
             }
@@ -81,37 +81,37 @@ public class GamePlaySurfaceView extends GLSurfaceView {
     void moveDetection(float x, float y) {
         if (isMoveButtonPressed(x, y)) {
             if (x > leftRotate.x - halfDimension && x < leftRotate.x + halfDimension)
-                staticTextures.enableLeftRotation();
+                staticTexturesRenderer.enableLeftRotation();
             else if (x > rightRotate.x - halfDimension)
-                staticTextures.enableRightRotation();
+                staticTexturesRenderer.enableRightRotation();
         } else
-            staticTextures.disableRotation();
+            staticTexturesRenderer.disableRotation();
     }
 
     void fireDetection(float x, float y) {
         if (y > leftCannon.y - halfDimension) {
-            if (staticTextures.isLeftCannonLoaded())
+            if (staticTexturesRenderer.isLeftCannonLoaded())
                 if (x > leftCannon.x - halfDimension && x < leftCannon.x + halfDimension)
-                    staticTextures.fireFromLeft();
+                    staticTexturesRenderer.fireFromLeft();
 
-            if (staticTextures.isRightCannonLoaded())
+            if (staticTexturesRenderer.isRightCannonLoaded())
                 if (x > rightCanon.x - halfDimension && x < rightCanon.x + halfDimension)
-                    staticTextures.fireFromRight();
+                    staticTexturesRenderer.fireFromRight();
         }
     }
 
     private void getButtonsSetting() {
 
-        if (staticTextures == null) {
+        if (staticTexturesRenderer == null) {
 
-            staticTextures = renderer.getStaticTextures();
+            staticTexturesRenderer = renderer.getStaticTexturesRenderer();
 
-            leftRotate = staticTextures.getLeftArrow().getPosition();
-            rightRotate = staticTextures.getRightArrow().getPosition();
-            leftCannon = staticTextures.getLeftCannonButton().getPosition();
-            rightCanon = staticTextures.getRightCannonButton().getPosition();
+            leftRotate = staticTexturesRenderer.getLeftArrow().getPosition();
+            rightRotate = staticTexturesRenderer.getRightArrow().getPosition();
+            leftCannon = staticTexturesRenderer.getLeftCannonButton().getPosition();
+            rightCanon = staticTexturesRenderer.getRightCannonButton().getPosition();
 
-            halfDimension = staticTextures.getLeftArrow().getHalfDimension();
+            halfDimension = staticTexturesRenderer.getLeftArrow().getHalfDimension();
         }
     }
 }

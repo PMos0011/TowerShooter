@@ -5,7 +5,7 @@ import android.graphics.PointF;
 import pmos0011.biox.AbstractClasses.ParticleEffects;
 import pmos0011.biox.CommonObjects.Transformations;
 import pmos0011.biox.GameLoopRenderer;
-import pmos0011.biox.StaticTextures.StaticTextures;
+import pmos0011.biox.StaticTextures.StaticTexturesRenderer;
 import pmos0011.biox.Weapons.Shells;
 
 public class SmokeParticleEffect extends ParticleEffects {
@@ -58,8 +58,8 @@ public class SmokeParticleEffect extends ParticleEffects {
             case RELOAD_STATUS:
                 getParticlePosition().x = xPos;
                 getParticlePosition().y = yPos;
-                setScaleX(StaticTextures.GAME_CONTROL_OBJECT_SIZE);
-                setScaleY(StaticTextures.GAME_CONTROL_OBJECT_SIZE);
+                setScaleX(StaticTexturesRenderer.GAME_CONTROL_OBJECT_SIZE);
+                setScaleY(StaticTexturesRenderer.GAME_CONTROL_OBJECT_SIZE);
 
                 setInnerColor(RED.clone());
                 setOptions(RELOAD_STATUS.clone());
@@ -224,9 +224,9 @@ public class SmokeParticleEffect extends ParticleEffects {
 
     private void reloadStatus() {
         changeVisibility(-0.002f);
-        setScaleX(StaticTextures.GAME_CONTROL_OBJECT_SIZE * getVisibility());
+        setScaleX(StaticTexturesRenderer.GAME_CONTROL_OBJECT_SIZE * getVisibility());
 
-        getParticlePosition().x += StaticTextures.GAME_CONTROL_OBJECT_SIZE * 0.002f;
+        getParticlePosition().x += StaticTexturesRenderer.GAME_CONTROL_OBJECT_SIZE * 0.002f;
 
         Transformations.setModelTranslation(getModelMatrix(), getWorldAngle(), getObjectAngle(), getParticlePosition().x, getParticlePosition().y, getScaleX(), getScaleY());
     }

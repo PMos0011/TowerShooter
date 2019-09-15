@@ -1,14 +1,14 @@
-package pmos0011.biox.ParticleEffect;
+package pmos0011.biox.TextHendler;
 
 import android.content.Context;
 
 import pmos0011.biox.AbstractClasses.Shader;
 
-public class ParticleShader extends Shader {
+public class FontShader extends Shader {
 
     private int uniformBlockProjectionMatrixIndex;
 
-    public ParticleShader(Context context, int vertexFileID, int fragmentFileID) {
+    public FontShader(Context context, int vertexFileID, int fragmentFileID) {
         super(context, vertexFileID, fragmentFileID);
     }
 
@@ -17,13 +17,14 @@ public class ParticleShader extends Shader {
         super.bindAttributes(0, "vPosition");
         super.bindAttributes(1, "vTextureCoords");
         super.bindAttributes(2, "vModelMatrix");
-        super.bindAttributes(6, "vInnerColor");
-        super.bindAttributes(7, "vOuterColor");
-        super.bindAttributes(8, "vOptions");
+        super.bindAttributes(6, "vTransition");
+        super.bindAttributes(7, "vMovement");
+        super.bindAttributes(8, "vColor");
     }
 
     @Override
     protected void getAllUniformsHandle() {
+
     }
 
     @Override

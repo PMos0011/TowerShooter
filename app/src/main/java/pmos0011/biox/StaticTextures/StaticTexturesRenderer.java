@@ -2,7 +2,6 @@ package pmos0011.biox.StaticTextures;
 
 import android.graphics.PointF;
 import android.opengl.GLES31;
-import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -17,13 +16,13 @@ import pmos0011.biox.Enemies.EnemySupervisor;
 import pmos0011.biox.GameControlObjects;
 import pmos0011.biox.CommonObjects.ObjectsLoader;
 import pmos0011.biox.ParticleEffect.FireParticleEffect;
-import pmos0011.biox.ParticleEffect.ParticleModel;
+import pmos0011.biox.ParticleEffect.ParticleModelRenderer;
 import pmos0011.biox.AbstractClasses.StaticModel;
 import pmos0011.biox.CommonObjects.Transformations;
 import pmos0011.biox.ParticleEffect.SmokeParticleEffect;
 import pmos0011.biox.Weapons.Shells;
 
-public class StaticTextures extends StaticModel {
+public class StaticTexturesRenderer extends StaticModel {
 
     public static final float GAME_CONTROL_OBJECT_SIZE = 0.18f;
     public static final float TOWER_HIT_SIZE = 0.1f;
@@ -31,8 +30,9 @@ public class StaticTextures extends StaticModel {
     private final float TOWER_SIZE = 0.4f;
     private final float RADAR_SIZE = 0.065f;
 
-    private ParticleModel particleModel;
+    private ParticleModelRenderer particleModelRenderer;
     private EnemySupervisor enemySupervisor;
+    private StaticShader staticShader;
 
     private GameControlObjects rightArrow = new GameControlObjects();
     private GameControlObjects leftArrow = new GameControlObjects();
@@ -63,16 +63,16 @@ public class StaticTextures extends StaticModel {
     private List<Shells> shells = new ArrayList<>();
     private List<Enemy> enemies = new ArrayList<>();
 
-    public StaticTextures(int vaoID) {
+    public StaticTexturesRenderer(int vaoID) {
         super(vaoID);
     }
 
-    public void setParticleModel(ParticleModel particleModel) {
-        this.particleModel = particleModel;
+    public void setParticleModelRenderer(ParticleModelRenderer particleModelRenderer) {
+        this.particleModelRenderer = particleModelRenderer;
         enemySupervisor = new EnemySupervisor(enemies);
         addTowerHPBar();
 
-        EnemyGenerator enemyGenerator = new EnemyGenerator(enemies, this, particleModel);
+        EnemyGenerator enemyGenerator = new EnemyGenerator(enemies, this, particleModelRenderer);
         Thread t = new Thread(enemyGenerator);
         t.start();
     }
@@ -113,6 +113,10 @@ public class StaticTextures extends StaticModel {
         super.disableVertexArray(1);
     }
 
+    public void setStaticShader(StaticShader staticShader) {
+        this.staticShader = staticShader;
+    }
+
     public float getTowerHP() {
         return towerHP;
     }
@@ -121,42 +125,42 @@ public class StaticTextures extends StaticModel {
         Transformations.setModelTranslation(modelMatrix, 0, 0, 0, 0, Transformations.getRatio(), Transformations.getRatio());
         loader.loadUniformMatrix4fv(staticShader.getModelMatrixHandle(), modelMatrix);
         GLES31.glBindTexture(GLES31.GL_TEXTURE_2D, loader.getTextureID(BitmapID.textureNames.BACKGROUND.getValue()));
-        GLES31.glDrawElements(GLES31.GL_TRIANGLES, StaticTextures.DRAW_ORDER.length, GLES31.GL_UNSIGNED_SHORT, 0);
+        GLES31.glDrawElements(GLES31.GL_TRIANGLES, StaticTexturesRenderer.DRAW_ORDER.length, GLES31.GL_UNSIGNED_SHORT, 0);
     }
 
     private void drawTowerBase(ObjectsLoader loader) {
         Transformations.setModelTranslation(modelMatrix, 0, 0, 0, 0, TOWER_SIZE, TOWER_SIZE);
         loader.loadUniformMatrix4fv(staticShader.getModelMatrixHandle(), modelMatrix);
         GLES31.glBindTexture(GLES31.GL_TEXTURE_2D, loader.getTextureID(BitmapID.textureNames.TOWER_BASE.getValue()));
-        GLES31.glDrawElements(GLES31.GL_TRIANGLES, StaticTextures.DRAW_ORDER.length, GLES31.GL_UNSIGNED_SHORT, 0);
+        GLES31.glDrawElements(GLES31.GL_TRIANGLES, StaticTexturesRenderer.DRAW_ORDER.length, GLES31.GL_UNSIGNED_SHORT, 0);
     }
 
     private void drawLeftCannon(ObjectsLoader loader) {
         Transformations.setModelTranslation(modelMatrix, turretAngle, 0, 0, leftCannonPosition, TOWER_SIZE, TOWER_SIZE);
         loader.loadUniformMatrix4fv(staticShader.getModelMatrixHandle(), modelMatrix);
         GLES31.glBindTexture(GLES31.GL_TEXTURE_2D, loader.getTextureID(BitmapID.textureNames.TOWER_LEFT_CANNON.getValue()));
-        GLES31.glDrawElements(GLES31.GL_TRIANGLES, StaticTextures.DRAW_ORDER.length, GLES31.GL_UNSIGNED_SHORT, 0);
+        GLES31.glDrawElements(GLES31.GL_TRIANGLES, StaticTexturesRenderer.DRAW_ORDER.length, GLES31.GL_UNSIGNED_SHORT, 0);
     }
 
     private void drawRightCannon(ObjectsLoader loader) {
         Transformations.setModelTranslation(modelMatrix, turretAngle, 0, 0, rightCannonPosition, TOWER_SIZE, TOWER_SIZE);
         loader.loadUniformMatrix4fv(staticShader.getModelMatrixHandle(), modelMatrix);
         GLES31.glBindTexture(GLES31.GL_TEXTURE_2D, loader.getTextureID(BitmapID.textureNames.TOWER_RIGHT_CANNON.getValue()));
-        GLES31.glDrawElements(GLES31.GL_TRIANGLES, StaticTextures.DRAW_ORDER.length, GLES31.GL_UNSIGNED_SHORT, 0);
+        GLES31.glDrawElements(GLES31.GL_TRIANGLES, StaticTexturesRenderer.DRAW_ORDER.length, GLES31.GL_UNSIGNED_SHORT, 0);
     }
 
     private void drawTurret(ObjectsLoader loader) {
         Transformations.setModelTranslation(modelMatrix, turretAngle, 0, 0, 0, TOWER_SIZE, TOWER_SIZE);
         loader.loadUniformMatrix4fv(staticShader.getModelMatrixHandle(), modelMatrix);
         GLES31.glBindTexture(GLES31.GL_TEXTURE_2D, loader.getTextureID(BitmapID.textureNames.TURRET.getValue()));
-        GLES31.glDrawElements(GLES31.GL_TRIANGLES, StaticTextures.DRAW_ORDER.length, GLES31.GL_UNSIGNED_SHORT, 0);
+        GLES31.glDrawElements(GLES31.GL_TRIANGLES, StaticTexturesRenderer.DRAW_ORDER.length, GLES31.GL_UNSIGNED_SHORT, 0);
     }
 
     private void drawRadar(ObjectsLoader loader) {
         Transformations.setModelTranslation(modelMatrix, turretAngle, radarAngle, 0.065f, -0.1f, RADAR_SIZE, RADAR_SIZE);
         loader.loadUniformMatrix4fv(staticShader.getModelMatrixHandle(), modelMatrix);
         GLES31.glBindTexture(GLES31.GL_TEXTURE_2D, loader.getTextureID(BitmapID.textureNames.RADAR.getValue()));
-        GLES31.glDrawElements(GLES31.GL_TRIANGLES, StaticTextures.DRAW_ORDER.length, GLES31.GL_UNSIGNED_SHORT, 0);
+        GLES31.glDrawElements(GLES31.GL_TRIANGLES, StaticTexturesRenderer.DRAW_ORDER.length, GLES31.GL_UNSIGNED_SHORT, 0);
     }
 
     private void drawLeftRotateButton(ObjectsLoader loader) {
@@ -164,7 +168,7 @@ public class StaticTextures extends StaticModel {
                 GAME_CONTROL_OBJECT_SIZE, GAME_CONTROL_OBJECT_SIZE);
         loader.loadUniformMatrix4fv(staticShader.getModelMatrixHandle(), modelMatrix);
         GLES31.glBindTexture(GLES31.GL_TEXTURE_2D, loader.getTextureID(BitmapID.textureNames.LEFT_ARROW.getValue()));
-        GLES31.glDrawElements(GLES31.GL_TRIANGLES, StaticTextures.DRAW_ORDER.length, GLES31.GL_UNSIGNED_SHORT, 0);
+        GLES31.glDrawElements(GLES31.GL_TRIANGLES, StaticTexturesRenderer.DRAW_ORDER.length, GLES31.GL_UNSIGNED_SHORT, 0);
     }
 
     private void drawRightRotateButton(ObjectsLoader loader) {
@@ -172,7 +176,7 @@ public class StaticTextures extends StaticModel {
                 GAME_CONTROL_OBJECT_SIZE, GAME_CONTROL_OBJECT_SIZE);
         loader.loadUniformMatrix4fv(staticShader.getModelMatrixHandle(), modelMatrix);
         GLES31.glBindTexture(GLES31.GL_TEXTURE_2D, loader.getTextureID(BitmapID.textureNames.RIGHT_ARROW.getValue()));
-        GLES31.glDrawElements(GLES31.GL_TRIANGLES, StaticTextures.DRAW_ORDER.length, GLES31.GL_UNSIGNED_SHORT, 0);
+        GLES31.glDrawElements(GLES31.GL_TRIANGLES, StaticTexturesRenderer.DRAW_ORDER.length, GLES31.GL_UNSIGNED_SHORT, 0);
     }
 
     private void drawLeftCannonButton(ObjectsLoader loader) {
@@ -180,7 +184,7 @@ public class StaticTextures extends StaticModel {
                 GAME_CONTROL_OBJECT_SIZE, GAME_CONTROL_OBJECT_SIZE);
         loader.loadUniformMatrix4fv(staticShader.getModelMatrixHandle(), modelMatrix);
         GLES31.glBindTexture(GLES31.GL_TEXTURE_2D, loader.getTextureID(BitmapID.textureNames.LEFT_CANNON_BUTTON.getValue()));
-        GLES31.glDrawElements(GLES31.GL_TRIANGLES, StaticTextures.DRAW_ORDER.length, GLES31.GL_UNSIGNED_SHORT, 0);
+        GLES31.glDrawElements(GLES31.GL_TRIANGLES, StaticTexturesRenderer.DRAW_ORDER.length, GLES31.GL_UNSIGNED_SHORT, 0);
     }
 
     private void drawRightCannonButton(ObjectsLoader loader) {
@@ -188,7 +192,7 @@ public class StaticTextures extends StaticModel {
                 GAME_CONTROL_OBJECT_SIZE, GAME_CONTROL_OBJECT_SIZE);
         loader.loadUniformMatrix4fv(staticShader.getModelMatrixHandle(), modelMatrix);
         GLES31.glBindTexture(GLES31.GL_TEXTURE_2D, loader.getTextureID(BitmapID.textureNames.RIGHT_CANNON_BUTTON.getValue()));
-        GLES31.glDrawElements(GLES31.GL_TRIANGLES, StaticTextures.DRAW_ORDER.length, GLES31.GL_UNSIGNED_SHORT, 0);
+        GLES31.glDrawElements(GLES31.GL_TRIANGLES, StaticTexturesRenderer.DRAW_ORDER.length, GLES31.GL_UNSIGNED_SHORT, 0);
     }
 
     private void drawShells(ObjectsLoader loader) {
@@ -212,15 +216,15 @@ public class StaticTextures extends StaticModel {
                 shell.getScale().x, shell.getScale().y);
         loader.loadUniformMatrix4fv(staticShader.getModelMatrixHandle(), modelMatrix);
         GLES31.glBindTexture(GLES31.GL_TEXTURE_2D, loader.getTextureID(BitmapID.textureNames.SHELL.getValue()));
-        GLES31.glDrawElements(GLES31.GL_TRIANGLES, StaticTextures.DRAW_ORDER.length, GLES31.GL_UNSIGNED_SHORT, 0);
+        GLES31.glDrawElements(GLES31.GL_TRIANGLES, StaticTexturesRenderer.DRAW_ORDER.length, GLES31.GL_UNSIGNED_SHORT, 0);
     }
 
     private void addFireEffects(Shells shell) {
         if (shell.getPosition().equals(shell.getStartPosition())) {
 
-            particleModel.addParticleEffect(new FireParticleEffect(ParticleEffects.effectKind.CANNON_FIRE, shell.getAngle(), 0,
+            particleModelRenderer.addParticleEffect(new FireParticleEffect(ParticleEffects.effectKind.CANNON_FIRE, shell.getAngle(), 0,
                     shell.getOffset(), shell.getStartPosition().x, shell.getStartPosition().y, shell.getScale().x, 0));
-            particleModel.addParticleEffect(new SmokeParticleEffect(ParticleEffects.effectKind.CANNON_SMOKE, shell.getAngle(), 0,
+            particleModelRenderer.addParticleEffect(new SmokeParticleEffect(ParticleEffects.effectKind.CANNON_SMOKE, shell.getAngle(), 0,
                     shell.getOffset(), shell.getStartPosition().x, shell.getStartPosition().y, shell.getScale().x, 0));
         }
     }
@@ -237,7 +241,7 @@ public class StaticTextures extends StaticModel {
             }
             if (shellRemove) {
                 shellsIterator.remove();
-                particleModel.addParticleEffect(new SmokeParticleEffect(ParticleEffects.effectKind.SHELL_STREAK, 0, shell.getAngle(),
+                particleModelRenderer.addParticleEffect(new SmokeParticleEffect(ParticleEffects.effectKind.SHELL_STREAK, 0, shell.getAngle(),
                         shell.getOffset(), shell.getStartPosition().x, shell.getStartPosition().y, shell.getScale().x, shell.getTravelDistance()));
             }
         } catch (Exception e) {
@@ -290,7 +294,7 @@ public class StaticTextures extends StaticModel {
         float currentAngle = shell.getAngle() - sparksCount * deltaAngle;
         for (int i = 0; i < 2 * sparksCount + 1; i++) {
 
-            particleModel.addParticleEffect(new FireParticleEffect(ParticleEffects.effectKind.HIT_SPARK, currentAngle, 0, 0,
+            particleModelRenderer.addParticleEffect(new FireParticleEffect(ParticleEffects.effectKind.HIT_SPARK, currentAngle, 0, 0,
                     shell.getPosition().x + deltaPosition.x, shell.getPosition().y + deltaPosition.y,
                     shell.getScale().x, 0));
             currentAngle += deltaAngle;
@@ -308,12 +312,12 @@ public class StaticTextures extends StaticModel {
                 loader.loadUniform4fv(staticShader.getColorHandle(), color);
                 loader.loadUniformMatrix4fv(staticShader.getModelMatrixHandle(), modelMatrix);
                 GLES31.glBindTexture(GLES31.GL_TEXTURE_2D, loader.getTextureID(BitmapID.textureNames.TANK_CHASSIS.getValue()));
-                GLES31.glDrawElements(GLES31.GL_TRIANGLES, StaticTextures.DRAW_ORDER.length, GLES31.GL_UNSIGNED_SHORT, 0);
+                GLES31.glDrawElements(GLES31.GL_TRIANGLES, StaticTexturesRenderer.DRAW_ORDER.length, GLES31.GL_UNSIGNED_SHORT, 0);
 
                 Transformations.setModelTranslation(modelMatrix, 0, enemy.getTurretAngle(), enemy.getPosition().x, enemy.getPosition().y, enemy.getScale().x, enemy.getScale().y);
                 loader.loadUniformMatrix4fv(staticShader.getModelMatrixHandle(), modelMatrix);
                 GLES31.glBindTexture(GLES31.GL_TEXTURE_2D, loader.getTextureID(BitmapID.textureNames.TANK_TURRET.getValue()));
-                GLES31.glDrawElements(GLES31.GL_TRIANGLES, StaticTextures.DRAW_ORDER.length, GLES31.GL_UNSIGNED_SHORT, 0);
+                GLES31.glDrawElements(GLES31.GL_TRIANGLES, StaticTexturesRenderer.DRAW_ORDER.length, GLES31.GL_UNSIGNED_SHORT, 0);
 
                 enemySupervisor.inspectEnemy(enemy);
                 enemy.enemyMove();
@@ -384,7 +388,7 @@ public class StaticTextures extends StaticModel {
     }
 
     public void fireFromLeft() {
-        particleModel.addParticleEffect(new SmokeParticleEffect(ParticleEffects.effectKind.RELOAD_STATUS, 0, 0, 0,
+        particleModelRenderer.addParticleEffect(new SmokeParticleEffect(ParticleEffects.effectKind.RELOAD_STATUS, 0, 0, 0,
                 leftCannonButton.getOpenGLPosition().x, leftCannonButton.getOpenGLPosition().y, 0, 0));
         shells.add(new Shells(turretAngle, true, Shells.SHELL_SPEED));
         isLeftCannonLoaded = false;
@@ -392,7 +396,7 @@ public class StaticTextures extends StaticModel {
     }
 
     public void fireFromRight() {
-        particleModel.addParticleEffect(new SmokeParticleEffect(ParticleEffects.effectKind.RELOAD_STATUS, 0, 0, 0,
+        particleModelRenderer.addParticleEffect(new SmokeParticleEffect(ParticleEffects.effectKind.RELOAD_STATUS, 0, 0, 0,
                 rightCannonButton.getOpenGLPosition().x, rightCannonButton.getOpenGLPosition().y, 0, 0));
         shells.add(new Shells(turretAngle, false, Shells.SHELL_SPEED));
         isRightCannonLoaded = false;
@@ -461,6 +465,6 @@ public class StaticTextures extends StaticModel {
         hitPoints = new SmokeParticleEffect(ParticleEffects.effectKind.HIT_POINTS,
                 0, 0, 0.2f, 0, 0,
                 ParticleEffects.HIT_POINT_SIZE, 0);
-        particleModel.addParticleEffect(hitPoints);
+        particleModelRenderer.addParticleEffect(hitPoints);
     }
 }
