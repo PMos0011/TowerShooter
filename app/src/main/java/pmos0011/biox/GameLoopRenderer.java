@@ -6,7 +6,6 @@ import javax.microedition.khronos.opengles.GL10;
 import android.content.Context;
 import android.opengl.GLES31;
 import android.opengl.GLSurfaceView;
-import android.util.Log;
 
 import java.util.Random;
 
@@ -30,6 +29,7 @@ public class GameLoopRenderer implements GLSurfaceView.Renderer {
     public static final float WIND_FLOW_Y = new Random().nextFloat() / 1000f;
 
     private Context context;
+    public static boolean restartGame;
 
     private ObjectsLoader loader;
     private StaticShader staticShader;
@@ -41,6 +41,9 @@ public class GameLoopRenderer implements GLSurfaceView.Renderer {
     private Transformations textureTransformations;
 
     private static int bodyCount;
+    private static int waveTimer;
+    private static boolean gamePlay;
+    private static boolean gameOver;
 
     public GameLoopRenderer(Context context) {
         this.context = context;
@@ -48,7 +51,7 @@ public class GameLoopRenderer implements GLSurfaceView.Renderer {
 
     public void onSurfaceCreated(GL10 unused, EGLConfig config) {
         GLES31.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-        resetBodyCount();
+        restartGame = false;
 
         loader = new ObjectsLoader(context, BitmapID.getStaticBitmapID());
         staticShader = new StaticShader(context, R.raw.texture_vertex_shader, R.raw.texture_fragment_shader);
@@ -67,12 +70,14 @@ public class GameLoopRenderer implements GLSurfaceView.Renderer {
     public void onDrawFrame(GL10 unused) {
         GLES31.glClear(GLES31.GL_COLOR_BUFFER_BIT);
 
+        if (restartGame)
+            resetGame();
+
         staticTexturesRenderer.drawClassElements(loader);
         staticTexturesRenderer.turretStateUpdate();
         particleModelRenderer.drawClassElements(loader);
 
         textHandling();
-
     }
 
     public void onSurfaceChanged(GL10 unused, int width, int height) {
@@ -82,9 +87,8 @@ public class GameLoopRenderer implements GLSurfaceView.Renderer {
 
         loader.addUniformBlockBuffer(0, textureTransformations.getProjectionMatrix());
         staticTexturesRenderer.setGameButtons(width, height, ratio, textureTransformations.getProjectionMatrix());
-        particleModelRenderer.drawRadar();
-        FontSettingsReader.loadCharacters(context, fontRenderer);
 
+        FontSettingsReader.loadCharacters(context, fontRenderer);
     }
 
     public StaticTexturesRenderer getStaticTexturesRenderer() {
@@ -93,10 +97,18 @@ public class GameLoopRenderer implements GLSurfaceView.Renderer {
 
     private void textHandling() {
         fontRenderer.writeText(-Transformations.getRatio() + 0.06f, 0.88f, 0.06f, FontRenderer.GREEN_FONT_COLOR, "KILLS " + bodyCount);
+        fontRenderer.writeText(Transformations.getRatio() - 0.8f, 0.9f, 0.04f, FontRenderer.GREEN_FONT_COLOR, "NEXT WAVE " + waveTimer);
+
+        if (!gamePlay)
+            fontRenderer.writeText(-1.0f, 0.3f, 0.1f, FontRenderer.GREEN_FONT_COLOR, "PRESS TO PLAY");
+
+        if (gameOver)
+            fontRenderer.writeText(-0.7f, -0.3f, 0.1f, FontRenderer.GREEN_FONT_COLOR, "GAME OVER");
+
         fontRenderer.drawClassElements(loader);
     }
 
-    public static void resetBodyCount() {
+    private static void resetBodyCount() {
         bodyCount = 0;
     }
 
@@ -104,4 +116,41 @@ public class GameLoopRenderer implements GLSurfaceView.Renderer {
         bodyCount++;
     }
 
+    private static void startGame() {
+        resetBodyCount();
+        gamePlay = true;
+        gameOver = false;
+    }
+
+    public static void endGame() {
+        gamePlay = false;
+        gameOver = true;
+    }
+
+    private void resetGame() {
+        particleModelRenderer.efectsClear();
+        restartGame = false;
+        waveTimer = 5;
+        bodyCount = 0;
+        staticTexturesRenderer.beginStatement();
+        startGame();
+        particleModelRenderer.drawRadar();
+    }
+
+    public static boolean isGamePlay() {
+        return gamePlay;
+    }
+
+    public static void setWaveTimer(int waveTimer) {
+        GameLoopRenderer.waveTimer = waveTimer;
+    }
+
+    public static int getWaveTimer() {
+        return waveTimer;
+    }
+
+    public static void decreaseTimer() {
+        if (waveTimer > 0)
+            waveTimer--;
+    }
 }

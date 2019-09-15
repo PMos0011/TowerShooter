@@ -10,6 +10,7 @@ import pmos0011.biox.AbstractClasses.ParticleEffects;
 import pmos0011.biox.CommonObjects.BitmapID;
 import pmos0011.biox.CommonObjects.ObjectsLoader;
 import pmos0011.biox.AbstractClasses.StaticModel;
+import pmos0011.biox.GameLoopRenderer;
 import pmos0011.biox.StaticTextures.StaticTexturesRenderer;
 
 public class ParticleModelRenderer extends StaticModel {
@@ -42,10 +43,12 @@ public class ParticleModelRenderer extends StaticModel {
         particleShader.start();
         GLES31.glBindTexture(GLES31.GL_TEXTURE_2D, loader.getTextureID(BitmapID.textureNames.LEFT_ARROW.getValue()));
 
-        updateSmokeParticleEffects(loader);
+        if (GameLoopRenderer.isGamePlay())
+            updateSmokeParticleEffects(loader);
         drawSmokeParticleEffects();
 
-        updateFireParticleEffects(loader);
+        if (GameLoopRenderer.isGamePlay())
+            updateFireParticleEffects(loader);
         drawFireParticleEffects();
 
         particleShader.stop();
@@ -155,5 +158,10 @@ public class ParticleModelRenderer extends StaticModel {
                 0, 1, ParticleEffects.RADAR_SIZE, 0));
         addParticleEffect(new SmokeParticleEffect(ParticleEffects.effectKind.TOWER_DOT, 0, 0, 0,
                 0, 1, ParticleEffects.RADAR_SIZE, 0));
+    }
+
+    public void efectsClear() {
+        smokeParticleEffects.clear();
+        fireParticleEffects.clear();
     }
 }

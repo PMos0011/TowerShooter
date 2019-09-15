@@ -1,9 +1,12 @@
 package pmos0011.biox.Enemies;
 
+import android.util.Log;
+
 import java.util.List;
 import java.util.Random;
 
 import pmos0011.biox.CommonObjects.Transformations;
+import pmos0011.biox.GameLoopRenderer;
 import pmos0011.biox.ParticleEffect.ParticleModelRenderer;
 import pmos0011.biox.StaticTextures.StaticTexturesRenderer;
 
@@ -12,8 +15,10 @@ public class EnemyGenerator implements Runnable {
     private StaticTexturesRenderer staticTexturesRenderer;
     private ParticleModelRenderer particleModelRenderer;
     private Random random;
-    private float enemiesCount1stWave;
-    private float enemiesCount2ndWave;
+    private float enemyAugmenter;
+    private int enemiesCount1stWave;
+    private int enemiesCount2ndWave;
+    private int waveTimer;
 
     public EnemyGenerator(List<Enemy> enemyList, StaticTexturesRenderer staticTexturesRenderer, ParticleModelRenderer particleModelRenderer) {
 
@@ -22,9 +27,10 @@ public class EnemyGenerator implements Runnable {
         this.particleModelRenderer = particleModelRenderer;
 
         random = new Random();
-
-        enemiesCount1stWave = 3.34f;
-        enemiesCount2ndWave = 0f;
+        enemyAugmenter = 0;
+        enemiesCount1stWave = 3;
+        enemiesCount2ndWave = 0;
+        waveTimer = 40;
     }
 
     @Override
@@ -34,20 +40,35 @@ public class EnemyGenerator implements Runnable {
 
     private void generateEnemy() {
 
-        while (staticTexturesRenderer.getTowerHP() > 0) {
+        while (GameLoopRenderer.isGamePlay()) {
 
-            if (enemyList.size() == 0) {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+
+            }
+            GameLoopRenderer.decreaseTimer();
+
+            if (GameLoopRenderer.getWaveTimer() == 0) {
 
                 boolean leftSide = random.nextBoolean();
 
-                generateWave(leftSide, (int) enemiesCount1stWave);
-                generateWave(!leftSide, (int) enemiesCount2ndWave);
-                enemiesCount1stWave += 0.34f;
+                generateWave(leftSide, enemiesCount1stWave);
+                generateWave(!leftSide, enemiesCount2ndWave);
 
-                if(enemiesCount1stWave>5.3){
-                    enemiesCount1stWave=3;
-                    enemiesCount2ndWave++;
+                if (enemyAugmenter > 1.0f) {
+                    enemyAugmenter = 0;
+                    enemiesCount1stWave++;
+                    waveTimer += 5;
                 }
+
+                if (enemiesCount1stWave > 5) {
+                    enemiesCount1stWave = 3;
+                    enemiesCount2ndWave++;
+                    waveTimer += 5;
+                }
+                enemyAugmenter += 0.6f;
+                GameLoopRenderer.setWaveTimer(waveTimer);
             }
         }
     }

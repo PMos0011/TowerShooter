@@ -36,38 +36,43 @@ public class GamePlaySurfaceView extends GLSurfaceView {
     public boolean onTouchEvent(MotionEvent e) {
 
         getButtonsSetting();
-
         int pointerCount = e.getPointerCount();
-        for (int i = 0; i < pointerCount; i++) {
 
-            PointF point = new PointF();
-            point.x = e.getX(i);
-            point.y = e.getY(i);
-            switch (e.getActionMasked()) {
+        if (!GameLoopRenderer.isGamePlay()) {
+            GameLoopRenderer.restartGame = true;
+        } else {
 
-                case MotionEvent.ACTION_DOWN:
-                case MotionEvent.ACTION_POINTER_DOWN:
+            for (int i = 0; i < pointerCount; i++) {
 
-                    if (isMoveButtonPressed(point.x, point.y))
-                        pointerID = e.getPointerId(i);
-                    if (pointerID == e.getPointerId(i))
-                        moveDetection(point.x, point.y);
-                    fireDetection(point.x, point.y);
-                    break;
+                PointF point = new PointF();
+                point.x = e.getX(i);
+                point.y = e.getY(i);
+                switch (e.getActionMasked()) {
 
-                case MotionEvent.ACTION_MOVE:
-                    if (pointerID == e.getPointerId(i))
-                        moveDetection(point.x, point.y);
-                    break;
+                    case MotionEvent.ACTION_DOWN:
+                    case MotionEvent.ACTION_POINTER_DOWN:
 
-                case MotionEvent.ACTION_UP:
-                    if (pointerID == e.getPointerId(i)) {
-                        staticTexturesRenderer.disableRotation();
-                        pointerID = -1;
-                    }
+                        if (isMoveButtonPressed(point.x, point.y))
+                            pointerID = e.getPointerId(i);
+                        if (pointerID == e.getPointerId(i))
+                            moveDetection(point.x, point.y);
+                        fireDetection(point.x, point.y);
+                        break;
+
+                    case MotionEvent.ACTION_MOVE:
+                        if (pointerID == e.getPointerId(i))
+                            moveDetection(point.x, point.y);
+                        break;
+
+                    case MotionEvent.ACTION_UP:
+                        if (pointerID == e.getPointerId(i)) {
+                            staticTexturesRenderer.disableRotation();
+                            pointerID = -1;
+                        }
+                }
             }
+            invalidate();
         }
-        invalidate();
         return true;
     }
 
