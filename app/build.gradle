@@ -1,7 +1,7 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 24
     defaultConfig {
         applicationId "pmos0011.biox"
         minSdkVersion 24
